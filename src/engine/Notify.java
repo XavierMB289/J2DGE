@@ -7,7 +7,7 @@ import java.awt.Toolkit;
 import java.awt.TrayIcon;
 import java.awt.TrayIcon.MessageType;
 
-public class Notify {
+public class Notify extends ImageHandler{
 	
 	private Image icon = null;
 	
@@ -15,16 +15,20 @@ public class Notify {
 		icon = Toolkit.getDefaultToolkit().createImage("icon.png");
 	}
 	
-	public void setIcon() {
-		
+	/**
+	 * @author Xavier Bennett
+	 * @param filename The filename and relative path to the image...
+	 */
+	public void setIcon(String filename) {
+		icon = getImage(filename);
 	}
 	
-	public void WindowsNotify(String title, String desc){
+	public void WindowsNotify(String title, String desc, String tooltip){
         SystemTray tray = SystemTray.getSystemTray();
 
-        TrayIcon trayIcon = new TrayIcon(icon, "Tray Demo");
+        TrayIcon trayIcon = new TrayIcon(icon, "3D Game Engine");
         trayIcon.setImageAutoSize(true);
-        trayIcon.setToolTip("System tray icon demo");
+        trayIcon.setToolTip(tooltip);
         
         try {
 			tray.add(trayIcon);
