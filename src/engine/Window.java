@@ -14,6 +14,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelListener;
 
 import javax.swing.JFrame;
+import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 
 public class Window extends JPanel implements Runnable{
@@ -39,7 +40,6 @@ public class Window extends JPanel implements Runnable{
 		frame = new JFrame(name);
 		frame.add(this);
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		frame.setResizable(false);
 		frame.setUndecorated(true);
 		
 	}
@@ -92,6 +92,10 @@ public class Window extends JPanel implements Runnable{
 	
 	public void addComp(Component c) {
 		frame.add(c);
+	}
+	
+	public void setMenuBar(JMenuBar j) {
+		frame.setJMenuBar(j);
 	}
 	
 	public void setVisible() {

@@ -62,8 +62,4 @@ public class NotifyExample extends Window{
 		setVisible();
 	}
 	
-	public static void main(String[] args) {
-		new NotifyExample();
-	}
-	
 }

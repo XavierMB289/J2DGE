@@ -47,8 +47,4 @@ public class CreateBasicWindow extends Window{
 		x = x > 100 ? -20 : x + 1;
 	}
 	
-	public static void main(String[] args) {
-		new CreateBasicWindow();
-	}
-	
 }

@@ -1,7 +1,5 @@
 package generate;
 
-import java.util.Arrays;
-
 public class RandGenDungeon {
 	
 	int width, height, roomW, roomH;

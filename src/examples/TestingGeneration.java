@@ -100,8 +100,4 @@ public class TestingGeneration extends Window{
 		}
 	}
 	
-	public static void main(String[] args) {
-		new TestingGeneration();
-	}
-	
 }
