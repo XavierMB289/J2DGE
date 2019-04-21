@@ -32,14 +32,12 @@ public class FileHandler {
 		}
 	}
 	
-	public void createFile(String filename) {
-		if(filename.equals(null) != true) {
-			if(filename.equals("")) {
-				filename = "unicornFarts";
-			}
+	public void createDirectory(String filename) {
+		if(filename.equals(null) != true || filename.equals("")) {
+			filename = "unicornFarts";
 		}
-		
-		File project = new File(projectPath+filename+"\\");
+		projectPath += filename+"\\";
+		File project = new File(projectPath);
 		if(project.exists() != true) {
 			project.mkdir();
 		}
