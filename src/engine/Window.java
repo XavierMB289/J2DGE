@@ -12,15 +12,20 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelListener;
+import java.util.ArrayList;
 
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 
+import backends.AppPage;
+import coffeeDev.Credit;
+
 public class Window extends JPanel implements Runnable{
 
 	private static final long serialVersionUID = 5651871526801520822L;
 	
+	//Frame Variables
 	private JFrame frame = null;
 	
 	private Thread thread = null;
@@ -29,6 +34,12 @@ public class Window extends JPanel implements Runnable{
 	
 	public Rectangle WINDOW_RECT;
 	
+	//Imports
+	public Credit c = null;
+	
+	//Page Variables
+	public ArrayList<AppPage> pages = null;
+	
 	/**
 	 * @author Xavier Bennett
 	 * @param name This is the name of the created window
@@ -36,6 +47,11 @@ public class Window extends JPanel implements Runnable{
 	public Window(String name) {
 		
 		thread = new Thread(this);
+		
+		//Imports
+		c = new Credit(this);
+		
+		pages = new ArrayList<>();
 		
 		frame = new JFrame(name);
 		frame.add(this);
@@ -105,6 +121,10 @@ public class Window extends JPanel implements Runnable{
 		WIDTH = frame.getWidth();
 		HEIGHT = frame.getHeight();
 		WINDOW_RECT = new Rectangle(WIDTH, HEIGHT);
+		
+		//inits
+		c.init();
+		
 		thread.start();
 	}
 	
@@ -138,11 +158,17 @@ public class Window extends JPanel implements Runnable{
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-		this.paintChildren(g2d);
+		for(AppPage p : pages) {
+			p.paint(g2d);
+		}
 		this.update();
 	}
 
-	public void update() {}
+	public void update() {
+		for(AppPage p : pages) {
+			p.update();
+		}
+	}
 	
 	public void drawCenteredString(Graphics2D g, String text, Rectangle rect) {
 		Font font = g.getFont();
