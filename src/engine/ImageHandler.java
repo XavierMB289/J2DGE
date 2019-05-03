@@ -7,6 +7,8 @@ import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
 
+import backends.ImageItem;
+
 public class ImageHandler {
 	
 	
@@ -20,7 +22,7 @@ public class ImageHandler {
 	 * Gets an image from inside the JAR file.
 	 */
 	public Image getImage(String name) {
-		return new ImageIcon(this.getClass().getResource(name)).getImage();
+		return new ImageIcon(getClass().getResource(name)).getImage();
 	}
 	
 	/**
@@ -29,19 +31,22 @@ public class ImageHandler {
 	 * @param filename Filename of directory with images in it
 	 * @return returns an array of images
 	 */
-	public Image[] getAllImages(String filename) {
-		File folder = new File(filename);
-		File[] files = folder.listFiles();
-		ArrayList<Image> ret = new ArrayList<>();
-		for(File f: files) {
-			if(f.isFile()) {
-				Image temp = getImage(f.getName());
-				if(temp != null) {
-					ret.add(temp);
+	public ArrayList<ImageItem> getAllImages(String filename) {
+		File folder = new File(getClass().getResource(filename).getFile());
+		if(folder.exists()) {
+			File[] files = folder.listFiles();
+			ArrayList<ImageItem> ret = new ArrayList<ImageItem>();
+			for(File f: files) {
+				if(f.isFile()) {
+					Image temp = getImage(filename+f.getName());
+					if(temp != null) {
+						ret.add(new ImageItem(temp, f.getName().split("\\.")[0]));
+					}
 				}
 			}
+			return ret;
 		}
-		return (Image[]) ret.toArray();
+		return null;
 	}
 	
 	/**

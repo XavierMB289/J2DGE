@@ -19,6 +19,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 
 import backends.AppPage;
+import backends.ImageItem;
 import coffeeDev.Credit;
 
 public class Window extends JPanel implements Runnable{
@@ -39,6 +40,10 @@ public class Window extends JPanel implements Runnable{
 	
 	//Page Variables
 	public ArrayList<AppPage> pages = null;
+	public String currentPage = "credit";
+	
+	//Images
+	ArrayList<ImageItem> images = null;
 	
 	/**
 	 * @author Xavier Bennett
@@ -52,6 +57,11 @@ public class Window extends JPanel implements Runnable{
 		c = new Credit(this);
 		
 		pages = new ArrayList<>();
+		
+		pages.add(c);
+		
+		//Setting Up Images
+		images = new ImageHandler().getAllImages("/img/");
 		
 		frame = new JFrame(name);
 		frame.add(this);
@@ -159,14 +169,18 @@ public class Window extends JPanel implements Runnable{
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 		for(AppPage p : pages) {
-			p.paint(g2d);
+			if(p.getID().equals(currentPage)) {
+				p.paint(g2d);
+			}
 		}
 		this.update();
 	}
 
 	public void update() {
 		for(AppPage p : pages) {
-			p.update();
+			if(p.getID().equals(currentPage)) {
+				p.update();
+			}
 		}
 	}
 	
