@@ -18,7 +18,7 @@ public class Credit extends AppPage{
 	//Animation variables
 	int x, y, topEdge, lineTimer;
 	double strNum;
-	float transparency;
+	float transparency = 0f;
 	String str, line;
 	
 	public Credit(Window w) {

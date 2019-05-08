@@ -4,9 +4,9 @@ import java.awt.Image;
 
 public class ImageItem {
 	
-	Image img;
+	public Image img;
 	
-	String ID;
+	public String ID;
 	
 	public ImageItem(Image i, String id) {
 		img = i;

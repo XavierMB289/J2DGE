@@ -1,18 +1,26 @@
 package engine;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.FontFormatException;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GraphicsEnvironment;
+import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelListener;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Map;
 
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
@@ -21,10 +29,14 @@ import javax.swing.JPanel;
 import backends.AppPage;
 import backends.ImageItem;
 import coffeeDev.Credit;
+import interfaces.Keys;
 
-public class Window extends JPanel implements Runnable{
+public class Window extends JPanel implements Runnable, Keys{
 
 	private static final long serialVersionUID = 5651871526801520822L;
+	
+	//Debug Variables
+	private final int DEBUG_LEVEL;
 	
 	//Frame Variables
 	private JFrame frame = null;
@@ -33,28 +45,35 @@ public class Window extends JPanel implements Runnable{
 	
 	public int WIDTH, HEIGHT;
 	
-	public Rectangle WINDOW_RECT;
+	public Rectangle WINDOW_RECT, TOP_RECT, BOTTOM_RECT;
+	
+	public int H12, W12;
 	
 	//Imports
 	public Credit c = null;
+	public EventHandler EH = null;
 	
 	//Page Variables
 	public ArrayList<AppPage> pages = null;
 	public String currentPage = "credit";
+	String overlayPage = "";
 	
 	//Images
-	ArrayList<ImageItem> images = null;
+	public ArrayList<ImageItem> images = null;
 	
 	/**
 	 * @author Xavier Bennett
 	 * @param name This is the name of the created window
 	 */
-	public Window(String name) {
+	public Window(String name, int debugLevel) {
 		
 		thread = new Thread(this);
 		
+		DEBUG_LEVEL = debugLevel;
+		
 		//Imports
 		c = new Credit(this);
+		EH = new EventHandler();
 		
 		pages = new ArrayList<>();
 		
@@ -67,6 +86,34 @@ public class Window extends JPanel implements Runnable{
 		frame.add(this);
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		frame.setUndecorated(true);
+		
+		frame.addKeyListener(new KeyListener() {
+
+			@Override
+			public void keyTyped(KeyEvent e) {}
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+				keys.put(e.getKeyCode(), true);
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+				keys.put(e.getKeyCode(), false);
+				if(e.getKeyCode() == ExitKey) {
+					if(currentPage.equals("credit") || currentPage.equals("mainMenu")) {
+						stop();
+					}else if(overlayPage.equals("pause")) {
+						currentPage = "mainMenu";
+					}
+				}else if(e.getKeyCode() == ENTER || e.getKeyCode() == ENTER_ALT) {
+					if(currentPage.equals("credit")) {
+						currentPage = "mainMenu";
+					}
+				}
+			}
+			
+		});
 		
 	}
 	
@@ -100,10 +147,6 @@ public class Window extends JPanel implements Runnable{
 		frame.setLocation(frame.getX() + addX, frame.getY() + addY);
 	}
 	
-	public void addKeyListen(KeyListener l) {
-		frame.addKeyListener(l);
-	}
-	
 	public void addMouseListen(MouseListener l) {
 		frame.addMouseListener(l);
 	}
@@ -131,6 +174,10 @@ public class Window extends JPanel implements Runnable{
 		WIDTH = frame.getWidth();
 		HEIGHT = frame.getHeight();
 		WINDOW_RECT = new Rectangle(WIDTH, HEIGHT);
+		TOP_RECT = new Rectangle(0, 0, WIDTH, (int)(HEIGHT/2));
+		BOTTOM_RECT = new Rectangle(0, (int)(HEIGHT/2), WIDTH, (int)(HEIGHT/2));
+		W12 = (int)Math.floor(WIDTH/12);
+		H12 = (int)Math.floor(HEIGHT/12);
 		
 		//inits
 		c.init();
@@ -173,6 +220,17 @@ public class Window extends JPanel implements Runnable{
 				p.paint(g2d);
 			}
 		}
+		//Debugging
+		if(DEBUG_LEVEL == 1) {
+			String buttons = "";
+			for(Map.Entry<Integer, Boolean> entry : keys.entrySet()) {
+				if(entry.getValue()) {
+					buttons += KeyEvent.getKeyText(entry.getKey());
+				}
+			}
+			g2d.setColor(Color.RED);
+			g2d.drawString(buttons, 10, 50);
+		}
 		this.update();
 	}
 
@@ -192,6 +250,32 @@ public class Window extends JPanel implements Runnable{
 	    int y = rect.y + ((rect.height - metrics.getHeight()) / 2) + metrics.getAscent();
 	    g.setFont(font);
 	    g.drawString(text, x, y);
+	}
+	
+	public void drawCenteredImage(Graphics2D g, Image i, Rectangle rect) {
+		int iCX = i.getWidth(null)/2;
+		int iCY = i.getHeight(null)/2;
+		int rCX = rect.width/2;
+		int rCY = rect.height/2;
+		g.drawImage(i, rCX-iCX, rCY-iCY, null);
+	}
+	
+	public static void addFont(int fontFormat, String fontNamePath) {
+		try {
+		     GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+		     ge.registerFont(Font.createFont(fontFormat, new File(Window.class.getResource(fontNamePath).getFile())));
+		} catch (IOException|FontFormatException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public Image getImage(String name) {
+		for(ImageItem i : images) {
+			if(i.ID.equals(name)) {
+				return i.img;
+			}
+		}
+		return null;
 	}
 
 }
