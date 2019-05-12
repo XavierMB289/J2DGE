@@ -132,11 +132,12 @@ public class DialogBox extends AppPage{
 				}
 			}else if(window.keyIsDown(window.ACTION) || window.keyIsDown(window.ACTION_ALT)) {
 				lineNum = 4;
-				charNum = lines.get(pageNum*4+3).length() - 2;
+				charNum = lines.get(lines.size() < pageNum*4+3 ? lines.size()-1 : pageNum*4+3).length() - 2;
 			}
-			if((pageNum+1)*4 > lines.size()) {
+			if(pageNum*4 > lines.size()) {
 				running = false;
 				window.EH.addDestroy(this);
+				window.EH.nextEvent();
 			}
 		}
 	}

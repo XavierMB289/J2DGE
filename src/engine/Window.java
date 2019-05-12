@@ -29,14 +29,16 @@ import javax.swing.JPanel;
 import backends.AppPage;
 import backends.ImageItem;
 import coffeeDev.Credit;
+import interfaces.Functions;
 import interfaces.Keys;
 
-public class Window extends JPanel implements Runnable, Keys{
+public class Window extends JPanel implements Runnable, Keys, Functions{
 
 	private static final long serialVersionUID = 5651871526801520822L;
 	
 	//Debug Variables
-	private final int DEBUG_LEVEL;
+	public final String[] args;
+	private String DEBUG_LEVEL;
 	
 	//Frame Variables
 	private JFrame frame = null;
@@ -65,11 +67,14 @@ public class Window extends JPanel implements Runnable, Keys{
 	 * @author Xavier Bennett
 	 * @param name This is the name of the created window
 	 */
-	public Window(String name, int debugLevel) {
+	public Window(String name, String[] args) {
 		
 		thread = new Thread(this);
 		
-		DEBUG_LEVEL = debugLevel;
+		//Commands
+		this.args = args;
+		DEBUG_LEVEL = ArrayContains(args, "-debug=");
+		DEBUG_LEVEL = DEBUG_LEVEL.equals(null) ? "0" : DEBUG_LEVEL.split("=")[1];
 		
 		//Imports
 		c = new Credit(this);
@@ -221,7 +226,7 @@ public class Window extends JPanel implements Runnable, Keys{
 			}
 		}
 		//Debugging
-		if(DEBUG_LEVEL == 1) {
+		if(DEBUG_LEVEL.equals("1")) {
 			String buttons = "";
 			for(Map.Entry<Integer, Boolean> entry : keys.entrySet()) {
 				if(entry.getValue()) {
