@@ -52,13 +52,13 @@ public class Window extends JPanel implements Runnable, Keys, Functions{
 	public int H12, W12;
 	
 	//Imports
-	public Credit c = null;
+	private Credit c = null;
 	public EventHandler EH = null;
+	public AudioHandler AH = null;
 	
 	//Page Variables
 	public ArrayList<AppPage> pages = null;
 	public String currentPage = "credit";
-	String overlayPage = "";
 	
 	//Images
 	public ArrayList<ImageItem> images = null;
@@ -79,6 +79,7 @@ public class Window extends JPanel implements Runnable, Keys, Functions{
 		//Imports
 		c = new Credit(this);
 		EH = new EventHandler();
+		AH = new AudioHandler();
 		
 		pages = new ArrayList<>();
 		
@@ -108,8 +109,6 @@ public class Window extends JPanel implements Runnable, Keys, Functions{
 				if(e.getKeyCode() == ExitKey) {
 					if(currentPage.equals("credit") || currentPage.equals("mainMenu")) {
 						stop();
-					}else if(overlayPage.equals("pause")) {
-						currentPage = "mainMenu";
 					}
 				}else if(e.getKeyCode() == ENTER || e.getKeyCode() == ENTER_ALT) {
 					if(currentPage.equals("credit")) {

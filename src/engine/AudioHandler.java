@@ -14,13 +14,17 @@ public class AudioHandler {
 	public Clipping[] loadClippings(String filename) {
 		File folder = new File(filename);
 		File[] files = folder.listFiles();
-		ArrayList<Clipping> ret = new ArrayList<>();
+		ArrayList<Clipping> list = new ArrayList<>();
 		for(File f: files) {
 			if(f.isFile()) {
-				ret.add(new Clipping(f.getName()));
+				list.add(new Clipping(f.getName()));
 			}
 		}
-		return (Clipping[]) ret.toArray();
+		Clipping[] ret = new Clipping[list.size()];
+		for(int i = 0; i < list.size(); i++) {
+			ret[i] = list.get(i);
+		}
+		return ret;
 	}
 	
 }

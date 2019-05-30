@@ -19,8 +19,8 @@ public class Notify extends ImageHandler{
 	 * @author Xavier Bennett
 	 * @param filename The filename and relative path to the image...
 	 */
-	public void setIcon(String filename) {
-		icon = getImage(filename);
+	public void setIcon(Image img) {
+		icon = img;
 	}
 	
 	public void WindowsNotify(String title, String desc, String tooltip){
