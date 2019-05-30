@@ -1,6 +1,6 @@
 # java2DGameEngine
 This is a 2D Game engine I am creating in Java for commercial use.
-Examples of usage can be found in [examples](src/examples/)
+A "Getting Started" page has been provided in the wiki.
 The Wiki can be used to learn how to use this. The Wiki can be found above.
 
 ### Editing
