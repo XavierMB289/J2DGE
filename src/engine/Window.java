@@ -1,5 +1,6 @@
 package engine;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -17,8 +18,12 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelListener;
+import java.awt.font.FontRenderContext;
+import java.awt.font.GlyphVector;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -27,12 +32,12 @@ import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 
 import backends.AppPage;
+import backends.Functions;
 import backends.ImageItem;
 import coffeeDev.Credit;
-import interfaces.Functions;
 import interfaces.Keys;
 
-public class Window extends JPanel implements Runnable, Keys, Functions{
+public class Window extends JPanel implements Runnable, Keys{
 
 	private static final long serialVersionUID = 5651871526801520822L;
 	
@@ -48,6 +53,7 @@ public class Window extends JPanel implements Runnable, Keys, Functions{
 	public int WIDTH, HEIGHT;
 	
 	public Rectangle WINDOW_RECT, TOP_RECT, BOTTOM_RECT;
+	private Rectangle DEBUG_RECT;
 	
 	public int H12, W12;
 	
@@ -55,6 +61,9 @@ public class Window extends JPanel implements Runnable, Keys, Functions{
 	private Credit c = null;
 	public EventHandler EH = null;
 	public AudioHandler AH = null;
+	public ImageHandler IH = null;
+	public FileHandler FH = null;
+	public Functions functions = null;
 	
 	//Page Variables
 	public ArrayList<AppPage> pages = null;
@@ -71,22 +80,28 @@ public class Window extends JPanel implements Runnable, Keys, Functions{
 		
 		thread = new Thread(this);
 		
-		//Commands
-		this.args = args;
-		DEBUG_LEVEL = ArrayContains(args, "-debug=");
-		DEBUG_LEVEL = DEBUG_LEVEL.equals(null) ? "0" : DEBUG_LEVEL.split("=")[1];
-		
 		//Imports
 		c = new Credit(this);
 		EH = new EventHandler();
 		AH = new AudioHandler();
+		IH = new ImageHandler();
+		functions = new Functions();
+		
+		//Commands
+		this.args = args;
+		if(args != null) {
+			DEBUG_LEVEL = functions.ArrayContains(args, "-debug=");
+			DEBUG_LEVEL = DEBUG_LEVEL.equals(null) ? "0" : DEBUG_LEVEL.split("=")[1];
+		}else {
+			DEBUG_LEVEL = "0";
+		}
 		
 		pages = new ArrayList<>();
 		
 		pages.add(c);
 		
 		//Setting Up Images
-		images = new ImageHandler().getAllImages("/img/");
+		images = IH.getAllImages("/img/");
 		
 		frame = new JFrame(name);
 		frame.add(this);
@@ -171,6 +186,7 @@ public class Window extends JPanel implements Runnable, Keys, Functions{
 		frame.setJMenuBar(j);
 	}
 	
+	@SuppressWarnings("rawtypes")
 	public void setVisible() {
 		frame.validate();
 		frame.pack();
@@ -182,11 +198,30 @@ public class Window extends JPanel implements Runnable, Keys, Functions{
 		BOTTOM_RECT = new Rectangle(0, (int)(HEIGHT/2), WIDTH, (int)(HEIGHT/2));
 		W12 = (int)Math.floor(WIDTH/12);
 		H12 = (int)Math.floor(HEIGHT/12);
+		DEBUG_RECT = new Rectangle(0, 0, W12, H12*2);
 		
 		//inits
 		c.init();
 		
 		thread.start();
+		
+		//Adding Pages
+		File file = new File(Window.class.getResource("/pages/").getFile());
+		String[] pageNames = file.list();
+		for(String pn : pageNames) {
+				try {
+					Class<?> c = Class.forName("pages."+pn.split("\\.")[0]);
+					Constructor con = c.getConstructor(new Class[] {Window.class});
+					Object o = con.newInstance(this);
+					if(o instanceof AppPage) {
+						pages.add((AppPage) o);
+						System.out.println("Page "+((AppPage)o).getID()+" has been successfully added.");
+					}
+				} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		}
 	}
 	
 	public synchronized void stop() {
@@ -232,8 +267,8 @@ public class Window extends JPanel implements Runnable, Keys, Functions{
 					buttons += KeyEvent.getKeyText(entry.getKey());
 				}
 			}
-			g2d.setColor(Color.RED);
-			g2d.drawString(buttons, 10, 50);
+			g2d.setFont(new Font("Arial", Font.PLAIN, 24));
+			debugText(g2d, buttons, DEBUG_RECT);
 		}
 		this.update();
 	}
@@ -252,7 +287,6 @@ public class Window extends JPanel implements Runnable, Keys, Functions{
 	    FontMetrics metrics = g.getFontMetrics(font);
 	    int x = rect.x + (rect.width - metrics.stringWidth(text)) / 2;
 	    int y = rect.y + ((rect.height - metrics.getHeight()) / 2) + metrics.getAscent();
-	    g.setFont(font);
 	    g.drawString(text, x, y);
 	}
 	
@@ -264,10 +298,33 @@ public class Window extends JPanel implements Runnable, Keys, Functions{
 		g.drawImage(i, rCX-iCX, rCY-iCY, null);
 	}
 	
+	private void debugText(Graphics2D g, String text, Rectangle rect) {
+		functions.push(g);
+		Font font = g.getFont();
+		
+	    FontMetrics metrics = g.getFontMetrics(font);
+	    int x = rect.x + (rect.width - metrics.stringWidth(text)) / 2;
+	    int y = rect.y + ((rect.height - metrics.getHeight()) / 2) + metrics.getAscent();
+	    g.drawString(text, x, y);
+	    
+		FontRenderContext frc = g.getFontRenderContext();
+		GlyphVector gv = g.getFont().createGlyphVector(frc, text);
+		
+		g.setStroke(new BasicStroke(5));
+		g.translate(x, y);
+		g.setColor(Color.black);
+		g.draw(gv.getOutline());
+		functions.pop(g);
+		g.setColor(Color.white);
+		g.drawString(text, x, y);
+	}
+	
 	public static void addFont(int fontFormat, String fontNamePath) {
 		try {
 		     GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-		     ge.registerFont(Font.createFont(fontFormat, new File(Window.class.getResource(fontNamePath).getFile())));
+		     Font f = Font.createFont(fontFormat, new File(Window.class.getResource(fontNamePath).getFile()));
+		     ge.registerFont(f);
+		     System.out.println("The font "+f.getFontName()+" has been added.");
 		} catch (IOException|FontFormatException e) {
 			e.printStackTrace();
 		}

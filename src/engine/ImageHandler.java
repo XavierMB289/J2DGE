@@ -1,6 +1,8 @@
 package engine;
 
+import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
@@ -77,6 +79,23 @@ public class ImageHandler {
 		}
 		
 		return (Image[]) ret.toArray();
+	}
+	
+	public Image resizeImage(Image img, double scale) {
+		BufferedImage bimg = new BufferedImage((int)(img.getWidth(null)*scale), (int)(img.getHeight(null)*scale), BufferedImage.TYPE_INT_ARGB);
+		Graphics2D g = (Graphics2D)bimg.createGraphics();
+		g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+		g.drawImage(img, 0, 0, (int)(img.getWidth(null)*scale), (int)(img.getHeight(null)*scale), null);
+		g.dispose();
+		return (Image) bimg;
+	}
+	
+	public Image getSliver(Image img, int start, int width) {
+		BufferedImage bimg = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+		Graphics2D g = (Graphics2D)bimg.createGraphics();
+		g.drawImage(img, 0, 0, null);
+		g.dispose();
+		return (Image)bimg.getSubimage(start, 0, width, img.getHeight(null));
 	}
 	
 }
