@@ -1,12 +1,15 @@
 package engine;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import backends.Clipping;
 
-public class AudioHandler {
+public class AudioHandler implements Serializable{
 	
+	private static final long serialVersionUID = 5403259306717693728L;
+
 	public Clipping getClipping(String filename) {
 		return new Clipping(filename);
 	}
@@ -25,6 +28,10 @@ public class AudioHandler {
 			ret[i] = list.get(i);
 		}
 		return ret;
+	}
+	
+	public void playSound(String filename) {
+		getClipping(filename).play();
 	}
 	
 }

@@ -1,11 +1,14 @@
 package engine;
 
 import java.awt.Graphics2D;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import backends.AppPage;
 
-public class EventHandler implements Runnable{
+public class EventHandler implements Runnable, Serializable{
+	
+	private static final long serialVersionUID = -2477938767670058066L;
 	
 	private ArrayList<AppPage> events;
 	private ArrayList<AppPage> destroy;

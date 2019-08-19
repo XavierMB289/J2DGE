@@ -1,80 +1,159 @@
 package engine;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
+import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.List;
-import java.util.Map;
+import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Scanner;
+import java.util.Set;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
-public class FileHandler {
+public class FileHandler implements Serializable{
 	
-	String projectPath = null;
-	String githubPath = null;
+	private static final long serialVersionUID = -5163715433825135015L;
 	
-	public FileHandler(String p) {
-		projectPath = p;
-		File project = new File(projectPath);
-		if(project.exists() != true) {
-			project.mkdirs();
-		}
+	Window w;
+	
+	public FileHandler(Window w) {
+		this.w = w;
 	}
 	
-	public FileHandler(String p, String g) {
-		projectPath = p;
-		githubPath = g;
-		File project = new File(projectPath);
-		if(project.exists() != true) {
-			project.mkdirs();
-		}
-	}
-	
-	public void createDirectory(String filename) {
-		if(filename.equals(null) != true || filename.equals("")) {
-			filename = "unicornFarts";
-		}
-		projectPath += filename+"\\";
-		File project = new File(projectPath);
-		if(project.exists() != true) {
-			project.mkdir();
-		}
-	}
-	
-	private static boolean isRedirected( Map<String, List<String>> header ) {
-		for( String hv : header.get( null )) {
-			if(   hv.contains( " 301 " ) || hv.contains( " 302 " )) {
-				return true;
+	public void save(String filepath, Object o) {
+		File f = new File(getClass().getResource(filepath).getFile());
+		if(f != null && f.exists()) {
+			try {
+				FileOutputStream file = new FileOutputStream(f.getAbsolutePath()); 
+				ObjectOutputStream out = new ObjectOutputStream(file);
+				out.writeObject(o);
+				out.close(); 
+				file.close();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
-		return false;
 	}
 	
-	public void download(String filepath, String fileName) {
+	public Object load(String filepath) {
+		
+		Object ret = null;
+		
+		File f = new File(getClass().getResource(filepath).getFile());
+		if(f != null && f.exists()) {
+			FileInputStream file;
+			try {
+				file = new FileInputStream(f);
+				ObjectInputStream in = new ObjectInputStream(file);
+				ret = in.readObject();
+				in.close(); 
+				file.close();
+			} catch (ClassNotFoundException | IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return ret;
+	}
+	
+	public boolean fileExists(String filepath) {
+		boolean ret;
+		BufferedReader br;
 		try {
-			String link = githubPath + filepath + fileName;
-			URL url  = new URL( link );
-			HttpURLConnection http = (HttpURLConnection)url.openConnection();
-			Map< String, List< String >> header = http.getHeaderFields();
-			while( isRedirected( header )) {
-				link = header.get( "Location" ).get( 0 );
-				url = new URL( link );
-				http = (HttpURLConnection)url.openConnection();
-				header = http.getHeaderFields();
+			br = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream(filepath)));
+			ret = br != null;
+			br.close();
+		}catch(NullPointerException | IOException e) {
+			ret = false;
+		}
+		return ret;
+	}
+	
+	public void writeToFile(String filepath, String[] lines) {
+		try {
+			FileWriter fw = new FileWriter(getClass().getResource(filepath).getFile());
+			
+			for(String line : lines) {
+				fw.write(line + System.lineSeparator());
 			}
-			InputStream input  = http.getInputStream();
-			byte[] buffer = new byte[4096];
-			int n = -1;
-			OutputStream output = new FileOutputStream( new File( projectPath+fileName ));
-			while ((n = input.read(buffer)) != -1) {
-				output.write( buffer, 0, n );
-			}
-			output.close();
+			
+			fw.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+	}
+	
+	public ArrayList<String> readFromFile(String filepath) {
+		
+		ArrayList<String> ret = new ArrayList<String>();
+		
+		try {
+			Scanner scan = new Scanner(new File(getClass().getResource(filepath).getFile()));
+			
+			while(scan.hasNextLine()) {
+				ret.add(scan.nextLine());
+			}
+			
+			scan.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return ret;
+	}
+	
+	public String[] getFilesFromDir(Class<?> clazz, String path) {
+		URL url = clazz.getClassLoader().getResource(path);
+		if(url != null && url.getProtocol().equals("file")) {
+			try {
+				return new File(url.toURI()).list();
+			} catch (URISyntaxException e) {
+				System.err.println("URISE in FileHandler.getFilesFromDir");
+			}
+		}
+		if(url == null) {
+			String temp = clazz.getName().replace(".", "/")+".class";
+			url = clazz.getClassLoader().getResource(temp);
+		}
+		
+		if(url.getProtocol().equals("jar")) {
+			String jarPath = url.getPath().substring(5, url.getPath().indexOf("!"));
+			JarFile jar = null;
+			try {
+				jar = new JarFile(URLDecoder.decode(jarPath, "UTF-8"));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			Enumeration<JarEntry> entries = jar.entries();
+			Set<String> result = new HashSet<String>();
+			while(entries.hasMoreElements()) {
+				String name = entries.nextElement().getName();
+				if(name.startsWith(path)) {
+					String entry = name.substring(path.length());
+					int checkSubdir = entry.indexOf("/");
+					if(checkSubdir >= 0) {
+						entry = entry.substring(0, checkSubdir);
+					}
+					result.add(entry);
+				}
+			}
+			return result.toArray(new String[result.size()]);
+		}
+		return null;
 	}
 }

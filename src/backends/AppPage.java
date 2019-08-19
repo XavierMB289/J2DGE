@@ -1,8 +1,11 @@
 package backends;
 
 import java.awt.Graphics2D;
+import java.io.Serializable;
 
-public abstract class AppPage {
+public abstract class AppPage implements Serializable{
+	
+	private static final long serialVersionUID = 5638768653315988428L;
 	
 	protected String ID = getClass().getSimpleName();
 	

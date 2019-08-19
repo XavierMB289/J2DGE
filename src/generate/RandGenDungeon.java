@@ -1,7 +1,11 @@
 package generate;
 
-public class RandGenDungeon {
+import java.io.Serializable;
+
+public class RandGenDungeon implements Serializable{
 	
+	private static final long serialVersionUID = -8722286054461845598L;
+
 	int width, height, roomW, roomH;
 	
 	public boolean FINISH_SETUP = false;

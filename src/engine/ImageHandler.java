@@ -1,19 +1,20 @@
 package engine;
 
-import java.awt.Graphics2D;
+import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
 
 import backends.ImageItem;
 
-public class ImageHandler {
+public class ImageHandler implements Serializable{
 	
-	
+	private static final long serialVersionUID = -317953162923412609L;
+
 	/**
 	 * @author Xavier Bennett
 	 * 
@@ -23,8 +24,12 @@ public class ImageHandler {
 	 * 
 	 * Gets an image from inside the JAR file.
 	 */
-	public Image getImage(String name) {
-		return new ImageIcon(getClass().getResource(name)).getImage();
+	public ImageIcon getImage(String name) {
+		return new ImageIcon(getClass().getResource(name));
+	}
+	
+	public ImageIcon toImage(BufferedImage bimg) {
+		return new ImageIcon(bimg);
 	}
 	
 	/**
@@ -40,7 +45,7 @@ public class ImageHandler {
 			ArrayList<ImageItem> ret = new ArrayList<ImageItem>();
 			for(File f: files) {
 				if(f.isFile()) {
-					Image temp = getImage(filename+f.getName());
+					ImageIcon temp = getImage(filename+f.getName());
 					if(temp != null) {
 						ret.add(new ImageItem(temp, f.getName().split("\\.")[0]));
 					}
@@ -51,51 +56,27 @@ public class ImageHandler {
 		return null;
 	}
 	
-	/**
-	 * @author Xavier Bennett
-	 * 
-	 * @param img the Image to separate
-	 * @param info an array with 4 values [width, height, xoffset, yoffset]
-	 */
-	public Image[] separateSprites(Image img, int[] info) {
-		ArrayList<Image> ret = new ArrayList<>();
-		
-		if(img.equals(null) || info.equals(null)) {
-			return null;
-		}
-		if(info.length > 4) {
-			return null;
-		}
-		
-		int width = info[0];
-		int height = info[1];
-		int xoff = info[2];
-		int yoff = info[3];
-		
-		for(int y = 0; y < img.getHeight(null); y+=height+yoff) {
-			for(int x = 0; x < img.getWidth(null); x+=width+xoff) {
-				ret.add((Image)((BufferedImage)img).getSubimage(x, y, width, height));
+	public ImageIcon resizeImage(Window w, ImageIcon img, double scale) {
+		return new ImageIcon(img.getImage().getScaledInstance((int)(img.getIconWidth()*scale), (int)(img.getIconHeight()*scale), Image.SCALE_SMOOTH));
+	}
+	
+	public ImageIcon getSprite(Window w, Image img, int x, int y, int size) {
+		BufferedImage i = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+		Graphics g = i.getGraphics();
+		g.drawImage(img, -x, -y, null);
+		g.dispose();
+		return new ImageIcon(i);
+	}
+	
+	public ImageIcon[] getSprites(Window w, ImageIcon img, int size) {
+		int sheetW = img.getIconWidth()/size, sheetH = img.getIconHeight()/size;
+		ImageIcon[] ret = new ImageIcon[sheetW*sheetH];
+		for(int y = 0; y < sheetH; y++) {
+			for(int x = 0; x < sheetW; x++) {
+				ret[(y*sheetH)+x] = getSprite(w, img.getImage(), x*size, y*size, size);
 			}
 		}
-		
-		return (Image[]) ret.toArray();
-	}
-	
-	public Image resizeImage(Image img, double scale) {
-		BufferedImage bimg = new BufferedImage((int)(img.getWidth(null)*scale), (int)(img.getHeight(null)*scale), BufferedImage.TYPE_INT_ARGB);
-		Graphics2D g = (Graphics2D)bimg.createGraphics();
-		g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-		g.drawImage(img, 0, 0, (int)(img.getWidth(null)*scale), (int)(img.getHeight(null)*scale), null);
-		g.dispose();
-		return (Image) bimg;
-	}
-	
-	public Image getSliver(Image img, int start, int width) {
-		BufferedImage bimg = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
-		Graphics2D g = (Graphics2D)bimg.createGraphics();
-		g.drawImage(img, 0, 0, null);
-		g.dispose();
-		return (Image)bimg.getSubimage(start, 0, width, img.getHeight(null));
+		return ret;
 	}
 	
 }

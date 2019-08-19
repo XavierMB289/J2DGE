@@ -2,9 +2,10 @@ package generate;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.Point;
 import java.util.ArrayList;
+
+import javax.swing.ImageIcon;
 
 import backends.AppPage;
 import engine.Window;
@@ -12,9 +13,11 @@ import engine.Window;
 @SuppressWarnings("static-access")
 public class DialogBox extends AppPage{
 	
+	private static final long serialVersionUID = -8289208060984467682L;
+
 	Window window;
 	
-	Image arrow = null;
+	ImageIcon arrow = null;
 	
 	ArrayList<String> lines;
 	
@@ -37,7 +40,7 @@ public class DialogBox extends AppPage{
 		window = w;
 		arrow = window.getImage("dialogArrow");
 		words = str.split(" ");
-		middle = new Point(window.WIDTH/2, window.H12 * 8);
+		middle = new Point(window.WIDTH/2, (int)window.H12 * 8);
 		height = window.H12*4;
 		width = window.W12*8;
 		back = colors[0];
@@ -99,7 +102,7 @@ public class DialogBox extends AppPage{
 			//Drawing the arrow
 			if(lineNum >= 4) {
 				if(arrow != null) {
-					g.drawImage(arrow, tempRight-arrow.getWidth(null)/2, tempBottom-arrow.getHeight(null)/2, null);
+					g.drawImage(arrow.getImage(), tempRight-arrow.getIconWidth()/2, tempBottom-arrow.getIconHeight()/2, null);
 				}else {
 					g.drawString("NEXT", tempRight, tempBottom);
 				}

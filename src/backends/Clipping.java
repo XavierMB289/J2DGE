@@ -1,21 +1,29 @@
 package backends;
 
-
+import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 
+import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import javax.sound.sampled.DataLine;
+import javax.sound.sampled.LineEvent;
+import javax.sound.sampled.LineEvent.Type;
+import javax.sound.sampled.LineListener;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
-public class Clipping {
+public class Clipping implements LineListener, Serializable{
+	
+	private static final long serialVersionUID = -1613757221445051139L;
 	
 	Long currentFrame;
 	Clip clip;
 	
 	String filename;
-	String status;
+	String status = "";
 	
 	AudioInputStream ais;
 	
@@ -24,13 +32,14 @@ public class Clipping {
 		this.filename = filename;
 		
 		try {
-			ais = AudioSystem.getAudioInputStream(this.getClass().getResource(filename));
-			clip = AudioSystem.getClip();
+			File temp = new File(getClass().getResource(filename).getFile());
+			ais = AudioSystem.getAudioInputStream(temp);
+			AudioFormat format = ais.getFormat();
+			DataLine.Info info = new DataLine.Info(Clip.class, format);
+			clip = (Clip) AudioSystem.getLine(info);
 			clip.open(ais);
 		} catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
-			System.err.println("There's an error in the audio file."+
-		"See if you got the relative location wrong, or if the file is in the wrong place...");
-			System.exit(-1);
+			e.printStackTrace();
 		}
 		
 	}
@@ -69,6 +78,12 @@ public class Clipping {
 		currentFrame = 0L;
 		clip.stop();
 		clip.close();
+		try {
+			ais.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public void jump(long pos) {
@@ -89,6 +104,20 @@ public class Clipping {
 		} catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void update(LineEvent event) {
+		Type type = event.getType();
+		if(type == Type.STOP) {
+			stop();
+			try {
+				this.finalize();
+			} catch (Throwable e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 	

@@ -1,14 +1,18 @@
 package backends;
 
-import java.awt.Image;
+import java.io.Serializable;
 
-public class ImageItem {
+import javax.swing.ImageIcon;
+
+public class ImageItem implements Serializable{
 	
-	public Image img;
+	private static final long serialVersionUID = -2621555721063050236L;
+
+	public ImageIcon img;
 	
 	public String ID;
 	
-	public ImageItem(Image i, String id) {
+	public ImageItem(ImageIcon i, String id) {
 		img = i;
 		ID = id;
 	}
