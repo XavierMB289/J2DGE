@@ -26,3 +26,4 @@ hs_err_pid*
 # eclipse project files
 .classpath
 .project
+/src/devtests/
