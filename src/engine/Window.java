@@ -25,9 +25,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
-
-//import annotations.AnnotationHandler;
-//import annotations.WIP;
 import backends.AppPage;
 import backends.Entity;
 import backends.Functions;
@@ -64,7 +61,6 @@ public class Window extends JPanel implements Runnable, Config, Serializable{
 	public ImageHandler IH = null;
 	public TransitionHandler TH = null;
 	public FileHandler FH = null;
-//	private AnnotationHandler AnnH = null;
 	public Functions functions = null;
 	
 	//Page Variables
@@ -96,7 +92,6 @@ public class Window extends JPanel implements Runnable, Config, Serializable{
 		IH = new ImageHandler();
 		TH = new TransitionHandler(this);
 		FH = new FileHandler(this);
-//		AnnH = new AnnotationHandler();
 		functions = new Functions();
 		c = new Credit(this);
 		
@@ -248,7 +243,6 @@ public class Window extends JPanel implements Runnable, Config, Serializable{
 					if(o instanceof AppPage) {
 						pages.add((AppPage) o);
 						System.out.println("Page "+((AppPage)o).getID()+" has been successfully added.");
-//						AnnH.getAnnoted(o.getClass(), WIP.class);
 					}
 				}
 			} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
