@@ -154,6 +154,6 @@ public class FileHandler implements Serializable{
 			}
 			return result.toArray(new String[result.size()]);
 		}
-		return null;
+		return new String[] {};
 	}
 }
