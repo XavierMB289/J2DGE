@@ -64,7 +64,6 @@ public class Window extends JPanel implements Runnable, Config, Serializable {
 	public Functions functions = null;
 
 	// Page Variables
-//	public ArrayList<AppPage> pages = null;
 	public Map<String, AppPage> pages = new HashMap<>();
 	public String currentPage = "credit";
 
