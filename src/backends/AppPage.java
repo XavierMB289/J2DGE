@@ -21,4 +21,5 @@ public abstract class AppPage implements Serializable{
 		return ID;
 	}
 	
+	public void init() {}
 }
