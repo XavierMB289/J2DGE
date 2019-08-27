@@ -1,4 +1,4 @@
-package engine;
+package handler;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -21,6 +21,8 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+
+import engine.Window;
 
 public class FileHandler implements Serializable{
 	

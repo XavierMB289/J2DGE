@@ -1,4 +1,4 @@
-package engine;
+package handler;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -8,6 +8,7 @@ import javax.swing.ImageIcon;
 
 import backends.AppPage;
 import backends.Entity;
+import engine.Window;
 
 public class TransitionHandler implements Serializable{
 	

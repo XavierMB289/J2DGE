@@ -15,7 +15,8 @@ public abstract class Entity implements Serializable{
 	
 	public Entity(Window w, String pageName) {
 		this.w = w;
-		ID = pageName;
+		ID = new Exception().getStackTrace()[1].getClassName();
+		ID = ID.substring(0, 1).toLowerCase() + ID.substring(1);
 	}
 	
 	public abstract void paint(Graphics2D g);

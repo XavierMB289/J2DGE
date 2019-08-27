@@ -1,4 +1,4 @@
-package engine;
+package handler;
 
 import java.awt.Graphics;
 import java.awt.Image;
@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import javax.swing.ImageIcon;
 
 import backends.ImageItem;
+import engine.Window;
 
 public class ImageHandler implements Serializable{
 	

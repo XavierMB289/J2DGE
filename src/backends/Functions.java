@@ -39,6 +39,14 @@ public class Functions implements Serializable{
 		return null;
 	}
 	
+	public String[] combineArrays(String[] a, String[] b) {
+		int len = a.length+b.length;
+		String[] ret = new String[len];
+		System.arraycopy(a, 0, ret, 0, a.length);
+		System.arraycopy(b, 0, ret, a.length, b.length);
+		return ret;
+	}
+	
 	public String md5(String input) {
 		// Static getInstance method is called with hashing MD5 
         MessageDigest md = null;

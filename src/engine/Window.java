@@ -17,7 +17,6 @@ import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,11 +24,18 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
+
 import backends.AppPage;
-import backends.Entity;
 import backends.Functions;
 import backends.ImageItem;
+import backends.Overlay;
 import coffeeDev.Credit;
+import handler.AudioHandler;
+import handler.EntityHandler;
+import handler.EventHandler;
+import handler.FileHandler;
+import handler.ImageHandler;
+import handler.TransitionHandler;
 import interfaces.Config;
 
 public class Window extends JPanel implements Runnable, Config, Serializable {
@@ -37,7 +43,7 @@ public class Window extends JPanel implements Runnable, Config, Serializable {
 	private static final long serialVersionUID = 5651871526801520822L;
 
 	// Debug Variables
-	public final String[] args;
+	private final String[] args;
 	private String DEBUG_LEVEL;
 
 	// Frame Variables
@@ -46,37 +52,35 @@ public class Window extends JPanel implements Runnable, Config, Serializable {
 	private transient Thread thread = null;
 
 	public int WIDTH = -1, HEIGHT = -1, HALF_W = -1, HALF_H = -1;
-
-	public Rectangle WINDOW_RECT, TOP_RECT, BOTTOM_RECT;
-	private Rectangle DEBUG_RECT;
-
-	public Point ORIGINAL_MIDDLE;
-
 	public double H12, W12;
+
+	//Window Graphics Variables
+	public Rectangle WINDOW_RECT, TOP_RECT, BOTTOM_RECT, LEFT_RECT, RIGHT_RECT;
+	private Rectangle DEBUG_RECT;
+	
+	//Window Location Variables
+	public Point SCREEN_CENTER;
 
 	// Imports
 	private Credit c = null;
-	public EventHandler EH = null;
-	public AudioHandler AH = null;
-	public ImageHandler IH = null;
-	public TransitionHandler TH = null;
-	public FileHandler FH = null;
+	public EventHandler EventH = null;
+	public AudioHandler AudioH = null;
+	public ImageHandler ImageH = null;
+	public TransitionHandler TransH = null;
+	public FileHandler FileH = null;
+	public EntityHandler EntityH = null;
 	public Functions functions = null;
 
-	// Page Variables
-	public Map<String, AppPage> pages = new HashMap<>();
-	public String currentPage = "credit";
-
-	// Entity Variables
-	public ArrayList<Entity> entity = null;
-	public ArrayList<Entity> removeEnt = null;
-	private int tick = 3;
+	// Page and Overlay Variables
+	private Map<String, AppPage> pages = new HashMap<>();
+	private String currentPage = "credit";
+	private Map<String, Overlay> overlays = new HashMap<>();
 
 	// Key Variables
-	public Map<Integer, Boolean> keys = new HashMap<>();
+	private Map<Integer, Boolean> keys = new HashMap<>();
 
 	// Images
-	public ArrayList<ImageItem> images = null;
+	private ArrayList<ImageItem> images = null;
 
 	/**
 	 * @author Xavier Bennett
@@ -87,11 +91,12 @@ public class Window extends JPanel implements Runnable, Config, Serializable {
 		thread = new Thread(this);
 
 		// Imports
-		EH = new EventHandler();
-		AH = new AudioHandler();
-		IH = new ImageHandler();
-		TH = new TransitionHandler(this);
-		FH = new FileHandler(this);
+		EventH = new EventHandler();
+		AudioH = new AudioHandler();
+		ImageH = new ImageHandler();
+		TransH = new TransitionHandler(this);
+		FileH = new FileHandler(this);
+		EntityH = new EntityHandler(this);
 		functions = new Functions();
 		c = new Credit(this);
 
@@ -105,16 +110,14 @@ public class Window extends JPanel implements Runnable, Config, Serializable {
 		}
 
 		pages = new HashMap<>();
-
-		// Setting Up Entities
-		entity = new ArrayList<>();
-		removeEnt = new ArrayList<>();
+		overlays = new HashMap<>();
 
 		// Setting Up Images
-		if (FH.fileExists("/img/")) {
-			images = IH.getAllImages("/img/");
+		if (FileH.fileExists("/img/")) {
+			images = ImageH.getAllImages("/img/");
 		}
-
+		
+		//Setup and create JFrame
 		frame = new JFrame(name);
 		frame.add(this);
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -171,27 +174,24 @@ public class Window extends JPanel implements Runnable, Config, Serializable {
 		frame.setLocationRelativeTo(null);
 		frame.setFocusable(true);
 		this.requestFocus();
-		if (WIDTH == -1) {
-			WIDTH = frame.getWidth();
-			HALF_W = WIDTH / 2;
-		}
-		if (HEIGHT == -1) {
-			HEIGHT = frame.getHeight();
-			HALF_H = HEIGHT / 2;
-		}
 	}
 
 	public void setWindowSize(int x, int y) {
 		setWindowSize(new Dimension(x, y));
 	}
 
-	public void changePage(String pageId) {
+	public void setCurrentPage(String pageId) {
 		currentPage = pageId;
-		if(pages.get(pageId) != null) {
+		if(pages.get(pageId) != null && overlays.get(pageId) != null) {
 			pages.get(pageId).init();
+			overlays.get(pageId).init();
 		} else {
-			System.err.println("Page: '" + pageId+ "' not loaded.");
+			System.err.println("The page "+currentPage+" was not properly loaded in engine.Window");
 		}
+	}
+	
+	public String getCurrentPage() {
+		return currentPage;
 	}
 	
 	/**
@@ -238,22 +238,37 @@ public class Window extends JPanel implements Runnable, Config, Serializable {
 		frame.validate();
 		frame.pack();
 		frame.setVisible(true);
+		
+		if (WIDTH == -1) {
+			WIDTH = frame.getWidth();
+			HALF_W = WIDTH / 2;
+		}
+		if (HEIGHT == -1) {
+			HEIGHT = frame.getHeight();
+			HALF_H = HEIGHT / 2;
+		}
 
 		WINDOW_RECT = new Rectangle(WIDTH, HEIGHT);
-		TOP_RECT = new Rectangle(0, 0, WIDTH, (int) (HEIGHT / 2));
-		BOTTOM_RECT = new Rectangle(0, (int) (HEIGHT / 2), WIDTH, (int) (HEIGHT / 2));
+		TOP_RECT = new Rectangle(0, 0, WIDTH, (int) HALF_H);
+		BOTTOM_RECT = new Rectangle(0, (int) HALF_H, WIDTH, (int) HALF_H);
+		LEFT_RECT = new Rectangle(0, 0, (int) HALF_W, HEIGHT);
+		RIGHT_RECT = new Rectangle((int) HALF_W, 0, (int) HALF_W, HEIGHT);
 		W12 = (int) Math.floor(WIDTH / 12);
 		H12 = (int) Math.floor(HEIGHT / 12);
 		DEBUG_RECT = new Rectangle(0, 0, (int) W12, (int) H12 * 2);
-		ORIGINAL_MIDDLE = new Point(frame.getX(), frame.getY());
+		
+		//Setting middle of screen
+		SCREEN_CENTER = frame.getLocationOnScreen();
+		SCREEN_CENTER = new Point(SCREEN_CENTER.x+HALF_W, SCREEN_CENTER.y+HALF_H);
 
 		c.init();
 		pages.put(c.getID(), c);
 
 		// Adding Pages
-		String[] dirList = FH.getFilesFromDir(getClass(), "pages/");
-		for (String pn : dirList) {
-			try {
+		String[] pageList = FileH.getFilesFromDir(getClass(), "pages/");
+		String[] overlayList = FileH.getFilesFromDir(getClass(), "overlays/");
+		try {
+			for (String pn : pageList) {
 				if (!pn.isEmpty() && !pn.matches(".*\\d.*")) {
 					Class<?> c = Class.forName("pages." + pn.split("\\.")[0]);
 					Constructor con = c.getConstructor(new Class[] { Window.class });
@@ -263,11 +278,22 @@ public class Window extends JPanel implements Runnable, Config, Serializable {
 						pages.put(ap.getID(), ap);
 					}
 				}
-			} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException
-					| IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
+			for (String pn : overlayList) {
+				if (!pn.isEmpty() && !pn.matches(".*\\d.*")) {
+					Class<?> c = Class.forName("overlays." + pn.split("\\.")[0]);
+					Constructor con = c.getConstructor(new Class[] { Window.class });
+					Object o = con.newInstance(this);
+					if (o instanceof Overlay) {
+						Overlay ap = (Overlay) o;
+						overlays.put(ap.getID(), ap);
+					}
+				}
+			}
+		} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException
+				| IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 		thread.start();
@@ -299,6 +325,11 @@ public class Window extends JPanel implements Runnable, Config, Serializable {
 		AppPage ap = pages.get(currentPage);
 		if(ap != null) {
 			ap.paint(g2d);
+			EntityH.paint(g2d);
+			Overlay o = overlays.get(currentPage);
+			if(o != null) {
+				o.paint(g2d);
+			}
 		}
 	}
 	
@@ -308,17 +339,10 @@ public class Window extends JPanel implements Runnable, Config, Serializable {
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-		if (!TH.transitioning) {
+		if (!TransH.transitioning) {
 			paintPage(g2d);
-			if (entity.size() > 0) {
-				for (Entity e : entity) {
-					if (e.getID().equals(currentPage)) {
-						e.paint(g2d);
-					}
-				}
-			}
 		} else {
-			g2d.drawImage(TH.getTransition().getImage(), 0, 0, null);
+			g2d.drawImage(TransH.getTransition().getImage(), 0, 0, null);
 		}
 		// Debugging
 		if (DEBUG_LEVEL.equals("1")) {
@@ -338,41 +362,17 @@ public class Window extends JPanel implements Runnable, Config, Serializable {
 		AppPage ap = pages.get(currentPage);
 		if(ap != null) {
 			ap.update();
+			EntityH.update();
+			Overlay o = overlays.get(currentPage);
+			if(o != null) {
+				o.update();
+			}
 		}
 	}
 	
 	public void update() {
-		try {
-			if (!TH.transitioning) {
-				updatePage();
-				if (entity.size() > 0) {
-					if (tick <= 0) {
-						tick = 3;
-
-						for (Entity e : entity) {
-							if (e.getID().equals(currentPage)) {
-								e.onTick();
-							}
-						}
-						if (removeEnt.size() > 0) {
-							for (Entity e : removeEnt) {
-								entity.remove(e);
-							}
-							removeEnt = new ArrayList<>();
-						}
-					} else {
-						tick--;
-					}
-				}
-			}
-		} catch (ConcurrentModificationException e) {
-			System.err.println("CME in engine.Window.update");
-		}
-	}
-
-	public void resetCheck() {
-		if (thread == null) {
-			thread = new Thread(this);
+		if (!TransH.transitioning) {
+			updatePage();
 		}
 	}
 
@@ -394,6 +394,10 @@ public class Window extends JPanel implements Runnable, Config, Serializable {
 	}
 
 	public void addPage(AppPage page) {
-		pages.put(page.getID(), page);
+		if(!pages.containsValue(page) && !pages.containsKey(page.getID())) {
+			pages.put(page.getID(), page);
+		}else {
+			System.err.println("Duplicate AppPage in engine.Window.addPage()");
+		}
 	}
 }

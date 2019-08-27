@@ -8,6 +8,8 @@ import java.awt.TrayIcon.MessageType;
 
 import javax.swing.ImageIcon;
 
+import handler.ImageHandler;
+
 public class Notify extends ImageHandler{
 	
 	private static final long serialVersionUID = -8044873457720248395L;
