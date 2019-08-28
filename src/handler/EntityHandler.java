@@ -63,5 +63,9 @@ public class EntityHandler {
 			addEnt.add(e);
 		}
 	}
+	
+	public ArrayList<Entity> getEntities(){
+		return entity;
+	}
 
 }

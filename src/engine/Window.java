@@ -3,11 +3,9 @@ package engine;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
@@ -23,7 +21,6 @@ import java.util.Map;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
-import javax.swing.JPanel;
 
 import backends.AppPage;
 import backends.Functions;
@@ -38,9 +35,12 @@ import handler.ImageHandler;
 import handler.TransitionHandler;
 import interfaces.Config;
 
-public class Window extends JPanel implements Runnable, Config, Serializable {
+public class Window implements Config, Serializable {
 
 	private static final long serialVersionUID = 5651871526801520822L;
+	
+	//Private JPanel
+	private CustomPanel customPanel;
 
 	// Debug Variables
 	private final String[] args;
@@ -75,6 +75,7 @@ public class Window extends JPanel implements Runnable, Config, Serializable {
 	private Map<String, AppPage> pages = new HashMap<>();
 	private String currentPage = "credit";
 	private Map<String, Overlay> overlays = new HashMap<>();
+	private String currentOverlay = "";
 
 	// Key Variables
 	private Map<Integer, Boolean> keys = new HashMap<>();
@@ -87,8 +88,10 @@ public class Window extends JPanel implements Runnable, Config, Serializable {
 	 * @param name This is the name of the created window
 	 */
 	public Window(String name, String[] args) {
+		
+		customPanel = new CustomPanel(this);
 
-		thread = new Thread(this);
+		thread = new Thread(customPanel);
 
 		// Imports
 		EventH = new EventHandler();
@@ -119,7 +122,7 @@ public class Window extends JPanel implements Runnable, Config, Serializable {
 		
 		//Setup and create JFrame
 		frame = new JFrame(name);
-		frame.add(this);
+		frame.add(customPanel);
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		frame.setUndecorated(true);
 
@@ -145,7 +148,7 @@ public class Window extends JPanel implements Runnable, Config, Serializable {
 				} else if (e.getKeyCode() == ENTER || e.getKeyCode() == ENTER_ALT) {
 					System.out.println("enter");
 					if (currentPage.equals("credit")) {
-						changePage("mainMenu");
+						setCurrentPage("mainMenu");
 						System.out.println("toMM");
 					}
 				}
@@ -154,6 +157,10 @@ public class Window extends JPanel implements Runnable, Config, Serializable {
 		});
 
 	}
+	
+	public JFrame getFrame() {
+		return frame;
+	}
 
 	/**
 	 * @author Xavier Bennett Creates a fullscreen window
@@ -161,7 +168,7 @@ public class Window extends JPanel implements Runnable, Config, Serializable {
 	public void setFullscreen() {
 		frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		frame.setFocusable(true);
-		this.requestFocus();
+		customPanel.requestFocus();
 	}
 
 	/**
@@ -173,7 +180,7 @@ public class Window extends JPanel implements Runnable, Config, Serializable {
 		frame.setMinimumSize(minimumSize);
 		frame.setLocationRelativeTo(null);
 		frame.setFocusable(true);
-		this.requestFocus();
+		customPanel.requestFocus();
 	}
 
 	public void setWindowSize(int x, int y) {
@@ -304,45 +311,25 @@ public class Window extends JPanel implements Runnable, Config, Serializable {
 		System.exit(-1);
 	}
 
-	public void run() {
-		long lastTime = System.nanoTime();
-		final double ns = 1000000000.0 / 60.0;// 60 times per second
-		double delta = 0;
-		while (frame.isVisible()) {
-			long now = System.nanoTime();
-			delta = delta + ((now - lastTime) / ns);
-			lastTime = now;
-			while (delta >= 1)// Make sure update is only happening 60 times a second
-			{
-				// handles all of the logic restricted time
-				this.repaint();
-				delta--;
-			}
-		}
-	}
-
 	private void paintPage(Graphics2D g2d) {
 		AppPage ap = pages.get(currentPage);
 		if(ap != null) {
 			ap.paint(g2d);
 			EntityH.paint(g2d);
-			Overlay o = overlays.get(currentPage);
-			if(o != null) {
-				o.paint(g2d);
+			if(!currentOverlay.equals("")) {
+				Overlay o = overlays.get(currentOverlay);
+				if(o != null) {
+					o.paint(g2d);
+				}
 			}
 		}
 	}
 	
-	@Override
-	public void paint(Graphics g) {
-		super.paint(g);
-		Graphics2D g2d = (Graphics2D) g;
-		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+	public void paint(Graphics2D g) {
 		if (!TransH.transitioning) {
-			paintPage(g2d);
+			paintPage(g);
 		} else {
-			g2d.drawImage(TransH.getTransition().getImage(), 0, 0, null);
+			g.drawImage(TransH.getTransition().getImage(), 0, 0, null);
 		}
 		// Debugging
 		if (DEBUG_LEVEL.equals("1")) {
@@ -352,10 +339,9 @@ public class Window extends JPanel implements Runnable, Config, Serializable {
 					buttons += KeyEvent.getKeyText(entry.getKey());
 				}
 			}
-			g2d.setFont(new Font("Arial", Font.PLAIN, 24));
-			functions.debugText(g2d, buttons, DEBUG_RECT);
+			g.setFont(new Font("Arial", Font.PLAIN, 24));
+			functions.debugText(g, buttons, DEBUG_RECT);
 		}
-		this.update();
 	}
 
 	private void updatePage() {
@@ -363,9 +349,11 @@ public class Window extends JPanel implements Runnable, Config, Serializable {
 		if(ap != null) {
 			ap.update();
 			EntityH.update();
-			Overlay o = overlays.get(currentPage);
-			if(o != null) {
-				o.update();
+			if(!currentOverlay.equals("")) {
+				Overlay o = overlays.get(currentOverlay);
+				if(o != null) {
+					o.update();
+				}
 			}
 		}
 	}

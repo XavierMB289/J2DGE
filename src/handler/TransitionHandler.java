@@ -47,7 +47,7 @@ public class TransitionHandler implements Serializable{
 			this.oldPage = oldPage;
 			this.newPage = newPage;
 			if(!audioFile.equals("")) {
-				w.AH.playSound(audioFile);
+				w.AudioH.playSound(audioFile);
 			}
 		}
 	}
@@ -59,7 +59,7 @@ public class TransitionHandler implements Serializable{
 			this.newPage = newPage;
 			this.transition = t;
 			if(!audioFile.equals("")) {
-				w.AH.playSound(audioFile);
+				w.AudioH.playSound(audioFile);
 			}
 		}
 	}
@@ -89,14 +89,14 @@ public class TransitionHandler implements Serializable{
 		
 		g.translate(0, -w.HEIGHT+y);
 		newPage.paint(g);
-		for(Entity e : w.entity) {
+		for(Entity e : w.EntityH.getEntities()) {
 			if(e.getID().equals(newPage.getID())) {
 				e.paint(g);
 			}
 		}
 		g.translate(0, w.HEIGHT);
 		oldPage.paint(g);
-		for(Entity e : w.entity) {
+		for(Entity e : w.EntityH.getEntities()) {
 			if(e.getID().equals(oldPage.getID())) {
 				e.paint(g);
 			}
@@ -104,14 +104,14 @@ public class TransitionHandler implements Serializable{
 		g.dispose();
 		
 		if(y >= w.HEIGHT) {
-			w.currentPage = newPage.getID();
+			w.setCurrentPage(newPage.getID());
 			y = 0;
 			transitioning = false;
 			transition = -1;
 		}else{
 			y+=speed;
 		}
-		return w.IH.toImage(temp);
+		return w.ImageH.toImage(temp);
 	}
 	
 	public ImageIcon leftRight() {
@@ -120,14 +120,14 @@ public class TransitionHandler implements Serializable{
 		
 		g.translate(-w.WIDTH+x, 0);
 		newPage.paint(g);
-		for(Entity e : w.entity) {
+		for(Entity e : w.EntityH.getEntities()) {
 			if(e.getID().equals(newPage.getID())) {
 				e.paint(g);
 			}
 		}
 		g.translate(w.WIDTH, 0);
 		oldPage.paint(g);
-		for(Entity e : w.entity) {
+		for(Entity e : w.EntityH.getEntities()) {
 			if(e.getID().equals(oldPage.getID())) {
 				e.paint(g);
 			}
@@ -135,13 +135,13 @@ public class TransitionHandler implements Serializable{
 		g.dispose();
 		
 		if(x >= w.WIDTH) {
-			w.currentPage = newPage.getID();
+			w.setCurrentPage(newPage.getID());
 			x = 0;
 			transitioning = false;
 			transition = -1;
 		}else{
 			x+=speed;
 		}
-		return w.IH.toImage(temp);
+		return w.ImageH.toImage(temp);
 	}
 }

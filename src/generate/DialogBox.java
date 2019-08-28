@@ -14,8 +14,6 @@ import engine.Window;
 public class DialogBox extends AppPage{
 	
 	private static final long serialVersionUID = -8289208060984467682L;
-
-	Window window;
 	
 	ImageIcon arrow = null;
 	
@@ -35,14 +33,13 @@ public class DialogBox extends AppPage{
 	int charMaxTimer = 8;
 	
 	public DialogBox(Window w, String str, Color[] colors) {
-		super();
+		super(w);
 		//variable setup
-		window = w;
-		arrow = window.getImage("dialogArrow");
+		arrow = w.getImage("dialogArrow");
 		words = str.split(" ");
-		middle = new Point(window.WIDTH/2, (int)window.H12 * 8);
-		height = window.H12*4;
-		width = window.W12*8;
+		middle = new Point(w.WIDTH/2, (int)w.H12 * 8);
+		height = w.H12*4;
+		width = w.W12*8;
 		back = colors[0];
 		front = colors[1];
 		//setup lines
@@ -127,22 +124,28 @@ public class DialogBox extends AppPage{
 				}
 			}
 			//Speed Logic
-			if(window.keyIsDown(window.ENTER) || window.keyIsDown(window.ENTER_ALT)) {
+			if(w.keyIsDown(w.ENTER) || w.keyIsDown(w.ENTER_ALT)) {
 				if(lineNum >= 4) {
 					lineNum = 0;
 					charNum = 0;
 					pageNum++;
 				}
-			}else if(window.keyIsDown(window.ACTION) || window.keyIsDown(window.ACTION_ALT)) {
+			}else if(w.keyIsDown(w.ACTION) || w.keyIsDown(w.ACTION_ALT)) {
 				lineNum = 4;
 				charNum = lines.get(lines.size() < pageNum*4+3 ? lines.size()-1 : pageNum*4+3).length() - 2;
 			}
 			if(pageNum*4 > lines.size()) {
 				running = false;
-				window.EH.addDestroy(this);
-				window.EH.nextEvent();
+				w.EventH.addDestroy(this);
+				w.EventH.nextEvent();
 			}
 		}
+	}
+
+	@Override
+	public void init() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

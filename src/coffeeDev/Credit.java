@@ -12,8 +12,6 @@ import engine.Window;
 public class Credit extends AppPage{
 	
 	private static final long serialVersionUID = 8848415916613610875L;
-
-	Window window;
 	
 	ImageIcon icon = null;
 	
@@ -24,16 +22,15 @@ public class Credit extends AppPage{
 	String str, line;
 	
 	public Credit(Window w) {
-		super();
-		window = w;
-		icon = w.IH.getImage("/coffeeDev/icon.png");
+		super(w);
+		icon = w.ImageH.getImage("/coffeeDev/icon.png");
 	}
 	
 	public void init() {
-		icon = window.IH.resizeImage(window, icon, (window.W12*12)/icon.getIconWidth());
-		x = window.WIDTH/2-icon.getIconWidth()/2;
+		icon = w.ImageH.resizeImage(w, icon, (w.W12*12)/icon.getIconWidth());
+		x = w.WIDTH/2-icon.getIconWidth()/2;
 		y = icon.getIconHeight()*-1;
-		topEdge = window.HEIGHT/2 - icon.getIconHeight()/2;
+		topEdge = w.HEIGHT/2 - icon.getIconHeight()/2;
 		transparency = 0f;
 		strNum = 0;
 		lineTimer = 0;
@@ -49,14 +46,14 @@ public class Credit extends AppPage{
 		}else {
 			g.setColor(Color.black);
 		}
-		g.fillRect(0, 0, window.WIDTH, window.HEIGHT);
+		g.fillRect(0, 0, w.WIDTH, w.HEIGHT);
 		if(transparency < 1) {
 			g.setColor(new Color(transparency, transparency, transparency, 1f));
 		}else {
 			g.setColor(new Color(1f, 1f, 1f, 1f));
 		}
-		g.setFont(new Font("Courier New", Font.PLAIN, Math.max(((int)window.H12/2), 12)));
-		window.functions.drawCenteredString(g, str.substring(0, (int)(strNum))+line, window.WINDOW_RECT, 0, (int)window.H12);
+		g.setFont(new Font("Courier New", Font.PLAIN, Math.max(((int)w.H12/2), 12)));
+		w.functions.drawCenteredString(g, str.substring(0, (int)(strNum))+line, w.WINDOW_RECT, 0, (int)w.H12);
 	}
 	
 	public void update() {
@@ -69,7 +66,7 @@ public class Credit extends AppPage{
 				transparency = transparency < 1 ? transparency + 0.01f : 1f;
 				if(transparency >= 1f) {
 					if(darkness <= 0d) {
-						window.currentPage = "mainMenu";
+						w.setCurrentPage("mainMenu");
 					}
 					darkness-=0.2d;
 				}

@@ -28,7 +28,7 @@ public abstract class Entity implements Serializable{
 	}
 	
 	public void removeMe(Entity e) {
-		w.removeEnt.add(e);
+		w.EntityH.removeEntity(this);
 	}
 	
 }
