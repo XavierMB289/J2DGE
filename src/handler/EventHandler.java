@@ -51,9 +51,9 @@ public class EventHandler implements Runnable, Serializable{
 		}
 	}
 	
-	public void updateCurrentEvent() {
+	public void updateCurrentEvent(double delta) {
 		if(events.size() > eventNum) {
-			events.get(eventNum).update();
+			events.get(eventNum).update(delta);
 		}
 		//Destroying destroyables
 		for(AppPage a : destroy) {

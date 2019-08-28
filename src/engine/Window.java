@@ -2,7 +2,6 @@ package engine;
 
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -40,10 +39,7 @@ public class Window implements Config, Serializable {
 	private static final long serialVersionUID = 5651871526801520822L;
 	
 	//Private JPanel
-	private CustomPanel customPanel;
-
-	// Debug Variables
-	private String DEBUG_LEVEL;
+	CustomPanel customPanel;
 
 	// Frame Variables
 	private JFrame frame = null;
@@ -55,12 +51,12 @@ public class Window implements Config, Serializable {
 
 	//Window Graphics Variables
 	public Rectangle WINDOW_RECT, TOP_RECT, BOTTOM_RECT, LEFT_RECT, RIGHT_RECT;
-	private Rectangle DEBUG_RECT;
 	
 	//Window Location Variables
 	public Point SCREEN_CENTER;
 
 	// Imports
+	private Debug debug = null;
 	private Credit c = null;
 	public EventHandler EventH = null;
 	public AudioHandler AudioH = null;
@@ -93,6 +89,7 @@ public class Window implements Config, Serializable {
 		thread = new Thread(customPanel);
 
 		// Imports
+		debug = new Debug(this);
 		EventH = new EventHandler();
 		AudioH = new AudioHandler();
 		ImageH = new ImageHandler();
@@ -101,13 +98,10 @@ public class Window implements Config, Serializable {
 		EntityH = new EntityHandler(this);
 		functions = new Functions();
 		c = new Credit(this);
-
-		// Commands
+		
+		//Commands
 		if (args != null && args.length > 0) {
-			DEBUG_LEVEL = functions.arrayContains(args, "-debug=");
-			DEBUG_LEVEL = DEBUG_LEVEL.equals(null) ? "0" : DEBUG_LEVEL.split("=")[1];
-		} else {
-			DEBUG_LEVEL = "0";
+			debug.init(args);
 		}
 
 		pages = new HashMap<>();
@@ -268,12 +262,12 @@ public class Window implements Config, Serializable {
 		RIGHT_RECT = new Rectangle((int) HALF_W, 0, (int) HALF_W, HEIGHT);
 		W12 = (int) Math.floor(WIDTH / 12);
 		H12 = (int) Math.floor(HEIGHT / 12);
-		DEBUG_RECT = new Rectangle(0, 0, (int) W12, (int) H12 * 2);
 		
 		//Setting middle of screen
 		SCREEN_CENTER = frame.getLocationOnScreen();
 		SCREEN_CENTER = new Point(SCREEN_CENTER.x+HALF_W, SCREEN_CENTER.y+HALF_H);
-
+		
+		debug.setupRect();
 		c.init();
 		pages.put(c.getID(), c);
 
@@ -332,46 +326,41 @@ public class Window implements Config, Serializable {
 	}
 	
 	public void paint(Graphics2D g) {
+		g.clearRect(0, 0, WIDTH, HEIGHT);
 		if (!TransH.transitioning) {
 			paintPage(g);
 		} else {
 			g.drawImage(TransH.getTransition().getImage(), 0, 0, null);
 		}
-		// Debugging
-		if (DEBUG_LEVEL.equals("1")) {
-			String buttons = "";
-			for (Map.Entry<Integer, Boolean> entry : keys.entrySet()) {
-				if (entry.getValue()) {
-					buttons += KeyEvent.getKeyText(entry.getKey());
-				}
-			}
-			g.setFont(new Font("Arial", Font.PLAIN, 24));
-			functions.debugText(g, buttons, DEBUG_RECT);
-		}
+		debug.paint(g);
 	}
 
-	private void updatePage() {
+	private void updatePage(double delta) {
 		AppPage ap = pages.get(currentPage);
 		if(ap != null) {
-			ap.update();
-			EntityH.update();
+			ap.update(delta);
+			EntityH.update(delta);
 			if(!currentOverlay.equals("")) {
 				Overlay o = overlays.get(currentOverlay);
 				if(o != null) {
-					o.update();
+					o.update(delta);
 				}
 			}
 		}
 	}
 	
-	public void update() {
+	public void update(double delta) {
 		if (!TransH.transitioning) {
-			updatePage();
+			updatePage(delta);
 		}
 	}
 
 	public boolean keyIsDown(int key) {
 		return keys.containsKey(key) ? keys.get(key) : false;
+	}
+	
+	public Map<Integer, Boolean> getKeys(){
+		return keys;
 	}
 
 	public ImageIcon getImage(String name) {

@@ -15,6 +15,7 @@ public class EntityHandler {
 	private ArrayList<Entity> removeEnt = null;
 	private ArrayList<Entity> addEnt = null;
 	private int tick = 3;
+	private double deltas = 0;
 
 	public EntityHandler(Window w) {
 		this.w = w;
@@ -31,11 +32,13 @@ public class EntityHandler {
 		}
 	}
 	
-	public void update() {
+	public void update(double delta) {
+		deltas += delta;
 		if(--tick <= 0) {
 			tick = 3;
+			deltas = 0;
 			for(Entity e : entity) {
-				e.onTick();
+				e.onTick(deltas);
 			}
 		}
 		if(removeEnt.size() > 0) {

@@ -56,7 +56,7 @@ public class Credit extends AppPage{
 		w.functions.drawCenteredString(g, str.substring(0, (int)(strNum))+line, w.WINDOW_RECT, 0, (int)w.H12);
 	}
 	
-	public void update() {
+	public void update(double delta) {
 		if(y < topEdge) {
 			y+=2;
 		}else {

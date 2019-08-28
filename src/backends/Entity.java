@@ -21,7 +21,7 @@ public abstract class Entity implements Serializable{
 	
 	public abstract void paint(Graphics2D g);
 	
-	public abstract void onTick();
+	public abstract void onTick(double delta);
 	
 	public String getID() {
 		return ID;

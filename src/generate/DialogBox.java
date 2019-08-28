@@ -108,7 +108,7 @@ public class DialogBox extends AppPage{
 	}
 
 	@Override
-	public void update() {
+	public void update(double delta) {
 		//Typewriter Logic
 		if(running) {
 			String currentLine = lines.get(pageNum*4+lineNum%4);

@@ -107,27 +107,6 @@ public class Functions implements Serializable{
 		g.drawImage(i, x, y, null);
 	}
 	
-	public void debugText(Graphics2D g, String text, Rectangle rect) {
-		push(g);
-		Font font = g.getFont();
-		
-	    FontMetrics metrics = g.getFontMetrics(font);
-	    int x = rect.x + (rect.width - metrics.stringWidth(text)) / 2;
-	    int y = rect.y + ((rect.height - metrics.getHeight()) / 2) + metrics.getAscent();
-	    g.drawString(text, x, y);
-	    
-		FontRenderContext frc = g.getFontRenderContext();
-		GlyphVector gv = g.getFont().createGlyphVector(frc, text);
-		
-		g.setStroke(new BasicStroke(5));
-		g.translate(x, y);
-		g.setColor(Color.black);
-		g.draw(gv.getOutline());
-		pop(g);
-		g.setColor(Color.white);
-		g.drawString(text, x, y);
-	}
-	
 	public void addFont(int fontFormat, String fontNamePath) {
 		try {
 			if(ge == null) {

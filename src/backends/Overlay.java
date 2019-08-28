@@ -30,7 +30,7 @@ public abstract class Overlay implements Serializable{
 		g.fillRect(0, 0, w.WIDTH, w.HEIGHT);
 	}
 	
-	public abstract void update();
+	public abstract void update(double delta);
 	
 	public String getID() {
 		return ID;
