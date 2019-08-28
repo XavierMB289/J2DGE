@@ -43,7 +43,6 @@ public class Window implements Config, Serializable {
 	private CustomPanel customPanel;
 
 	// Debug Variables
-	private final String[] args;
 	private String DEBUG_LEVEL;
 
 	// Frame Variables
@@ -104,7 +103,6 @@ public class Window implements Config, Serializable {
 		c = new Credit(this);
 
 		// Commands
-		this.args = args;
 		if (args != null && args.length > 0) {
 			DEBUG_LEVEL = functions.arrayContains(args, "-debug=");
 			DEBUG_LEVEL = DEBUG_LEVEL.equals(null) ? "0" : DEBUG_LEVEL.split("=")[1];
@@ -146,10 +144,8 @@ public class Window implements Config, Serializable {
 						stop();
 					}
 				} else if (e.getKeyCode() == ENTER || e.getKeyCode() == ENTER_ALT) {
-					System.out.println("enter");
 					if (currentPage.equals("credit")) {
 						setCurrentPage("mainMenu");
-						System.out.println("toMM");
 					}
 				}
 			}
@@ -189,9 +185,8 @@ public class Window implements Config, Serializable {
 
 	public void setCurrentPage(String pageId) {
 		currentPage = pageId;
-		if(pages.get(pageId) != null && overlays.get(pageId) != null) {
+		if(pages.get(pageId) != null) {
 			pages.get(pageId).init();
-			overlays.get(pageId).init();
 		} else {
 			System.err.println("The page "+currentPage+" was not properly loaded in engine.Window");
 		}
@@ -199,6 +194,17 @@ public class Window implements Config, Serializable {
 	
 	public String getCurrentPage() {
 		return currentPage;
+	}
+	
+	public void setCurrentOverlay(String id) {
+		currentOverlay = id;
+		if(overlays.get(currentOverlay) != null) {
+			overlays.get(currentOverlay).init();
+		}
+	}
+	
+	public String getCurrentOverlay() {
+		return currentOverlay;
 	}
 	
 	/**
@@ -283,6 +289,7 @@ public class Window implements Config, Serializable {
 					if (o instanceof AppPage) {
 						AppPage ap = (AppPage) o;
 						pages.put(ap.getID(), ap);
+						System.out.println("The AppPage, "+ap.getID()+" has been added.");
 					}
 				}
 			}
@@ -294,6 +301,7 @@ public class Window implements Config, Serializable {
 					if (o instanceof Overlay) {
 						Overlay ap = (Overlay) o;
 						overlays.put(ap.getID(), ap);
+						System.out.println("The Overlay, "+ap.getID()+" has been added.");
 					}
 				}
 			}
@@ -316,11 +324,9 @@ public class Window implements Config, Serializable {
 		if(ap != null) {
 			ap.paint(g2d);
 			EntityH.paint(g2d);
-			if(!currentOverlay.equals("")) {
-				Overlay o = overlays.get(currentOverlay);
-				if(o != null) {
-					o.paint(g2d);
-				}
+			Overlay o = overlays.get(currentOverlay);
+			if(o != null) {
+				o.paint(g2d);
 			}
 		}
 	}
@@ -375,17 +381,5 @@ public class Window implements Config, Serializable {
 			}
 		}
 		return null;
-	}
-
-	public AppPage getPage(String id) {
-		return pages.get(id);
-	}
-
-	public void addPage(AppPage page) {
-		if(!pages.containsValue(page) && !pages.containsKey(page.getID())) {
-			pages.put(page.getID(), page);
-		}else {
-			System.err.println("Duplicate AppPage in engine.Window.addPage()");
-		}
 	}
 }

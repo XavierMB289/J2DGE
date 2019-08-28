@@ -20,7 +20,7 @@ public class TransitionHandler implements Serializable{
 	private int x = 0, y = 0;
 	
 	//TransitionHandler Variables
-	private int speed = 2;
+	private int speed = 3;
 	public boolean transitioning = false;
 	private AppPage oldPage, newPage;
 	private int transition = -1;
