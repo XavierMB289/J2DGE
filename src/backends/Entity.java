@@ -13,9 +13,9 @@ public abstract class Entity implements Serializable{
 	
 	protected String ID;
 	
-	public Entity(Window w, String pageName) {
+	public Entity(Window w) {
 		this.w = w;
-		ID = new Exception().getStackTrace()[1].getClassName();
+		ID = new Exception().getStackTrace()[2].getClassName().split("\\.")[1];
 		ID = ID.substring(0, 1).toLowerCase() + ID.substring(1);
 	}
 	

@@ -27,11 +27,11 @@ public class ProgressBar extends Entity{
 	int sheetX=0, sheetY=0, spriteW, spriteH;
 	
 	//Finished?
-	boolean FINISHED = false;
+	public boolean FINISHED = false;
 	
 
-	public ProgressBar(Window win, String id, ImageIcon i, Point l, int w, int h) {
-		super(win, id);
+	public ProgressBar(Window win, ImageIcon i, Point l, int w, int h) {
+		super(win);
 		image = i;
 		left = l;
 		width = w > 4 ? w : 5;
@@ -56,6 +56,11 @@ public class ProgressBar extends Entity{
 	
 	public void setSpeed(int s) {
 		speed = s;
+	}
+	
+	@SuppressWarnings("static-access")
+	public void setRelativeSpeed(double s) {
+		speed = (int) (width / (w.TARGET_FPS*s));
 	}
 	
 	public void makeLoop() {
@@ -104,7 +109,7 @@ public class ProgressBar extends Entity{
 			}
 			FINISHED = true;
 		}else {
-			x++;
+			x+=speed;
 		}
 	}
 

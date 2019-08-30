@@ -32,7 +32,7 @@ public class Debug {
 	
 	public void paint(Graphics2D g) {
 		if (DEBUG_LEVEL.equals("1")) {
-			debugText(g, "FPS: "+w.customPanel.FPS, DEBUG_RECT);
+			debugText(g, "FPS: "+w.getPanel().FPS, DEBUG_RECT);
 		}else if(DEBUG_LEVEL.equals("2")) {
 			String buttons = "";
 			for (Map.Entry<Integer, Boolean> entry : w.getKeys().entrySet()) {

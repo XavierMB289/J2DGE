@@ -16,6 +16,10 @@ public class Notify extends ImageHandler{
 	
 	private transient ImageIcon icon = null;
 	
+	public Notify(Window w) {
+		super(w);
+	}
+	
 	/**
 	 * @author Xavier Bennett
 	 * @param filename The filename and relative path to the image...

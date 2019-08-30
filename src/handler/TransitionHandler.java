@@ -1,5 +1,6 @@
 package handler;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.Serializable;
@@ -18,6 +19,8 @@ public class TransitionHandler implements Serializable{
 	
 	//Generic Variables
 	private int x = 0, y = 0;
+	private float transparency = 0f;
+	private boolean flipped = false;
 	
 	//TransitionHandler Variables
 	private int speed = 3;
@@ -78,6 +81,9 @@ public class TransitionHandler implements Serializable{
 				break;
 			case 1:
 				ret = leftRight();
+				break;
+			case 2:
+				ret = fadeInOut();
 				break;
 		}
 		return ret;
@@ -142,6 +148,46 @@ public class TransitionHandler implements Serializable{
 		}else{
 			x+=speed;
 		}
+		return w.ImageH.toImage(temp);
+	}
+	
+	public ImageIcon fadeInOut() {
+		BufferedImage temp = new BufferedImage(w.WIDTH, w.HEIGHT, BufferedImage.TYPE_INT_ARGB);
+		Graphics2D g = temp.createGraphics();
+		
+		if(!flipped) {
+			oldPage.paint(g);
+			for(Entity e : w.EntityH.getEntities()) {
+				if(e.getID().equals(oldPage.getID())) {
+					e.paint(g);
+				}
+			}
+		}else {
+			newPage.paint(g);
+			for(Entity e : w.EntityH.getEntities()) {
+				if(e.getID().equals(newPage.getID())) {
+					e.paint(g);
+				}
+			}
+		}
+		
+		g.setColor(new Color(0f, 0f, 0f, transparency));
+		g.fillRect(0, 0, w.WIDTH, w.HEIGHT);
+		
+		g.dispose();
+		
+		transparency += !flipped ? 0.02 : -0.02;
+		if(transparency >= 1f) {
+			flipped = true;
+			transparency = 1f;
+		}else if(flipped == true && transparency <= 0f) {
+			w.setCurrentPage(newPage.getID());
+			transparency = 0f;
+			flipped = false;
+			transitioning = false;
+			transition = -1;
+		}
+		
 		return w.ImageH.toImage(temp);
 	}
 }

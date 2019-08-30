@@ -16,8 +16,8 @@ public abstract class Tower extends Entity implements Serializable{
 	protected Point tower;
 	protected Ellipse2D.Double base;
 	
-	public Tower(Window w, String pageName) {
-		super(w, pageName);
+	public Tower(Window w) {
+		super(w);
 	}
 
 	public AffineTransform rotateTowards(Graphics2D g, Point enemy) {

@@ -20,7 +20,7 @@ public interface Config {
 	public int ACTION_ALT = KeyEvent.VK_X;
 	
 	//GameLoop Variables
-	public final int LOOP_TYPE = 0;
+	public final int LOOP_TYPE = 1;
 	//Variable Timestep Variables
 	public final double TARGET_FPS = 60;
 	public final double OPTIMAL_TIME = 1000000000 / TARGET_FPS;

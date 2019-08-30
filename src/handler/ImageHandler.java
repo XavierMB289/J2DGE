@@ -1,5 +1,6 @@
 package handler;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -15,6 +16,12 @@ import engine.Window;
 public class ImageHandler implements Serializable{
 	
 	private static final long serialVersionUID = -317953162923412609L;
+	
+	Window w;
+	
+	public ImageHandler(Window w) {
+		this.w = w;
+	}
 
 	/**
 	 * @author Xavier Bennett
@@ -31,6 +38,17 @@ public class ImageHandler implements Serializable{
 	
 	public ImageIcon toImage(BufferedImage bimg) {
 		return new ImageIcon(bimg);
+	}
+	
+	public BufferedImage toBuffImage(ImageIcon icon) {
+		if(icon.getImage() instanceof BufferedImage) {
+			return (BufferedImage) icon.getImage();
+		}
+		BufferedImage ret = new BufferedImage(icon.getIconWidth(), icon.getIconWidth(), BufferedImage.TYPE_INT_ARGB);
+		Graphics g = ret.createGraphics();
+		g.drawImage(icon.getImage(), 0, 0, null);
+		g.dispose();
+		return ret;
 	}
 	
 	/**
@@ -78,6 +96,20 @@ public class ImageHandler implements Serializable{
 			}
 		}
 		return ret;
+	}
+	
+	public ImageIcon colorize(ImageIcon icon, Color base) {
+		BufferedImage image = toBuffImage(icon);
+		for (int y = 0; y < image.getHeight(); y++) {
+			for (int x = 0; x < image.getWidth(); x++) {
+				int rgb = image.getRGB(x, y);
+				if( (rgb>>24) != 0x00 ) {
+					Color blended = w.functions.blend(new Color(image.getRGB(x, y), true), base);
+					image.setRGB(x, y, blended.getRGB());
+				}
+			}
+		}
+		return toImage(image);
 	}
 	
 }

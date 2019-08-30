@@ -39,7 +39,7 @@ public class Window implements Config, Serializable {
 	private static final long serialVersionUID = 5651871526801520822L;
 	
 	//Private JPanel
-	CustomPanel customPanel;
+	private CustomPanel customPanel;
 
 	// Frame Variables
 	private JFrame frame = null;
@@ -92,7 +92,7 @@ public class Window implements Config, Serializable {
 		debug = new Debug(this);
 		EventH = new EventHandler();
 		AudioH = new AudioHandler();
-		ImageH = new ImageHandler();
+		ImageH = new ImageHandler(this);
 		TransH = new TransitionHandler(this);
 		FileH = new FileHandler(this);
 		EntityH = new EntityHandler(this);
@@ -151,6 +151,10 @@ public class Window implements Config, Serializable {
 	public JFrame getFrame() {
 		return frame;
 	}
+	
+	public CustomPanel getPanel() {
+		return customPanel;
+	}
 
 	/**
 	 * @author Xavier Bennett Creates a fullscreen window
@@ -178,16 +182,25 @@ public class Window implements Config, Serializable {
 	}
 
 	public void setCurrentPage(String pageId) {
-		currentPage = pageId;
 		if(pages.get(pageId) != null) {
 			pages.get(pageId).init();
+			currentPage = pageId;
 		} else {
 			System.err.println("The page "+currentPage+" was not properly loaded in engine.Window");
+			System.exit(-1);
 		}
 	}
 	
 	public String getCurrentPage() {
 		return currentPage;
+	}
+	
+	public AppPage getCurrentAppPage() {
+		return pages.get(currentPage);
+	}
+	
+	public AppPage getLoadedPage(String page) {
+		return pages.get(page);
 	}
 	
 	public void setCurrentOverlay(String id) {
