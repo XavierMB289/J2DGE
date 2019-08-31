@@ -31,7 +31,7 @@ public class Credit extends AppPage{
 
 	@Override
 	public void init() {
-		icon = w.ImageH.resizeImage(w, w.ImageH.getImage("/coffeeDev/icon.png"), 0.1);
+		icon = w.ImageH.resizeImage(w, w.ImageH.getImage("coffeeDev/icon.png"), 0.1);
 		PB = new ProgressBar(w, icon, new Point((int)w.W12*2, (int)w.H12*11), (int)w.W12*8, 5);
 		PB.setColor(Color.LIGHT_GRAY);
 		PB.setRelativeSpeed(3);

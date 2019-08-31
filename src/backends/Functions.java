@@ -1,6 +1,5 @@
 package backends;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontFormatException;
@@ -9,13 +8,12 @@ import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Rectangle;
-import java.awt.font.FontRenderContext;
-import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigInteger;
+import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -109,13 +107,23 @@ public class Functions implements Serializable{
 	
 	public void addFont(int fontFormat, String fontNamePath) {
 		try {
+			URL url = getClass().getClassLoader().getResource(fontNamePath);
+			Font f = null;
 			if(ge == null) {
 				ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 			}
-			Font f = Font.createFont(fontFormat, new File(getClass().getResource(fontNamePath).getFile()));
+			if(url == null) {
+				String temp = getClass().getName().replace(".", "/")+".class";
+				url = getClass().getClassLoader().getResource(temp);
+			}
+			if(url.getProtocol().equals("jar")) {
+				f = Font.createFont(fontFormat, getClass().getClassLoader().getResourceAsStream(fontNamePath));
+			}else {
+				f = Font.createFont(fontFormat, new File(url.getFile()));
+			}
 			ge.registerFont(f);
 			System.out.println("The font "+f.getFontName()+" has been added.");
-		} catch (IOException|FontFormatException e) {
+		} catch (IOException | FontFormatException e) {
 			e.printStackTrace();
 		}
 	}

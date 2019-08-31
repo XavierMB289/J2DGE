@@ -49,6 +49,7 @@ public class TransitionHandler implements Serializable{
 			transitioning = true;
 			this.oldPage = oldPage;
 			this.newPage = newPage;
+			this.newPage.init();
 			if(!audioFile.equals("")) {
 				w.AudioH.playSound(audioFile);
 			}
@@ -60,6 +61,7 @@ public class TransitionHandler implements Serializable{
 			transitioning = true;
 			this.oldPage = oldPage;
 			this.newPage = newPage;
+			this.newPage.init();
 			this.transition = t;
 			if(!audioFile.equals("")) {
 				w.AudioH.playSound(audioFile);

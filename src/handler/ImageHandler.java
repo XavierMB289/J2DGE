@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -33,7 +32,7 @@ public class ImageHandler implements Serializable{
 	 * Gets an image from inside the JAR file.
 	 */
 	public ImageIcon getImage(String name) {
-		return new ImageIcon(getClass().getResource(name));
+		return new ImageIcon(getClass().getClassLoader().getResource(name));
 	}
 	
 	public ImageIcon toImage(BufferedImage bimg) {
@@ -58,21 +57,14 @@ public class ImageHandler implements Serializable{
 	 * @return returns an array of images
 	 */
 	public ArrayList<ImageItem> getAllImages(String filename) {
-		File folder = new File(getClass().getResource(filename).getFile());
-		if(folder.exists()) {
-			File[] files = folder.listFiles();
-			ArrayList<ImageItem> ret = new ArrayList<ImageItem>();
-			for(File f: files) {
-				if(f.isFile()) {
-					ImageIcon temp = getImage(filename+f.getName());
-					if(temp != null) {
-						ret.add(new ImageItem(temp, f.getName().split("\\.")[0]));
-					}
-				}
-			}
-			return ret;
+		ArrayList<ImageItem> ret = new ArrayList<>();
+		String[] temp = w.FileH.getFilesFromDir(getClass(), filename);
+		
+		for(String t : temp) {
+			ret.add(new ImageItem(getImage(filename+t), t.split("\\.")[0]));
 		}
-		return null;
+		
+		return ret;
 	}
 	
 	public ImageIcon resizeImage(Window w, ImageIcon img, double scale) {

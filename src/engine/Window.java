@@ -108,9 +108,7 @@ public class Window implements Config, Serializable {
 		overlays = new HashMap<>();
 
 		// Setting Up Images
-		if (FileH.fileExists("/img/")) {
-			images = ImageH.getAllImages("/img/");
-		}
+		images = ImageH.getAllImages("img/");
 		
 		//Setup and create JFrame
 		frame = new JFrame(name);
@@ -377,9 +375,11 @@ public class Window implements Config, Serializable {
 	}
 
 	public ImageIcon getImage(String name) {
-		for (ImageItem i : images) {
-			if (i.ID.equals(name)) {
-				return i.img;
+		if(images != null && images.size() > 0) {
+			for (ImageItem i : images) {
+				if (i.ID.equals(name) || i.ID.contains(name)) {
+					return i.img;
+				}
 			}
 		}
 		return null;
