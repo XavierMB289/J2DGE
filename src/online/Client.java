@@ -30,9 +30,5 @@ public class Client {
 		out.close();
 		client.close();
 	}
-	
-	public boolean compare(String ip, int port) {
-		return client.getLocalPort() == port && client.getRemoteSocketAddress().toString().equals(ip);
-	}
 
 }
