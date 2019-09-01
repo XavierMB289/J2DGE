@@ -14,6 +14,7 @@ import java.util.Map;
 public class Debug {
 
 	Window w;
+	private String[] args;
 	private Rectangle DEBUG_RECT;
 	private String DEBUG_LEVEL = "0";
 	
@@ -22,8 +23,14 @@ public class Debug {
 	}
 	
 	public void init(String[] args) {
+		this.args = args;
 		DEBUG_LEVEL = w.functions.arrayContains(args, "-debug=");
-		DEBUG_LEVEL = DEBUG_LEVEL.equals(null) ? "0" : DEBUG_LEVEL.split("=")[1];
+		DEBUG_LEVEL = DEBUG_LEVEL == null ? "0" : DEBUG_LEVEL.split("=")[1];
+	}
+	
+	public String getCommands(String splitter) {
+		String temp = w.functions.arrayContains(args, splitter);
+		return temp == null ? "" : temp.split("=")[1];
 	}
 	
 	public void setupRect() {

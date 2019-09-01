@@ -11,19 +11,27 @@ import java.util.ArrayList;
 public class Server {
 	
 	private ServerSocket server;
+	private ArrayList<ClientHandler> CH;
 	public boolean ACCEPTING;
-	ArrayList<ClientHandler> CH;
+	public ArrayList<String> inputs;
+	public int PORT = 0;
 	
-	public void start(int port) throws IOException {
-		server = new ServerSocket(port);
-		ACCEPTING = true;
+	public void start() throws IOException {
+		server = new ServerSocket(0);
+		PORT = server.getLocalPort();
 		CH = new ArrayList<>();
+		ACCEPTING = true;
+		inputs = new ArrayList<>();
 		
 		while(ACCEPTING) {
-			ClientHandler temp = new ClientHandler(server.accept());
+			ClientHandler temp = new ClientHandler(this, server.accept());
 			temp.start();
 			CH.add(temp);
 		}
+	}
+	
+	public int getInputsSize() {
+		return inputs == null ? 0 : inputs.size();
 	}
 	
 	public void stop() throws IOException {
@@ -32,11 +40,13 @@ public class Server {
 	}
 	
 	private static class ClientHandler extends Thread{
+		private Server server;
 		private Socket client;
 		private PrintWriter out;
 		private BufferedReader in;
 		
-		public ClientHandler(Socket s) {
+		public ClientHandler(Server ser, Socket s) {
+			server = ser;
 			client = s;
 		}
 		
@@ -52,6 +62,9 @@ public class Server {
 						break;
 					}
 					//Logic Here
+					server.inputs.add(input);
+					//Then returns the recieved Data
+					out.println("Recieved input ("+input+")");
 				}
 				
 				in.close();

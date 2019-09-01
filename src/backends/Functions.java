@@ -26,7 +26,7 @@ public class Functions implements Serializable{
 	AffineTransform pushpop = null;
 
 	public String arrayContains(String[] arr, String checking) {
-		if(arr.equals(null) || checking.equals(null)) {
+		if(arr == null || checking == null) {
 			return null;
 		}
 		for(String s : arr) {

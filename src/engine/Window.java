@@ -56,7 +56,7 @@ public class Window implements Config, Serializable {
 	public Point SCREEN_CENTER;
 
 	// Imports
-	private Debug debug = null;
+	public Debug debug = null;
 	private Credit c = null;
 	public EventHandler EventH = null;
 	public AudioHandler AudioH = null;
