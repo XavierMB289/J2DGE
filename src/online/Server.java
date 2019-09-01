@@ -8,19 +8,18 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
-public class Server implements Runnable{
+public class Server extends Wrapper implements Runnable{
 	
 	private ServerSocket server;
 	private ArrayList<ClientHandler> CH;
-	private Thread t;
 	public boolean ACCEPTING = true;
-	public ArrayList<String> inputs;
-	ArrayList<String> removeInput;
-	Logger logger;
 	public int PORT = 0;
 	
+	public Server() {
+		super();
+	}
+	
 	public void start() {
-		logger = new Logger();
 		try {
 			server = new ServerSocket(0);
 		} catch (IOException e) {
@@ -29,8 +28,6 @@ public class Server implements Runnable{
 		}
 		PORT = server.getLocalPort();
 		CH = new ArrayList<>();
-		inputs = new ArrayList<>();
-		removeInput = new ArrayList<>();
 		t = new Thread(this);
 		t.start();
 	}
@@ -47,14 +44,6 @@ public class Server implements Runnable{
 				e.printStackTrace();
 			}
 		}
-	}
-	
-	public void subInput(String in) {
-		removeInput.add(in);
-	}
-	
-	public int getInputsSize() {
-		return inputs == null ? 0 : inputs.size();
 	}
 	
 	public void stop() throws IOException {
@@ -121,7 +110,10 @@ public class Server implements Runnable{
 						//Closing Server
 						break;
 					}
-					sendMessage("Recieved Input");
+					if(!server.nextMessage.equals("")) {
+						server.nextMessage = "";
+						sendMessage(server.nextMessage);
+					}
 					//Logic Here
 					server.inputs.add(input);
 					server.logger.print(input);

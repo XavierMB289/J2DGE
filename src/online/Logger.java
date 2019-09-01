@@ -13,7 +13,7 @@ public class Logger extends Functions{
 	}
 	
 	public void print(String input) {
-		if(arrayContains(lastFive, input) != null) {
+		if(arrayContains(lastFive, input) == null) {
 			lastFive[0] = lastFive[1];
 			lastFive[1] = lastFive[2];
 			lastFive[2] = lastFive[3];
