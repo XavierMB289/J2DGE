@@ -71,6 +71,12 @@ public class Server implements Runnable{
 		}
 	}
 	
+	public void sendMessage(String m) {
+		for(ClientHandler c : CH) {
+			c.sendMessage(m);
+		}
+	}
+	
 	private static class ClientHandler implements Runnable{
 		private Server server;
 		private Socket client;
@@ -100,6 +106,10 @@ public class Server implements Runnable{
 			}
 		}
 		
+		public void sendMessage(String m) {
+			out.println(m);
+		}
+		
 		@Override
 		public void run() {
 			try {
@@ -111,7 +121,7 @@ public class Server implements Runnable{
 						//Closing Server
 						break;
 					}
-					out.println("Recieved input");
+					sendMessage("Recieved Input");
 					//Logic Here
 					server.inputs.add(input);
 					server.logger.print(input);
