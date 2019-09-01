@@ -30,8 +30,10 @@ public class Functions implements Serializable{
 			return null;
 		}
 		for(String s : arr) {
-			if(s.equals(checking) || s.contains(checking)) {
-				return s;
+			if(s != null) {
+				if(s.equals(checking) || s.contains(checking)) {
+					return s;
+				}
 			}
 		}
 		return null;

@@ -15,7 +15,7 @@ public class Client {
 
 	public Client start(String ip, int port) throws UnknownHostException, IOException {
 		client = new Socket(ip, port);
-		out = new PrintWriter(client.getOutputStream());
+		out = new PrintWriter(client.getOutputStream(), true);
 		in = new BufferedReader(new InputStreamReader(client.getInputStream()));
 		return this;
 	}

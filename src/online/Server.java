@@ -8,26 +8,49 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
-public class Server {
+public class Server implements Runnable{
 	
 	private ServerSocket server;
 	private ArrayList<ClientHandler> CH;
-	public boolean ACCEPTING;
+	private Thread t;
+	public boolean ACCEPTING = true;
 	public ArrayList<String> inputs;
+	ArrayList<String> removeInput;
+	Logger logger;
 	public int PORT = 0;
 	
-	public void start() throws IOException {
-		server = new ServerSocket(0);
+	public void start() {
+		logger = new Logger();
+		try {
+			server = new ServerSocket(0);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		PORT = server.getLocalPort();
 		CH = new ArrayList<>();
-		ACCEPTING = true;
 		inputs = new ArrayList<>();
-		
+		removeInput = new ArrayList<>();
+		t = new Thread(this);
+		t.start();
+	}
+	
+	@Override
+	public void run() {
 		while(ACCEPTING) {
-			ClientHandler temp = new ClientHandler(this, server.accept());
-			temp.start();
-			CH.add(temp);
+			try {
+				ClientHandler temp = new ClientHandler(this, server.accept());
+				temp.start();
+				CH.add(temp);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
+	}
+	
+	public void subInput(String in) {
+		removeInput.add(in);
 	}
 	
 	public int getInputsSize() {
@@ -36,40 +59,65 @@ public class Server {
 	
 	public void stop() throws IOException {
 		ACCEPTING = false;
+		for(ClientHandler c : CH) {
+			c.stop();
+		}
 		server.close();
+		try {
+			t.join();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
-	private static class ClientHandler extends Thread{
+	private static class ClientHandler implements Runnable{
 		private Server server;
 		private Socket client;
 		private PrintWriter out;
 		private BufferedReader in;
+		private Thread t;
 		
 		public ClientHandler(Server ser, Socket s) {
 			server = ser;
 			client = s;
+			t = new Thread(this);
 		}
 		
+		public void start() {
+			t.start();
+		}
+		
+		public void stop() {
+			try {
+				in.close();
+				out.close();
+				client.close();
+				t.join();
+			} catch (InterruptedException | IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		@Override
 		public void run() {
 			try {
-				out = new PrintWriter(client.getOutputStream());
+				out = new PrintWriter(client.getOutputStream(), true);
 				in = new BufferedReader(new InputStreamReader(client.getInputStream()));
-				
 				String input;
 				while((input = in.readLine()) != null) {
 					if(input.equals("closeServer")) {
 						//Closing Server
 						break;
 					}
+					out.println("Recieved input");
 					//Logic Here
 					server.inputs.add(input);
-					//Then returns the recieved Data
-					out.println("Recieved input ("+input+")");
+					server.logger.print(input);
 				}
 				
-				in.close();
-				out.close();
-				client.close();
+				stop();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
