@@ -69,7 +69,7 @@ public class FileHandler implements Serializable{
 	
 	public void writeToFile(String filepath, String[] lines) {
 		try {
-			FileWriter fw = new FileWriter(getClass().getResource(filepath).getFile());
+			FileWriter fw = new FileWriter(getClass().getClassLoader().getResource(filepath).getFile());
 			
 			for(String line : lines) {
 				fw.write(line + System.lineSeparator());
