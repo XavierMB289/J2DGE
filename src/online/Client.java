@@ -50,7 +50,7 @@ public class Client extends Wrapper implements Runnable{
 		}
 	}
 	
-	public String sendMessage(String msg) throws IOException {
+	private String sendMessage(String msg) throws IOException {
 		out.println(msg);
 		return in.readLine();
 	}

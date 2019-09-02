@@ -26,5 +26,13 @@ public class Wrapper{
 	public ArrayList<String> copyInputs(){
 		return new ArrayList<>(inputs);
 	}
+	
+	public void setMessage(String s) {
+		nextMessage = s;
+	}
+	
+	public String getMessage() {
+		return nextMessage;
+	}
 
 }

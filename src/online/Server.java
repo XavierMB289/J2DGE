@@ -60,12 +60,6 @@ public class Server extends Wrapper implements Runnable{
 		}
 	}
 	
-	public void sendMessage(String m) {
-		for(ClientHandler c : CH) {
-			c.sendMessage(m);
-		}
-	}
-	
 	private static class ClientHandler implements Runnable{
 		private Server server;
 		private Socket client;
