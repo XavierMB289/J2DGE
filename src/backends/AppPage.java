@@ -30,6 +30,8 @@ public abstract class AppPage implements Serializable{
 		}
 	}
 	
+	public abstract void onChange();
+	
 	public abstract void paint(Graphics2D g);
 	
 	public abstract void update(double delta);

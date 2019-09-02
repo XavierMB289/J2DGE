@@ -48,6 +48,7 @@ public class TransitionHandler implements Serializable{
 		if(!transitioning) {
 			transitioning = true;
 			this.oldPage = oldPage;
+			this.oldPage.onChange();
 			this.newPage = newPage;
 			if(!this.newPage.getInit()) {
 				this.newPage.init();
@@ -60,16 +61,8 @@ public class TransitionHandler implements Serializable{
 	
 	public void setTransition(AppPage oldPage, AppPage newPage, int t) {
 		if(!transitioning) {
-			transitioning = true;
-			this.oldPage = oldPage;
-			this.newPage = newPage;
-			if(!this.newPage.getInit()) {
-				this.newPage.init();
-			}
+			setTransition(oldPage, newPage);
 			this.transition = t;
-			if(!audioFile.equals("")) {
-				w.AudioH.playSound(audioFile);
-			}
 		}
 	}
 	

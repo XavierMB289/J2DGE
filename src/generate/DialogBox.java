@@ -147,5 +147,10 @@ public class DialogBox extends AppPage{
 		// TODO Auto-generated method stub
 		
 	}
+	
+	@Override
+	public void onChange() {
+		
+	}
 
 }

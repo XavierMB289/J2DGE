@@ -42,6 +42,11 @@ public class Credit extends AppPage{
 		indexMult = 1;
 		timer = 15;
 	}
+	
+	@Override
+	public void onChange() {
+		
+	}
 
 	@Override
 	public void paint(Graphics2D g) {

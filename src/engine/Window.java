@@ -181,6 +181,8 @@ public class Window implements Config, Serializable {
 
 	public void setCurrentPage(String pageId) {
 		if(pages.get(pageId) != null) {
+			//Only if there is a new page to go to, make sure to "exit" old page
+			pages.get(currentPage).onChange();
 			AppPage temp = pages.get(pageId);
 			if(!temp.getInit()) {
 				temp.init();
