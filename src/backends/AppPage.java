@@ -13,12 +13,22 @@ public abstract class AppPage implements Serializable{
 	
 	protected String ID = getClass().getSimpleName();
 	
+	protected boolean initialized = false;
+	
 	public AppPage(Window win) {
 		w = win;
 		ID = ID.substring(0, 1).toLowerCase() + ID.substring(1);
 	}
 	
-	public abstract void init();
+	public boolean getInit() {
+		return initialized;
+	}
+	
+	public void init() {
+		if(!initialized) {
+			initialized = true;
+		}
+	}
 	
 	public abstract void paint(Graphics2D g);
 	
