@@ -194,6 +194,12 @@ public class Window implements Config, Serializable {
 		}
 	}
 	
+	public void addPage(AppPage p) {
+		if(!pages.containsValue(p)) {
+			pages.put(p.getID(), p);
+		}
+	}
+	
 	public String getCurrentPage() {
 		return currentPage;
 	}
@@ -325,6 +331,7 @@ public class Window implements Config, Serializable {
 	}
 
 	public synchronized void stop() {
+		getCurrentAppPage().onChange();
 		frame.setVisible(false);
 		System.exit(-1);
 	}

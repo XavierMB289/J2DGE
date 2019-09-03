@@ -33,7 +33,7 @@ public class FileHandler implements Serializable{
 	}
 	
 	public void save(String filepath, Object o) {
-		File f = new File(getClass().getResource(filepath).getFile());
+		File f = new File(getClass().getClassLoader().getResource(filepath).getFile());
 		if(f != null && f.exists()) {
 			try {
 				FileOutputStream file = new FileOutputStream(f.getAbsolutePath()); 
@@ -51,17 +51,21 @@ public class FileHandler implements Serializable{
 		
 		Object ret = null;
 		
-		File f = new File(getClass().getResource(filepath).getFile());
+		File f = new File(getClass().getClassLoader().getResource(filepath).getFile());
 		if(f != null && f.exists()) {
-			FileInputStream file;
-			try {
-				file = new FileInputStream(f);
-				ObjectInputStream in = new ObjectInputStream(file);
-				ret = in.readObject();
-				in.close(); 
-				file.close();
-			} catch (ClassNotFoundException | IOException e) {
-				e.printStackTrace();
+			if(f.length() == 0) {
+				return null;
+			}else {
+				FileInputStream file;
+				try {
+					file = new FileInputStream(f);
+					ObjectInputStream in = new ObjectInputStream(file);
+					ret = in.readObject();
+					in.close(); 
+					file.close();
+				} catch (ClassNotFoundException | IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 		return ret;
@@ -88,7 +92,7 @@ public class FileHandler implements Serializable{
 		ArrayList<String> ret = new ArrayList<String>();
 		
 		try {
-			Scanner scan = new Scanner(new File(getClass().getResource(filepath).getFile()));
+			Scanner scan = new Scanner(new File(getClass().getClassLoader().getResource(filepath).getFile()));
 			
 			while(scan.hasNextLine()) {
 				ret.add(scan.nextLine());
