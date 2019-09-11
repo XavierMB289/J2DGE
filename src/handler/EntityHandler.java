@@ -1,13 +1,16 @@
 package handler;
 
 import java.awt.Graphics2D;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import backends.Entity;
 import engine.Window;
 
-public class EntityHandler {
+public class EntityHandler implements Serializable{
 	
+	private static final long serialVersionUID = -6427291011070466960L;
+
 	Window w;
 	
 	// Entity Variables

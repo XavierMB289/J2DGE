@@ -137,7 +137,7 @@ public class Window implements Config, Serializable {
 					}
 				} else if (e.getKeyCode() == ENTER || e.getKeyCode() == ENTER_ALT) {
 					if (currentPage.equals("credit")) {
-						setCurrentPage("mainMenu");
+						setCurrentPage("mainMenu", true);
 					}
 				}
 			}
@@ -179,12 +179,12 @@ public class Window implements Config, Serializable {
 		setWindowSize(new Dimension(x, y));
 	}
 
-	public void setCurrentPage(String pageId) {
+	public void setCurrentPage(String pageId, boolean init) {
 		if(pages.get(pageId) != null) {
 			//Only if there is a new page to go to, make sure to "exit" old page
-			pages.get(currentPage).onChange();
-			AppPage temp = pages.get(pageId);
-			if(!temp.getInit()) {
+			if(init) { 
+				getCurrentAppPage().onChange();
+				AppPage temp = pages.get(pageId);
 				temp.init();
 			}
 			currentPage = pageId;
@@ -258,6 +258,26 @@ public class Window implements Config, Serializable {
 
 	public void setMenuBar(JMenuBar j) {
 		frame.setJMenuBar(j);
+		frame.validate();
+	}
+	
+	public void removeMouseListen(MouseListener l) {
+		frame.removeMouseListener(l);
+		frame.validate();
+	}
+	
+	public void removeMouseMotionListen(MouseMotionListener l) {
+		frame.removeMouseMotionListener(l);
+		frame.validate();
+	}
+
+	public void removeMouseWheelListen(MouseWheelListener l) {
+		frame.removeMouseWheelListener(l);
+		frame.validate();
+	}
+
+	public void removeComp(Component c) {
+		frame.remove(c);
 		frame.validate();
 	}
 

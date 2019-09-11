@@ -9,26 +9,16 @@ public abstract class AppPage implements Serializable{
 	
 	private static final long serialVersionUID = 5638768653315988428L;
 	
-	protected Window w;
+	protected transient Window w;
 	
 	protected String ID = getClass().getSimpleName();
-	
-	protected boolean initialized = false;
 	
 	public AppPage(Window win) {
 		w = win;
 		ID = ID.substring(0, 1).toLowerCase() + ID.substring(1);
 	}
 	
-	public boolean getInit() {
-		return initialized;
-	}
-	
-	public void init() {
-		if(!initialized) {
-			initialized = true;
-		}
-	}
+	public abstract void init();
 	
 	public abstract void onChange();
 	

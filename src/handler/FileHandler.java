@@ -43,6 +43,7 @@ public class FileHandler implements Serializable{
 				file.close();
 			} catch (IOException e) {
 				e.printStackTrace();
+				deleteContents(filepath);
 			}
 		}
 	}
@@ -146,5 +147,14 @@ public class FileHandler implements Serializable{
 			return result.toArray(new String[result.size()]);
 		}
 		return new String[] {};
+	}
+	
+	public void deleteContents(String filePath) {
+		try {
+			new FileWriter(getClass().getClassLoader().getResource(filePath).getFile(), false).close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

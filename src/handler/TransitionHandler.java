@@ -46,16 +46,27 @@ public class TransitionHandler implements Serializable{
 	
 	public void setTransition(AppPage oldPage, AppPage newPage) {
 		if(!transitioning) {
+			transitioning = true;
 			this.oldPage = oldPage;
-			this.oldPage.onChange();
+			oldPage.onChange();
 			this.newPage = newPage;
-			if(!this.newPage.getInit()) {
-				this.newPage.init();
-			}
+			newPage.init();
 			if(!audioFile.equals("")) {
 				w.AudioH.playSound(audioFile);
 			}
+			w.addPage(newPage);
+		}
+	}
+	
+	public void setTransNoInit(AppPage oldPage, AppPage newPage) {
+		if(!transitioning) {
 			transitioning = true;
+			this.oldPage = oldPage;
+			oldPage.onChange();
+			this.newPage = newPage;
+			if(!audioFile.equals("")) {
+				w.AudioH.playSound(audioFile);
+			}
 			w.addPage(newPage);
 		}
 	}
@@ -110,7 +121,7 @@ public class TransitionHandler implements Serializable{
 		g.dispose();
 		
 		if(y >= w.HEIGHT) {
-			w.setCurrentPage(newPage.getID());
+			w.setCurrentPage(newPage.getID(), false);
 			y = 0;
 			transitioning = false;
 			transition = -1;
@@ -141,7 +152,7 @@ public class TransitionHandler implements Serializable{
 		g.dispose();
 		
 		if(x >= w.WIDTH) {
-			w.setCurrentPage(newPage.getID());
+			w.setCurrentPage(newPage.getID(), false);
 			x = 0;
 			transitioning = false;
 			transition = -1;
@@ -181,7 +192,7 @@ public class TransitionHandler implements Serializable{
 			flipped = true;
 			transparency = 1f;
 		}else if(flipped == true && transparency <= 0f) {
-			w.setCurrentPage(newPage.getID());
+			w.setCurrentPage(newPage.getID(), false);
 			transparency = 0f;
 			flipped = false;
 			transitioning = false;

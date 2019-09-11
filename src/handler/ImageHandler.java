@@ -2,6 +2,7 @@ package handler;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.Serializable;
@@ -43,7 +44,7 @@ public class ImageHandler implements Serializable{
 		if(icon.getImage() instanceof BufferedImage) {
 			return (BufferedImage) icon.getImage();
 		}
-		BufferedImage ret = new BufferedImage(icon.getIconWidth(), icon.getIconWidth(), BufferedImage.TYPE_INT_ARGB);
+		BufferedImage ret = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
 		Graphics g = ret.createGraphics();
 		g.drawImage(icon.getImage(), 0, 0, null);
 		g.dispose();
@@ -84,7 +85,7 @@ public class ImageHandler implements Serializable{
 		ImageIcon[] ret = new ImageIcon[sheetW*sheetH];
 		for(int y = 0; y < sheetH; y++) {
 			for(int x = 0; x < sheetW; x++) {
-				ret[(y*sheetH)+x] = getSprite(w, img.getImage(), x*size, y*size, size);
+				ret[(y*sheetW)+x] = getSprite(w, img.getImage(), x*size, y*size, size);
 			}
 		}
 		return ret;
@@ -102,6 +103,18 @@ public class ImageHandler implements Serializable{
 			}
 		}
 		return toImage(image);
+	}
+	
+	public ImageIcon rotate(ImageIcon image, int degrees) {
+		int w = image.getIconWidth(), h = image.getIconHeight();
+		BufferedImage temp = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+		Graphics2D g = temp.createGraphics();
+		g.translate(w/2, h/2);
+		g.rotate(Math.toRadians(degrees));
+		g.translate(-w/2, -h/2);
+		g.drawImage(image.getImage(), 0, 0, null);
+		g.dispose();
+		return toImage(temp);
 	}
 	
 }
