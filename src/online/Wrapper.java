@@ -1,38 +1,28 @@
 package online;
 
-import java.util.ArrayList;
+import java.io.IOException;
+import java.nio.channels.SocketChannel;
 
-public class Wrapper{
+public class Wrapper extends Logger{
 	
-	protected ArrayList<String> inputs;
-	protected Thread t;
-	protected Logger logger;
-	protected String nextMessage = "";
-
-	public Wrapper() {
-		inputs = new ArrayList<>();
-		logger = new Logger();
+	private static final long serialVersionUID = -7537729586644209586L;
+	
+	SocketChannel client;
+	
+	public void setClient(SocketChannel sc) {
+		client = sc;
 	}
-	
-	public String getLastLog() {
-		String log = logger.getRecentLog();
-		if(inputs.size() > 0) {
-			String input = inputs.get(inputs.size()-1);
-			return log.equals(input) ? log : input;
+
+	public void parse(String input) {
+		switch(input) {
+			case "closeConnection":
+				try {
+					client.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				break;
 		}
-		return log;
-	}
-	
-	public ArrayList<String> copyInputs(){
-		return new ArrayList<>(inputs);
-	}
-	
-	public void setMessage(String s) {
-		nextMessage = s;
-	}
-	
-	public String getMessage() {
-		return nextMessage;
 	}
 
 }

@@ -1,124 +1,83 @@
 package online;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.ArrayList;
+import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
+import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
+import java.util.Iterator;
+import java.util.Set;
 
-public class Server extends Wrapper implements Runnable{
+public class Server extends Wrapper{
 	
-	private ServerSocket server;
-	private ArrayList<ClientHandler> CH;
-	public boolean ACCEPTING = true;
-	public int PORT = 0;
+	private static final long serialVersionUID = -1181155211514559101L;
 	
-	public Server() {
-		super();
+	transient Thread t = null;
+	Selector sel = null;
+	ServerSocketChannel socket = null;
+	InetSocketAddress address = null;
+	
+	boolean running;
+	
+	public Server start() {
+		return this.start("127.0.0.1", 0);
 	}
 	
-	public void start() {
-		try {
-			server = new ServerSocket(0);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		PORT = server.getLocalPort();
-		CH = new ArrayList<>();
-		t = new Thread(this);
-		t.start();
-	}
-	
-	@Override
-	public void run() {
-		while(ACCEPTING) {
-			try {
-				ClientHandler temp = new ClientHandler(this, server.accept());
-				temp.start();
-				CH.add(temp);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-	}
-	
-	public void stop() throws IOException {
-		ACCEPTING = false;
-		for(ClientHandler c : CH) {
-			c.stop();
-		}
-		server.close();
-		try {
-			t.join();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	private static class ClientHandler implements Runnable{
-		private Server server;
-		private Socket client;
-		private PrintWriter out;
-		private BufferedReader in;
-		private Thread t;
-		
-		public ClientHandler(Server ser, Socket s) {
-			server = ser;
-			client = s;
-			t = new Thread(this);
-		}
-		
-		public void start() {
-			t.start();
-		}
-		
-		public void stop() {
-			try {
-				in.close();
-				out.close();
-				client.close();
-				t.join();
-			} catch (InterruptedException | IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		
-		public void sendMessage(String m) {
-			out.println(m);
-		}
-		
-		@Override
-		public void run() {
-			try {
-				out = new PrintWriter(client.getOutputStream(), true);
-				in = new BufferedReader(new InputStreamReader(client.getInputStream()));
-				String input;
-				while((input = in.readLine()) != null) {
-					if(input.equals("closeServer")) {
-						//Closing Server
-						break;
+	public Server start(String ip, int port) {
+		running = true;
+		t = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					sel = Selector.open();
+					socket = ServerSocketChannel.open();
+					address = new InetSocketAddress(ip, port);
+					
+					socket.bind(address);
+					socket.configureBlocking(false);
+					
+					int ops = socket.validOps();
+					SelectionKey key = socket.register(sel, ops, null);
+					
+					while(running) {
+						sel.select();
+						
+						Set<SelectionKey> keys = sel.selectedKeys();
+						Iterator<SelectionKey> iterator = keys.iterator();
+						
+						while(iterator.hasNext()) {
+							
+							SelectionKey myKey = iterator.next();
+							
+							if(myKey.isAcceptable()) {
+								SocketChannel client = socket.accept();
+								
+								client.configureBlocking(false);
+								
+								client.register(sel, SelectionKey.OP_READ);
+								
+							}else if(myKey.isReadable()) {
+								SocketChannel client = (SocketChannel) myKey.channel();
+								ByteBuffer buffer = ByteBuffer.allocate(256);
+								client.read(buffer);
+								String result = new String(buffer.array()).trim();
+								
+								setClient(client);
+								parse(result);
+							}
+							iterator.remove();
+						}
 					}
-					if(!server.nextMessage.equals("")) {
-						server.nextMessage = "";
-						sendMessage(server.nextMessage);
-					}
-					//Logic Here
-					server.inputs.add(input);
-					server.logger.print(input);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
-				
-				stop();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}			
-		}
+			}
+		});
+		t.start();
+		return this;
 	}
 
 }

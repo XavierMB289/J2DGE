@@ -21,6 +21,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 
+import achievement.Trophy;
+import achievement.TrophyCallback;
 import backends.AppPage;
 import backends.Functions;
 import backends.ImageItem;
@@ -65,6 +67,7 @@ public class Window implements Config, Serializable {
 	public FileHandler FileH = null;
 	public EntityHandler EntityH = null;
 	public Functions functions = null;
+	public Trophy trophy = null;
 
 	// Page and Overlay Variables
 	private Map<String, AppPage> pages = new HashMap<>();
@@ -312,6 +315,7 @@ public class Window implements Config, Serializable {
 		debug.setupRect();
 		c.init();
 		pages.put(c.getID(), c);
+		trophy = new Trophy(this);
 
 		// Adding Pages
 		String[] pageList = FileH.getFilesFromDir(getClass(), "pages/");
@@ -375,6 +379,9 @@ public class Window implements Config, Serializable {
 		} else {
 			g.drawImage(TransH.getTransition().getImage(), 0, 0, null);
 		}
+		if(trophy != null) {
+			trophy.paint(g);
+		}
 		debug.paint(g);
 	}
 
@@ -396,6 +403,9 @@ public class Window implements Config, Serializable {
 		if (!TransH.transitioning) {
 			updatePage(delta);
 		}
+		if(trophy != null) {
+			trophy.update();
+		}
 	}
 
 	public boolean keyIsDown(int key) {
@@ -415,5 +425,13 @@ public class Window implements Config, Serializable {
 			}
 		}
 		return null;
+	}
+	
+	public void addTrophy(String title, String desc) {
+		trophy.addTrophy(title, desc);
+	}
+	
+	public void addTrophy(String title, String desc, TrophyCallback call) {
+		trophy.addTrophy(title, desc, call);
 	}
 }

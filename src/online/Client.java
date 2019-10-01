@@ -1,64 +1,71 @@
 package online;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.Socket;
-import java.net.UnknownHostException;
+import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
+import java.nio.channels.SocketChannel;
 
 public class Client extends Wrapper implements Runnable{
 	
-	private Socket client;
-	private PrintWriter out;
-	private BufferedReader in;
-	
-	public Client() {
-		super();
-	}
+	private static final long serialVersionUID = 6799828793921830730L;
 
-	public Client start(String ip, int port) throws UnknownHostException, IOException {
-		client = new Socket(ip, port);
-		out = new PrintWriter(client.getOutputStream(), true);
-		in = new BufferedReader(new InputStreamReader(client.getInputStream()));
-		t = new Thread(this);
-		t.start();
-		return this;
+	transient Thread t;
+	
+	public String message;
+	
+	InetSocketAddress address;
+	SocketChannel channel;
+	
+	public Client start() {
+		return this.start("127.0.0.1", 0);
 	}
 	
-	@Override
-	public void run() {
-		String input;
+	public Client start(String IP, int PORT) {
+		address = new InetSocketAddress(IP, PORT);
 		try {
-			while((input = in.readLine()) != null) {
-				if(input.equals("closeServer")) {
-					//Closing Server
-					break;
-				}
-				if(!nextMessage.equals("")) {
-					nextMessage = "";
-					sendMessage(nextMessage);
-				}
-				//Logic Here
-				inputs.add(input);
-				logger.print(input);
-			}
-			stop();
+			channel = SocketChannel.open(address);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return this;
 	}
 	
-	private String sendMessage(String msg) throws IOException {
-		out.println(msg);
-		return in.readLine();
+	public void loop() {
+		t = new Thread(this);
+		t.start();
 	}
-	
-	public void stop() throws IOException {
-		in.close();
-		out.close();
-		client.close();
+
+	@SuppressWarnings("static-access")
+	@Override
+	public void run() {
+		while(channel.isConnected()) {
+			if(message != null && !message.equals("")) {
+				ByteBuffer buffer = ByteBuffer.wrap(message.getBytes());
+				try {
+					client.write(buffer);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				buffer.clear();
+				message = "";
+				try {
+					t.sleep(1000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		try {
+			client.close();
+			t.join();
+		} catch (IOException | InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 
 }
