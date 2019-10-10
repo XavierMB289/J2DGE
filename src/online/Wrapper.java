@@ -7,7 +7,9 @@ public class Wrapper extends Logger{
 	
 	private static final long serialVersionUID = -7537729586644209586L;
 	
-	SocketChannel client;
+	protected SocketChannel client;
+	
+	private int connections;
 	
 	public void setClient(SocketChannel sc) {
 		client = sc;
@@ -23,6 +25,14 @@ public class Wrapper extends Logger{
 				}
 				break;
 		}
+	}
+
+	public int getConnections() {
+		return connections;
+	}
+
+	public void setConnections(int connections) {
+		this.connections = connections;
 	}
 
 }

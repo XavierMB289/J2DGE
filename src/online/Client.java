@@ -12,9 +12,16 @@ public class Client extends Wrapper implements Runnable{
 	transient Thread t;
 	
 	public String message;
+
+	OnlineMethods OM;
 	
 	InetSocketAddress address;
 	SocketChannel channel;
+	
+	public Client addMethods(OnlineMethods o) {
+		OM = o;
+		return this;
+	}
 	
 	public Client start() {
 		return this.start("127.0.0.1", 0);
@@ -24,21 +31,21 @@ public class Client extends Wrapper implements Runnable{
 		address = new InetSocketAddress(IP, PORT);
 		try {
 			channel = SocketChannel.open(address);
+			if(OM!=null) OM.start();
+			t = new Thread(this);
+			t.start();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return this;
 	}
-	
-	public void loop() {
-		t = new Thread(this);
-		t.start();
-	}
 
 	@SuppressWarnings("static-access")
 	@Override
 	public void run() {
+		setConnections(1);
+		if(OM!=null) OM.onConnectionChange(1);
 		while(channel.isConnected()) {
 			if(message != null && !message.equals("")) {
 				ByteBuffer buffer = ByteBuffer.wrap(message.getBytes());
@@ -57,15 +64,26 @@ public class Client extends Wrapper implements Runnable{
 					e.printStackTrace();
 				}
 			}
+			if(OM!=null) OM.ping();
 		}
 		try {
 			client.close();
+			if(OM!=null) OM.stop();
 			t.join();
 		} catch (IOException | InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
+	}
+	
+	public void stop() {
+		try {
+			channel.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }
