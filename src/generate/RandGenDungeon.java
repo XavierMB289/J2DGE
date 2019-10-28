@@ -9,7 +9,7 @@ public class RandGenDungeon implements Serializable{
 	int width, height, roomW, roomH;
 	
 	public boolean FINISH_SETUP = false;
-	private boolean forceDoor = false;
+	private boolean door = false;
 	
 	/**
 	 * @author Xavier Bennett
@@ -23,7 +23,7 @@ public class RandGenDungeon implements Serializable{
 	 *  1000000001 -
 	 *  1111111111
 	 */
-	public RandGenDungeon(int[] data, boolean forceDoor) {
+	public RandGenDungeon(int[] data, boolean isDoor) {
 		if(data.length != 4) {
 			System.err.println("Too much/little data input for RandGenDungeon");
 			System.exit(-1);
@@ -33,7 +33,7 @@ public class RandGenDungeon implements Serializable{
 		roomW = data[2];
 		roomH = data[3];
 		
-		this.forceDoor = forceDoor;
+		this.door = isDoor;
 		
 		if(width <= 2) {
 			System.err.println("width needs to be greater than 2 in RandGenDungeon");
@@ -131,13 +131,6 @@ public class RandGenDungeon implements Serializable{
 				dirs[0] = y > 0;
 				dirs[1] = x < directions[y].length-1;
 				directions[y][x] = getDirections(dirs);
-				if(forceDoor) {
-					if(x != directions[y].length-1 && y != 0) {
-						while(directions[y][x].equals("")) {
-							directions[y][x] = getDirections(dirs);
-						}
-					}
-				}
 			}
 		}
 		
@@ -153,12 +146,12 @@ public class RandGenDungeon implements Serializable{
 					if(dirs[0] == 'n') {
 						line = ret[y*(1+roomH)];
 						int halfRoom = (roomW/2);
-						line = line.substring(0, halfRoom+x*(roomW+1)+randomDoor) + "0" + line.substring(1+halfRoom+x*(roomW+1)+randomDoor);
+						line = line.substring(0, halfRoom+x*(roomW+1)+randomDoor) + (door ? "2" : "0") + line.substring(1+halfRoom+x*(roomW+1)+randomDoor);
 						ret[y*(1+roomH)] = line;
 					}else if(dirs[0] == 'e') {
 						int halfRoom = (roomH/2);
 						line = ret[halfRoom+y*(1+roomH)];
-						line = line.substring(0, (x+1)*(roomW+1)) + "0" + line.substring(1+(x+1)*(roomW+1));
+						line = line.substring(0, (x+1)*(roomW+1)) + (door ? "2" : "0") + line.substring(1+(x+1)*(roomW+1));
 						ret[halfRoom+y*(1+roomH)] = line;
 					}
 				}
@@ -166,7 +159,7 @@ public class RandGenDungeon implements Serializable{
 					if(dirs[1] == 'e') {
 						int halfRoom = (roomH/2);
 						line = ret[halfRoom+y*(1+roomH)+randomDoor+1];
-						line = line.substring(0, (x+1)*(roomW+1)) + "0" + line.substring(1+(x+1)*(roomW+1));
+						line = line.substring(0, (x+1)*(roomW+1)) + (door ? "2" : "0") + line.substring(1+(x+1)*(roomW+1));
 						ret[halfRoom+y*(1+roomH)+randomDoor+1] = line;
 					}
 				}

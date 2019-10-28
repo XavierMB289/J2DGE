@@ -107,6 +107,19 @@ public class Functions implements Serializable{
 		g.drawImage(i, x, y, null);
 	}
 	
+	public Rectangle createCenteredRect(Image i, Rectangle rect, int addX, int addY) {
+		int x = rect.x + (rect.width - i.getWidth(null)) / 2 + addX;
+		int y = rect.y + (rect.height - i.getHeight(null)) / 2 + addY;
+		return new Rectangle(x, y, i.getWidth(null), i.getHeight(null));
+	}
+	
+	public Rectangle createCenteredRect(Graphics2D g, String text, Rectangle rect, int addX, int addY) {
+		FontMetrics mets = g.getFontMetrics(g.getFont());
+		int x = rect.x + (rect.width - mets.stringWidth(text)) / 2 + addX;
+		int y = rect.y + ((rect.height - mets.getHeight()) / 2) + mets.getAscent() + addY;
+		return new Rectangle(x, y, mets.stringWidth(text), mets.getHeight());
+	}
+	
 	public void addFont(int fontFormat, String fontNamePath) {
 		try {
 			URL url = getClass().getClassLoader().getResource(fontNamePath);

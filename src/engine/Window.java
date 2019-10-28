@@ -3,6 +3,8 @@ package engine;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
@@ -158,12 +160,46 @@ public class Window implements Config, Serializable {
 	}
 
 	/**
-	 * @author Xavier Bennett Creates a fullscreen window
+	 * @author Xavier Bennett
+	 * @desc Creates a fullscreen window
 	 */
 	public void setFullscreen() {
 		frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		frame.setFocusable(true);
 		customPanel.requestFocus();
+	}
+	
+	/**
+	 * @author Xavier Bennett
+	 * @desc Fullscreen Exclusive Mode with multi-monitor system
+	 */
+	public void fullscreenExclusive(int screenNum) {
+		GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
+		GraphicsDevice device = env.getScreenDevices()[screenNum];
+		if(device.isFullScreenSupported()) {
+			device.setFullScreenWindow(frame);
+			frame.setFocusable(true);
+			customPanel.requestFocus();
+		}else {
+			setFullscreen();
+		}
+	}
+	
+	/**
+	 * @author Xavier Bennett
+	 * @desc Fullscreen Exclusive Mode with single monitor
+	 */
+	
+	public void fullscreenExclusive() {
+		GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
+		GraphicsDevice device = env.getDefaultScreenDevice();
+		if(device.isFullScreenSupported()) {
+			device.setFullScreenWindow(frame);
+			frame.setFocusable(true);
+			customPanel.requestFocus();
+		}else {
+			setFullscreen();
+		}
 	}
 
 	/**

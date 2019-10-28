@@ -24,4 +24,6 @@ public interface Config {
 	//Variable Timestep Variables
 	public final double TARGET_FPS = 60;
 	public final double OPTIMAL_TIME = 1000000000 / TARGET_FPS;
+	//Physics Variables
+	public final double GRAVITY = 9.8;
 }
