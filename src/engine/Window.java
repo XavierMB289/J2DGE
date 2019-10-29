@@ -177,26 +177,11 @@ public class Window implements Config, Serializable {
 		GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		GraphicsDevice device = env.getScreenDevices()[screenNum];
 		if(device.isFullScreenSupported()) {
+			frame.setLocationRelativeTo(null);
+			frame.setUndecorated(true);
+			frame.setResizable(false);
 			device.setFullScreenWindow(frame);
-			frame.setFocusable(true);
-			customPanel.requestFocus();
-		}else {
-			setFullscreen();
-		}
-	}
-	
-	/**
-	 * @author Xavier Bennett
-	 * @desc Fullscreen Exclusive Mode with single monitor
-	 */
-	
-	public void fullscreenExclusive() {
-		GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
-		GraphicsDevice device = env.getDefaultScreenDevice();
-		if(device.isFullScreenSupported()) {
-			device.setFullScreenWindow(frame);
-			frame.setFocusable(true);
-			customPanel.requestFocus();
+			windowSetup();
 		}else {
 			setFullscreen();
 		}
@@ -327,6 +312,11 @@ public class Window implements Config, Serializable {
 		frame.pack();
 		frame.setVisible(true);
 		
+		windowSetup();
+		
+	}
+	
+	private void windowSetup() {
 		if (WIDTH == -1) {
 			WIDTH = frame.getWidth();
 			HALF_W = WIDTH / 2;
