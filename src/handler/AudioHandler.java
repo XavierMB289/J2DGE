@@ -15,7 +15,7 @@ public class AudioHandler implements Serializable{
 	}
 	
 	public Clipping[] loadClippings(String filename) {
-		File folder = new File(filename);
+		File folder = new File(getClass().getClassLoader().getResource(filename).getFile());
 		File[] files = folder.listFiles();
 		ArrayList<Clipping> list = new ArrayList<>();
 		for(File f: files) {

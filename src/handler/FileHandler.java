@@ -157,4 +157,23 @@ public class FileHandler implements Serializable{
 			e.printStackTrace();
 		}
 	}
+	
+	public void createBlankFile(String path) {
+		try {
+			File temp = new File(getClass().getClassLoader().getResource(path).getFile());
+			if(!temp.exists()) {
+				temp.createNewFile();
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void createDirectory(String path) {
+		File temp = new File(getClass().getClassLoader().getResource(path).getFile());
+		if(!temp.exists()) {
+			temp.mkdirs();
+		}
+	}
 }

@@ -22,7 +22,7 @@ public class Clipping implements LineListener, Serializable{
 	Long currentFrame;
 	Clip clip;
 	
-	String filename;
+	public String filename;
 	String status = "";
 	
 	AudioInputStream ais;
@@ -32,7 +32,7 @@ public class Clipping implements LineListener, Serializable{
 		this.filename = filename;
 		
 		try {
-			File temp = new File(getClass().getResource(filename).getFile());
+			File temp = new File(getClass().getClassLoader().getResource(filename).getFile());
 			ais = AudioSystem.getAudioInputStream(temp);
 			AudioFormat format = ais.getFormat();
 			DataLine.Info info = new DataLine.Info(Clip.class, format);

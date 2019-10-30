@@ -26,6 +26,7 @@ import javax.swing.JMenuBar;
 import achievement.Trophy;
 import achievement.TrophyCallback;
 import backends.AppPage;
+import backends.Clipping;
 import backends.Functions;
 import backends.ImageItem;
 import backends.Overlay;
@@ -84,6 +85,9 @@ public class Window implements Config, Serializable {
 	// Images
 	private ArrayList<ImageItem> images = null;
 	
+	//Audio
+	private ArrayList<Clipping> audio = null;
+	
 	//ProgressionChecks
 	public ProgressionCheck imageCheck;
 	public ProgressionCheck pageCheck;
@@ -121,7 +125,11 @@ public class Window implements Config, Serializable {
 		overlays = new HashMap<>();
 
 		// Setting Up Images
+		FileH.createDirectory("img/");
 		images = ImageH.getAllImages("img/");
+		
+		//Audio Init
+		audio = new ArrayList<>();
 		
 		//Setup and create JFrame
 		frame = new JFrame(name);
@@ -313,7 +321,6 @@ public class Window implements Config, Serializable {
 		frame.validate();
 	}
 
-	@SuppressWarnings("rawtypes")
 	public void setVisible() {
 
 		frame.validate();
@@ -352,7 +359,9 @@ public class Window implements Config, Serializable {
 		trophy = new Trophy(this);
 
 		// Adding Pages
+		FileH.createDirectory("pages/");
 		String[] pageList = FileH.getFilesFromDir(getClass(), "pages/");
+		FileH.createDirectory("overlays/");
 		String[] overlayList = FileH.getFilesFromDir(getClass(), "overlays/");
 		int totalFiles = pageList.length + overlayList.length;
 		int tempNum = 0;
@@ -361,7 +370,7 @@ public class Window implements Config, Serializable {
 				tempNum++;
 				if (!pn.isEmpty() && !pn.matches(".*\\d.*")) {
 					Class<?> c = Class.forName("pages." + pn.split("\\.")[0]);
-					Constructor con = c.getConstructor(new Class[] { Window.class });
+					Constructor<?> con = c.getConstructor(new Class[] { Window.class });
 					Object o = con.newInstance(this);
 					if (o instanceof AppPage) {
 						AppPage ap = (AppPage) o;
@@ -375,7 +384,7 @@ public class Window implements Config, Serializable {
 				tempNum++;
 				if (!pn.isEmpty() && !pn.matches(".*\\d.*")) {
 					Class<?> c = Class.forName("overlays." + pn.split("\\.")[0]);
-					Constructor con = c.getConstructor(new Class[] { Window.class });
+					Constructor<?> con = c.getConstructor(new Class[] { Window.class });
 					Object o = con.newInstance(this);
 					if (o instanceof Overlay) {
 						Overlay ap = (Overlay) o;
@@ -389,6 +398,18 @@ public class Window implements Config, Serializable {
 				| IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+		
+		FileH.createDirectory("audio/bgm/");
+		Clipping[] bgm = AudioH.loadClippings("audio/bgm/");
+		FileH.createDirectory("audio/sprite/");
+		Clipping[] sprite = AudioH.loadClippings("audio/sprite/");
+		
+		for(Clipping clip : bgm) {
+			audio.add(clip);
+		}
+		for(Clipping clip : sprite) {
+			audio.add(clip);
 		}
 
 		thread.start();
