@@ -60,9 +60,13 @@ public class ImageHandler implements Serializable{
 	public ArrayList<ImageItem> getAllImages(String filename) {
 		ArrayList<ImageItem> ret = new ArrayList<>();
 		String[] temp = w.FileH.getFilesFromDir(getClass(), filename);
+		int totalFiles = temp.length;
+		int num = 0;
 		
 		for(String t : temp) {
+			num++;
 			ret.add(new ImageItem(getImage(filename+t), t.split("\\.")[0]));
+			w.imageCheck.setProgress((int)Math.floor((num / totalFiles) * 100));
 		}
 		
 		return ret;

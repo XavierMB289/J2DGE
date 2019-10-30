@@ -9,13 +9,13 @@ import javax.swing.ImageIcon;
 
 import backends.AppPage;
 import engine.Window;
-import objs.ProgressBar;
+import objs.progress.ProgressBar;
 
 public class Credit extends AppPage{
 
 	private static final long serialVersionUID = 89647535374755949L;
 	
-	ProgressBar PB;
+	public ProgressBar PB;
 	
 	ImageIcon icon;
 	
@@ -35,6 +35,8 @@ public class Credit extends AppPage{
 		PB = new ProgressBar(w, icon, new Point((int)w.W12*2, (int)w.H12*11), (int)w.W12*8, 5);
 		PB.setColor(Color.LIGHT_GRAY);
 		PB.setRelativeSpeed(3);
+		PB.addCheck(w.imageCheck);
+		PB.addCheck(w.pageCheck);
 		w.EntityH.addEntity(PB);
 		str = new String[] {"Java", "CoffeeDev"};
 		stringNum = 0;

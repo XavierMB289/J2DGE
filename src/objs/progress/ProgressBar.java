@@ -1,10 +1,11 @@
-package objs;
+package objs.progress;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
 
@@ -29,6 +30,10 @@ public class ProgressBar extends Entity{
 	//Finished?
 	public boolean FINISHED = false;
 	
+	//Progressions
+	ArrayList<ProgressionCheck> checks;
+	int progressAdding = 0;
+	int spacing = 0;
 
 	public ProgressBar(Window win, ImageIcon i, Point l, int w, int h) {
 		super(win);
@@ -38,6 +43,15 @@ public class ProgressBar extends Entity{
 		height = h > 0 ? h : 1;
 		x = l.x;
 		y = l.y;
+	}
+	
+	public void addCheck(ProgressionCheck c) {
+		if(checks == null) {
+			checks = new ArrayList<>();
+		}
+		checks.add(c);
+		progressAdding = 100 % checks.size();
+		spacing = (100 - progressAdding) / checks.size();
 	}
 	
 	public void dontShowLine() {
@@ -109,7 +123,18 @@ public class ProgressBar extends Entity{
 			}
 			FINISHED = true;
 		}else {
-			x+=speed;
+			int num = 0;
+			double percent = 0;
+			for(ProgressionCheck check : checks) {
+				if(percent == 0) {
+					if(check.getProgress() >= 1) {
+						num++;
+					}else {
+						percent = check.getProgress();
+					}
+				}
+			}
+			x = progressAdding + (num * spacing) + (int)Math.floor(percent * spacing);
 		}
 	}
 

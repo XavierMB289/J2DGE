@@ -37,6 +37,7 @@ import handler.FileHandler;
 import handler.ImageHandler;
 import handler.TransitionHandler;
 import interfaces.Config;
+import objs.progress.ProgressionCheck;
 
 public class Window implements Config, Serializable {
 
@@ -82,6 +83,10 @@ public class Window implements Config, Serializable {
 
 	// Images
 	private ArrayList<ImageItem> images = null;
+	
+	//ProgressionChecks
+	public ProgressionCheck imageCheck;
+	public ProgressionCheck pageCheck;
 
 	/**
 	 * @author Xavier Bennett
@@ -92,6 +97,9 @@ public class Window implements Config, Serializable {
 		customPanel = new CustomPanel(this);
 
 		thread = new Thread(customPanel);
+		
+		imageCheck = new ProgressionCheck();
+		pageCheck = new ProgressionCheck();
 
 		// Imports
 		debug = new Debug(this);
@@ -346,8 +354,11 @@ public class Window implements Config, Serializable {
 		// Adding Pages
 		String[] pageList = FileH.getFilesFromDir(getClass(), "pages/");
 		String[] overlayList = FileH.getFilesFromDir(getClass(), "overlays/");
+		int totalFiles = pageList.length + overlayList.length;
+		int tempNum = 0;
 		try {
 			for (String pn : pageList) {
+				tempNum++;
 				if (!pn.isEmpty() && !pn.matches(".*\\d.*")) {
 					Class<?> c = Class.forName("pages." + pn.split("\\.")[0]);
 					Constructor con = c.getConstructor(new Class[] { Window.class });
@@ -358,8 +369,10 @@ public class Window implements Config, Serializable {
 						System.out.println("The AppPage, "+ap.getID()+" has been added.");
 					}
 				}
+				pageCheck.setProgress((int)Math.floor((tempNum / totalFiles) * 100));
 			}
 			for (String pn : overlayList) {
+				tempNum++;
 				if (!pn.isEmpty() && !pn.matches(".*\\d.*")) {
 					Class<?> c = Class.forName("overlays." + pn.split("\\.")[0]);
 					Constructor con = c.getConstructor(new Class[] { Window.class });
@@ -370,6 +383,7 @@ public class Window implements Config, Serializable {
 						System.out.println("The Overlay, "+ap.getID()+" has been added.");
 					}
 				}
+				pageCheck.setProgress((int)Math.floor((tempNum / totalFiles) * 100));
 			}
 		} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException
 				| IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
