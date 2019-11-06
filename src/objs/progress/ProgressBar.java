@@ -50,8 +50,8 @@ public class ProgressBar extends Entity{
 			checks = new ArrayList<>();
 		}
 		checks.add(c);
-		progressAdding = 100 % checks.size();
-		spacing = (100 - progressAdding) / checks.size();
+		progressAdding = ((100 % checks.size()) / 100 * width);
+		spacing = (int)Math.floor((double)((100 - progressAdding) / checks.size()) / 100 * width);
 	}
 	
 	public void dontShowLine() {
@@ -134,7 +134,7 @@ public class ProgressBar extends Entity{
 					}
 				}
 			}
-			x = progressAdding + (num * spacing) + (int)Math.floor(percent * spacing);
+			x = left.x + progressAdding + (num * spacing) + (int)Math.floor(percent * spacing);
 		}
 	}
 

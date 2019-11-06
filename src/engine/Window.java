@@ -89,8 +89,8 @@ public class Window implements Config, Serializable {
 	private ArrayList<Clipping> audio = null;
 	
 	//ProgressionChecks
-	public ProgressionCheck imageCheck;
 	public ProgressionCheck pageCheck;
+	public ProgressionCheck imageCheck;
 
 	/**
 	 * @author Xavier Bennett
@@ -102,8 +102,8 @@ public class Window implements Config, Serializable {
 
 		thread = new Thread(customPanel);
 		
-		imageCheck = new ProgressionCheck();
 		pageCheck = new ProgressionCheck();
+		imageCheck = new ProgressionCheck();
 
 		// Imports
 		debug = new Debug(this);
@@ -125,7 +125,6 @@ public class Window implements Config, Serializable {
 		overlays = new HashMap<>();
 
 		// Setting Up Images
-		FileH.createDirectory("img/");
 		images = ImageH.getAllImages("img/");
 		
 		//Audio Init
@@ -359,9 +358,7 @@ public class Window implements Config, Serializable {
 		trophy = new Trophy(this);
 
 		// Adding Pages
-		FileH.createDirectory("pages/");
 		String[] pageList = FileH.getFilesFromDir(getClass(), "pages/");
-		FileH.createDirectory("overlays/");
 		String[] overlayList = FileH.getFilesFromDir(getClass(), "overlays/");
 		int totalFiles = pageList.length + overlayList.length;
 		int tempNum = 0;
@@ -394,15 +391,15 @@ public class Window implements Config, Serializable {
 				}
 				pageCheck.setProgress((int)Math.floor((tempNum / totalFiles) * 100));
 			}
+			pageCheck.setProgress(100);
 		} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException
 				| IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		FileH.createDirectory("audio/bgm/");
+		
 		Clipping[] bgm = AudioH.loadClippings("audio/bgm/");
-		FileH.createDirectory("audio/sprite/");
 		Clipping[] sprite = AudioH.loadClippings("audio/sprite/");
 		
 		for(Clipping clip : bgm) {

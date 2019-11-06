@@ -68,6 +68,7 @@ public class ImageHandler implements Serializable{
 			ret.add(new ImageItem(getImage(filename+t), t.split("\\.")[0]));
 			w.imageCheck.setProgress((int)Math.floor((num / totalFiles) * 100));
 		}
+		w.imageCheck.setProgress(100);
 		
 		return ret;
 	}
