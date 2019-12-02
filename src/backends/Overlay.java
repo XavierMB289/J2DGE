@@ -1,6 +1,6 @@
 package backends;
 
-import java.awt.Color;
+import java.awt.AlphaComposite;
 import java.awt.Graphics2D;
 import java.io.Serializable;
 
@@ -14,11 +14,10 @@ public abstract class Overlay implements Serializable{
 	
 	protected String ID = getClass().getSimpleName();
 	
-	protected Color bg;
+	protected float alpha = 0.5f;
 	
-	public Overlay(Window w, Color bg) {
+	public Overlay(Window w) {
 		this.w = w;
-		this.bg = bg;
 		ID = ID.substring(0, 1).toLowerCase() + ID.substring(1);
 	}
 	
@@ -26,13 +25,22 @@ public abstract class Overlay implements Serializable{
 	
 	//Will need to be overridden in order to work
 	public void paint(Graphics2D g) {
-		g.setColor(bg);
-		g.fillRect(0, 0, w.WIDTH, w.HEIGHT);
+		AlphaComposite alcom = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
+		AlphaComposite orig = (AlphaComposite) g.getComposite();
+		g.setComposite(alcom);
+		paintOverlay(g);
+		g.setComposite(orig);
 	}
+	
+	public abstract void paintOverlay(Graphics2D g);
 	
 	public abstract void update(double delta);
 	
 	public String getID() {
 		return ID;
+	}
+	
+	public void setTransparency(float t) {
+		alpha = t;
 	}
 }

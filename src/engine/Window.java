@@ -81,6 +81,10 @@ public class Window implements Config, Serializable {
 
 	// Key Variables
 	private Map<Integer, Boolean> keys = new HashMap<>();
+	private Map<Integer, Boolean> keyUp = new HashMap<>();
+	
+	//Global Variables
+	Map<String, Object> globals;
 
 	// Images
 	private ArrayList<ImageItem> images = null;
@@ -101,6 +105,8 @@ public class Window implements Config, Serializable {
 		customPanel = new CustomPanel(this);
 
 		thread = new Thread(customPanel);
+		
+		globals = new HashMap<>();
 		
 		pageCheck = new ProgressionCheck();
 		imageCheck = new ProgressionCheck();
@@ -150,6 +156,9 @@ public class Window implements Config, Serializable {
 			@Override
 			public void keyReleased(KeyEvent e) {
 				keys.put(e.getKeyCode(), false);
+				if(!TransH.transitioning) {
+					keyUp.put(e.getKeyCode(), true);
+				}
 
 				if (e.getKeyCode() == EXIT) {
 					if (currentPage.equals("credit") || currentPage.equals("mainMenu")) {
@@ -227,6 +236,7 @@ public class Window implements Config, Serializable {
 				temp.init();
 			}
 			currentPage = pageId;
+			currentOverlay = pageId;
 		} else {
 			System.err.println("The page "+currentPage+" was not properly loaded in engine.Window");
 			System.exit(-1);
@@ -248,7 +258,11 @@ public class Window implements Config, Serializable {
 	}
 	
 	public AppPage getLoadedPage(String page) {
-		return pages.get(page);
+		return pages.containsKey(page) ? pages.get(page) : null;
+	}
+	
+	public Overlay getLoadedOverlay(String over) {
+		return pages.containsKey(over) ? overlays.get(over) : null;
 	}
 	
 	public void setCurrentOverlay(String id) {
@@ -470,6 +484,15 @@ public class Window implements Config, Serializable {
 		return keys.containsKey(key) ? keys.get(key) : false;
 	}
 	
+	public boolean keyIsUp(int key) {
+		if(keyUp.containsKey(key)) {
+			boolean ret = keyUp.get(key);
+			keyUp.put(key, false);
+			return ret;
+		}
+		return false;
+	}
+	
 	public Map<Integer, Boolean> getKeys(){
 		return keys;
 	}
@@ -491,5 +514,23 @@ public class Window implements Config, Serializable {
 	
 	public void addTrophy(String title, String desc, TrophyCallback call) {
 		trophy.addTrophy(title, desc, call);
+	}
+	
+	public Object getGlobal(String key) {
+		return globals.containsKey(key) ? globals.get(key) : -1;
+	}
+	
+	public void setGlobal(String key, Object value) {
+		globals.put(key, value);
+	}
+	
+	public Map<String, Object> globalDump(){
+		return globals;
+	}
+	
+	public void resetKeyUp() {
+		for(Map.Entry<Integer, Boolean> entry : keyUp.entrySet()) {
+			keyUp.put(entry.getKey(), false);
+		}
 	}
 }

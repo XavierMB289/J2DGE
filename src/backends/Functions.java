@@ -39,6 +39,16 @@ public class Functions implements Serializable{
 		return null;
 	}
 	
+	public boolean stringContains(String str, String[] checking) {
+		boolean ret = false;
+		for(String s : checking) {
+			if(str.contains(s)) {
+				ret = true;
+			}
+		}
+		return ret;
+	}
+	
 	public String[] combineArrays(String[] a, String[] b) {
 		int len = a.length+b.length;
 		String[] ret = new String[len];

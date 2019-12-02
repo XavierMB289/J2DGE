@@ -9,6 +9,7 @@ import javax.swing.ImageIcon;
 
 import backends.AppPage;
 import backends.Entity;
+import backends.Overlay;
 import engine.Window;
 
 public class TransitionHandler implements Serializable{
@@ -26,6 +27,7 @@ public class TransitionHandler implements Serializable{
 	private int speed = 3;
 	public boolean transitioning = false;
 	private AppPage oldPage, newPage;
+	private Overlay oldOverlay, newOverlay;
 	private int transition = -1;
 	private int appTrans = -1;
 	private String audioFile = "";
@@ -49,8 +51,10 @@ public class TransitionHandler implements Serializable{
 			transitioning = true;
 			this.oldPage = oldPage;
 			oldPage.onChange();
+			oldOverlay = w.getLoadedOverlay(oldPage.getID());
 			this.newPage = newPage;
 			newPage.init();
+			newOverlay = w.getLoadedOverlay(newPage.getID());
 			if(!audioFile.equals("")) {
 				w.AudioH.playSound(audioFile);
 			}
@@ -63,7 +67,9 @@ public class TransitionHandler implements Serializable{
 			transitioning = true;
 			this.oldPage = oldPage;
 			oldPage.onChange();
+			oldOverlay = w.getLoadedOverlay(oldPage.getID());
 			this.newPage = newPage;
+			newOverlay = w.getLoadedOverlay(newPage.getID());
 			if(!audioFile.equals("")) {
 				w.AudioH.playSound(audioFile);
 			}
@@ -111,12 +117,18 @@ public class TransitionHandler implements Serializable{
 				e.paint(g);
 			}
 		}
+		if(newOverlay != null) {
+			newOverlay.paint(g);
+		}
 		g.translate(0, w.HEIGHT);
 		oldPage.paint(g);
 		for(Entity e : w.EntityH.getEntities()) {
 			if(e.getID().equals(oldPage.getID())) {
 				e.paint(g);
 			}
+		}
+		if(oldOverlay != null) {
+			oldOverlay.paint(g);
 		}
 		g.dispose();
 		
@@ -142,12 +154,18 @@ public class TransitionHandler implements Serializable{
 				e.paint(g);
 			}
 		}
+		if(newOverlay != null) {
+			newOverlay.paint(g);
+		}
 		g.translate(w.WIDTH, 0);
 		oldPage.paint(g);
 		for(Entity e : w.EntityH.getEntities()) {
 			if(e.getID().equals(oldPage.getID())) {
 				e.paint(g);
 			}
+		}
+		if(oldOverlay != null) {
+			oldOverlay.paint(g);
 		}
 		g.dispose();
 		
@@ -173,12 +191,18 @@ public class TransitionHandler implements Serializable{
 					e.paint(g);
 				}
 			}
+			if(oldOverlay != null) {
+				oldOverlay.paint(g);
+			}
 		}else {
 			newPage.paint(g);
 			for(Entity e : w.EntityH.getEntities()) {
 				if(e.getID().equals(newPage.getID())) {
 					e.paint(g);
 				}
+			}
+			if(newOverlay != null) {
+				newOverlay.paint(g);
 			}
 		}
 		

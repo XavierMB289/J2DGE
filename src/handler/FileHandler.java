@@ -157,4 +157,9 @@ public class FileHandler implements Serializable{
 			e.printStackTrace();
 		}
 	}
+	
+	public boolean isEmpty(String filepath) {
+		File f = new File(getClass().getClassLoader().getResource(filepath).getFile());
+		return f.length() == 0;
+	}
 }

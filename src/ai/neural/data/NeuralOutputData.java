@@ -42,7 +42,7 @@ public class NeuralOutputData {
 		this.targetData = _data;
 		this.neuralData = new ArrayList<>();
 		for (int i = 0; i < numberOfRecords; i++) {
-			this.neuralData.add(new ArrayList());
+			this.neuralData.add(new ArrayList<Double>());
 			for (int j = 0; j < numberOfOutputs; j++) {
 				this.neuralData.get(i).add(null);
 			}

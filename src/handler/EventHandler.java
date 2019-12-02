@@ -61,13 +61,13 @@ public class EventHandler implements Runnable, Serializable{
 		}
 	}
 
-	@SuppressWarnings("static-access")
 	@Override
 	public void run() {
 		try {
-			tEventThread.sleep(timer);
-			addEvent(timedEvent);
-			tEventThread.interrupt();
+			Thread.sleep(timer);
+			events.add(0, timedEvent);
+			timedEvent = null;
+			tEventThread.join();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
