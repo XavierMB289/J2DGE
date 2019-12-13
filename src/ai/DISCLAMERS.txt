@@ -1,1 +1,0 @@
-The base Neural Networking code was used from the book "Neural Network Programming with Java" by Fabio M. Soares and Alan M.F. Souza.
