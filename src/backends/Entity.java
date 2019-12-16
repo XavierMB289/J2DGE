@@ -13,6 +13,10 @@ public abstract class Entity implements Serializable{
 	
 	protected String ID;
 	
+	/**
+	 * @author Xavier Bennett
+	 * @param w
+	 */
 	public Entity(Window w) {
 		this.w = w;
 		ID = new Exception().getStackTrace()[2].getClassName().split("\\.")[1];

@@ -27,6 +27,11 @@ public class Clipping implements LineListener, Serializable{
 	
 	AudioInputStream ais;
 	
+	/**
+	 * @author Xavier Bennett
+	 * @param filename filename of an audio file.
+	 * Loads an audio file for simple manipulation.
+	 */
 	public Clipping(String filename) {
 		
 		this.filename = filename;
@@ -44,6 +49,10 @@ public class Clipping implements LineListener, Serializable{
 		
 	}
 	
+	/**
+	 * @author Xavier Bennett
+	 * Plays the selected audio.
+	 */
 	public void play() {
 		if(status.equals("pause") != true) {
 			status = "play";
@@ -57,6 +66,10 @@ public class Clipping implements LineListener, Serializable{
 		}
 	}
 	
+	/**
+	 * @author Xavier Bennett
+	 * Pauses the selected audio.
+	 */
 	public void pause() {
 		if(status.equals("play")) {
 			currentFrame = clip.getMicrosecondPosition();
@@ -65,6 +78,10 @@ public class Clipping implements LineListener, Serializable{
 		}
 	}
 	
+	/**
+	 * @author Xavier Bennett
+	 * Restarts the selected audio.
+	 */
 	public void restart() {
 		clip.stop();
 		clip.close();
@@ -74,6 +91,10 @@ public class Clipping implements LineListener, Serializable{
 		play();
 	}
 	
+	/**
+	 * @author Xavier Bennett
+	 * Stops the selected audio.
+	 */
 	public void stop() {
 		currentFrame = 0L;
 		clip.stop();
@@ -86,6 +107,11 @@ public class Clipping implements LineListener, Serializable{
 		}
 	}
 	
+	/**
+	 * @author Xavier Bennett
+	 * @param pos A long representing an audio position
+	 * Moves to a position in the audio based on the given long location
+	 */
 	public void jump(long pos) {
 		if(pos > 0 && pos < clip.getMicrosecondLength()) {
 			clip.stop();

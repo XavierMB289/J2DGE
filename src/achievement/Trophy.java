@@ -38,6 +38,11 @@ public class Trophy extends Notify implements Serializable{
 		setIcon(icon);
 	}
 	
+	/**
+	 * @author Xavier Bennett
+	 * @param TITLE Title of achievement.
+	 * @param DESC Description of achievement earned.
+	 */
 	public void addTrophy(String TITLE, String DESC) {
 		if(!added.containsKey(TITLE) && !added.containsValue(DESC)) {
 			added.put(TITLE, DESC);
@@ -47,6 +52,12 @@ public class Trophy extends Notify implements Serializable{
 		}
 	}
 	
+	/**
+	 * @author Xavier Bennett
+	 * @param TITLE Title of achievement.
+	 * @param DESC Description of achievement.
+	 * @param callback A callback method for the achievement.
+	 */
 	public void addTrophy(String TITLE, String DESC, TrophyCallback callback) {
 		if(!added.containsKey(TITLE) && !added.containsValue(DESC)) {
 			this.callback = callback;

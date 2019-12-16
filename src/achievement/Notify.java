@@ -23,16 +23,28 @@ public class Notify extends ImageHandler{
 	
 	/**
 	 * @author Xavier Bennett
-	 * @param filename The filename and relative path to the image...
+	 * @param img An ImageIcon.
+	 * Sets the icon for the notification using the set ImageIcon
 	 */
 	public void setIcon(ImageIcon img) {
 		icon = img;
 	}
 	
+	/**
+	 * @author Xavier Bennett
+	 * @param name The name of an image.
+	 * Sets the icon for the notification using the set filename
+	 */
 	public void setIcon(String name) {
 		icon = getImage(name);
 	}
 	
+	/**
+	 * @author Xavier Bennett
+	 * @param title Notification Title
+	 * @param desc Description of Notification
+	 * @param tooltip When hovered, display the string...
+	 */
 	public void windowsNotify(String title, String desc, String tooltip){
 		if(SystemTray.isSupported()) {
 			//if(icon == null) { //Cant use due to Java bug
