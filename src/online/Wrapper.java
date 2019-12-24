@@ -1,6 +1,7 @@
 package online;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
 public class Wrapper extends Logger{
@@ -9,19 +10,33 @@ public class Wrapper extends Logger{
 	
 	protected SocketChannel client;
 	
-	private int connections;
+	protected int connections;
+	
+	protected CustomParser cp;
 	
 	public void setClient(SocketChannel sc) {
 		client = sc;
+	}
+	
+	public void setParser(CustomParser c){
+		cp = c;
 	}
 
 	public void parse(String input) {
 		switch(input) {
 			case "closeConnection":
 				try {
+					write("Connect Soon!");
 					client.close();
 				} catch (IOException e) {
 					e.printStackTrace();
+				}
+				break;
+			default:
+				if(cp != null){
+					cp.parse(client, input);
+				}else{
+					write("ping");
 				}
 				break;
 		}
@@ -33,6 +48,17 @@ public class Wrapper extends Logger{
 
 	public void setConnections(int connections) {
 		this.connections = connections;
+	}
+	
+	private void write(String msg){
+		ByteBuffer buffer = ByteBuffer.wrap(msg.getBytes());
+		try {
+			client.write(buffer);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		buffer.clear();
 	}
 
 }

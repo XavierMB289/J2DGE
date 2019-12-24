@@ -1,6 +1,7 @@
 package online;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
@@ -17,6 +18,7 @@ public class Client extends Wrapper implements Runnable{
 	
 	InetSocketAddress address;
 	SocketChannel channel;
+	ObjectInputStream ois;
 	
 	public Client addMethods(OnlineMethods o) {
 		OM = o;
@@ -32,6 +34,7 @@ public class Client extends Wrapper implements Runnable{
 		try {
 			channel = SocketChannel.open(address);
 			if(OM!=null) OM.start();
+			ois = new ObjectInputStream(channel.socket().getInputStream());
 			t = new Thread(this);
 			t.start();
 		} catch (IOException e) {
@@ -41,28 +44,15 @@ public class Client extends Wrapper implements Runnable{
 		return this;
 	}
 
-	@SuppressWarnings("static-access")
 	@Override
 	public void run() {
 		setConnections(1);
 		if(OM!=null) OM.onConnectionChange(1);
 		while(channel.isConnected()) {
 			if(message != null && !message.equals("")) {
-				ByteBuffer buffer = ByteBuffer.wrap(message.getBytes());
-				try {
-					client.write(buffer);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				buffer.clear();
+				writeToChannel(message);
 				message = "";
-				try {
-					t.sleep(1000);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				readFromChannel();
 			}
 			if(OM!=null) OM.ping();
 		}
@@ -75,6 +65,26 @@ public class Client extends Wrapper implements Runnable{
 			e.printStackTrace();
 		}
 		
+	}
+	
+	public void writeToChannel(String msg){
+		if(msg != null && !msg.equals("")){
+			ByteBuffer buffer = ByteBuffer.wrap(msg.getBytes());
+			try {
+				channel.write(buffer);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			buffer.clear();
+		}
+	}
+	
+	private String readFromChannel(){
+		try {
+			return (String)ois.readObject();
+		} catch (ClassNotFoundException | IOException e) {
+			return "error";
+		}
 	}
 	
 	public void stop() {

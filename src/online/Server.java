@@ -82,6 +82,8 @@ public class Server extends Wrapper implements Runnable{
 						
 						client.register(sel, SelectionKey.OP_READ);
 						
+						print("New Client Connected");
+						
 					}else if(myKey.isReadable()) {
 						SocketChannel client = (SocketChannel) myKey.channel();
 						ByteBuffer buffer = ByteBuffer.allocate(256);
