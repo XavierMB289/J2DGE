@@ -32,7 +32,7 @@ public class Server extends Wrapper implements Runnable{
 	}
 	
 	public Server start() {
-		return this.start("127.0.0.1", 0);
+		return this.start("127.0.0.1", 8080);
 	}
 	
 	public Server start(String ip, int port) {
