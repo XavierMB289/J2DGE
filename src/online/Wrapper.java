@@ -14,7 +14,7 @@ public class Wrapper extends Logger{
 	
 	protected CustomParser cp;
 	
-	public void setClient(SocketChannel sc) {
+	protected void setClient(SocketChannel sc) {
 		client = sc;
 	}
 	
