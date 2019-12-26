@@ -26,7 +26,7 @@ public class Client extends Wrapper implements Runnable{
 	}
 	
 	public Client start() {
-		return this.start("127.0.0.1", 8080);
+		return this.start("127.0.0.1", 0);
 	}
 	
 	public Client start(String IP, int PORT) {
