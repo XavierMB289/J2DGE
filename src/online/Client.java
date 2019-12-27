@@ -58,16 +58,15 @@ public class Client extends Wrapper implements Runnable{
 		if(OM!=null) OM.onConnectionChange(1);
 		while(channel.isConnected()) {
 			if(message != null && !message.equals("")) {
-				writeToChannel(message);
+				write(channel, message);
 				message = "";
-				setClient(channel);
-				parse(readFromChannel());
+				parse(channel, read(channel));
 			}
 			if(OM!=null) OM.ping();
 		}
 		
 		try {
-			client.close();
+			channel.close();
 			if(OM!=null) OM.stop();
 			t.join();
 		} catch (IOException | InterruptedException e) {
@@ -75,34 +74,6 @@ public class Client extends Wrapper implements Runnable{
 			e.printStackTrace();
 		}
 		
-	}
-	
-	public void writeToChannel(String msg){
-		if(msg != null && !msg.equals("")){
-			try {
-				ByteBuffer buf = ByteBuffer.allocate(256);
-				buf.clear();
-				buf.put(msg.getBytes());
-				buf.flip();
-				while(buf.hasRemaining()){
-					channel.write(buf);
-				}
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-	}
-	
-	private String readFromChannel(){
-		try {
-			ByteBuffer buffer = ByteBuffer.allocate(256);
-			channel.read(buffer);
-			String result = new String(buffer.array()).trim();
-			return result;
-		} catch (IOException e) {
-			return "error";
-		}
 	}
 	
 	public void stop() {

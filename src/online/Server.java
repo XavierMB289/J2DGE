@@ -99,12 +99,13 @@ public class Server extends Wrapper implements Runnable{
 						client.read(buffer);
 						String result = new String(buffer.array()).trim();
 						
-						setClient(client);
-						parse(result);
+						parse(client, result);
 					}
 					if(myKey.isWritable()){
 						if(!message.equals("") && message != null){
+							SocketChannel client = (SocketChannel) myKey.channel();
 							ByteBuffer buffer = ByteBuffer.wrap(message.getBytes());
+							buffer.flip();
 							try {
 								client.write(buffer);
 							} catch (IOException e) {

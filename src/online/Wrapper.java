@@ -8,25 +8,19 @@ public class Wrapper extends Logger{
 	
 	private static final long serialVersionUID = -7537729586644209586L;
 	
-	protected SocketChannel client;
-	
 	protected int connections;
 	
 	protected CustomParser cp;
-	
-	protected void setClient(SocketChannel sc) {
-		client = sc;
-	}
 	
 	public void setParser(CustomParser c){
 		cp = c;
 	}
 
-	public void parse(String input) {
+	public void parse(SocketChannel client, String input) {
 		switch(input) {
 			case "closeConnection":
 				try {
-					write("Connect Soon!");
+					write(client, "Connect Soon!");
 					client.close();
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -37,7 +31,7 @@ public class Wrapper extends Logger{
 					cp.parse(client, input);
 				}else{
 					print(input);
-					write("ping");
+					write(client, "ping");
 				}
 				break;
 		}
@@ -51,15 +45,30 @@ public class Wrapper extends Logger{
 		this.connections = connections;
 	}
 	
-	private void write(String msg){
-		ByteBuffer buffer = ByteBuffer.wrap(msg.getBytes());
+	public void write(SocketChannel client, String msg){
 		try {
-			client.write(buffer);
+			ByteBuffer buf = ByteBuffer.allocate(256);
+			buf.clear();
+			buf.put(msg.getBytes());
+			buf.flip();
+			while(buf.hasRemaining()){
+				client.write(buf);
+			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		buffer.clear();
+	}
+	
+	public String read(SocketChannel client){
+		try {
+			ByteBuffer buffer = ByteBuffer.allocate(256);
+			client.read(buffer);
+			String result = new String(buffer.array()).trim();
+			return result;
+		} catch (IOException e) {
+			return "error";
+		}
 	}
 
 }
