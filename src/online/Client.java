@@ -20,7 +20,6 @@ public class Client extends Wrapper implements Runnable{
 	
 	InetSocketAddress address;
 	SocketChannel channel;
-	ObjectInputStream ois;
 	
 	public Client addMethods(OnlineMethods o) {
 		OM = o;
@@ -50,7 +49,6 @@ public class Client extends Wrapper implements Runnable{
 			channel = SocketChannel.open(address);
 			channel.configureBlocking(false);
 			if(OM!=null) OM.start();
-			ois = new ObjectInputStream(channel.socket().getInputStream());
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -80,20 +78,28 @@ public class Client extends Wrapper implements Runnable{
 	
 	public void writeToChannel(String msg){
 		if(msg != null && !msg.equals("")){
-			ByteBuffer buffer = ByteBuffer.wrap(msg.getBytes());
 			try {
-				channel.write(buffer);
+				ByteBuffer buf = ByteBuffer.allocate(256);
+				buf.clear();
+				buf.put(message.getBytes());
+				buf.flip();
+				while(buf.hasRemaining()){
+					client.write(buf);
+				}
 			} catch (IOException e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			buffer.clear();
 		}
 	}
 	
 	private String readFromChannel(){
 		try {
-			return (String)ois.readObject();
-		} catch (ClassNotFoundException | IOException e) {
+			ByteBuffer buffer = ByteBuffer.allocate(256);
+			client.read(buffer);
+			String result = new String(buffer.array()).trim();
+			return result;
+		} catch (IOException e) {
 			return "error";
 		}
 	}

@@ -131,6 +131,10 @@ public class Server extends Wrapper implements Runnable{
 		}
 	}
 	
+	public void sendMessage(String m){
+		message = m;
+	}
+	
 	public void stop() {
 		running = false;
 	}
