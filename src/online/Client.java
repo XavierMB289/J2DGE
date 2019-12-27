@@ -38,21 +38,23 @@ public class Client extends Wrapper implements Runnable{
 	
 	public Client start(String IP, int PORT) {
 		address = new InetSocketAddress(IP, PORT);
-		try {
-			channel = SocketChannel.open(address);
-			if(OM!=null) OM.start();
-			ois = new ObjectInputStream(channel.socket().getInputStream());
-			t = new Thread(this);
-			t.start();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		t = new Thread(this);
+		t.start();
 		return this;
 	}
 
 	@Override
 	public void run() {
+		
+		try {
+			channel = SocketChannel.open(address);
+			if(OM!=null) OM.start();
+			ois = new ObjectInputStream(channel.socket().getInputStream());
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
 		setConnections(1);
 		if(OM!=null) OM.onConnectionChange(1);
 		while(channel.isConnected()) {
