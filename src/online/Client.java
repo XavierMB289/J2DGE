@@ -2,7 +2,9 @@ package online;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
@@ -26,7 +28,12 @@ public class Client extends Wrapper implements Runnable{
 	}
 	
 	public Client start() {
-		return this.start("127.0.0.1", 0);
+		try {
+			return this.start(InetAddress.getLocalHost().getHostAddress(), 55555);
+		} catch (UnknownHostException e) {
+			System.err.println("UHE in Client.start()");
+			return this;
+		}
 	}
 	
 	public Client start(String IP, int PORT) {

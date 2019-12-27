@@ -1,7 +1,9 @@
 package online;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
@@ -33,7 +35,12 @@ public class Server extends Wrapper implements Runnable{
 	}
 	
 	public Server start() {
-		return this.start("127.0.0.1", 0);
+		try {
+			return this.start(InetAddress.getLocalHost().getHostAddress(), 55555);
+		} catch (UnknownHostException e) {
+			System.err.println("UHE in Server.start()");
+			return this;
+		}
 	}
 	
 	public Server start(String ip, int port) {
