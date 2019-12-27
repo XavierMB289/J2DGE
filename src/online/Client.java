@@ -53,10 +53,10 @@ public class Client extends ClientWrapper implements Runnable{
 		setConnections(1);
 		if(OM!=null) OM.onConnectionChange(1);
 		while(channel.isConnected()) {
-			parse(channel, read(channel));
 			if(message != null) {
 				write(channel, message);
 				message = "";
+				parse(channel, read(channel));
 			}
 			if(OM!=null) OM.ping();
 		}
