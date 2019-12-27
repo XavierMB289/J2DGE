@@ -1,4 +1,4 @@
-package online;
+package online.server;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -10,6 +10,8 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Set;
+
+import online.OnlineMethods;
 
 public class Server extends ServerWrapper implements Runnable{
 	

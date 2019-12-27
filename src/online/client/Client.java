@@ -1,10 +1,12 @@
-package online;
+package online.client;
 
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.nio.channels.SocketChannel;
+
+import online.OnlineMethods;
 
 public class Client extends ClientWrapper implements Runnable{
 
@@ -16,6 +18,8 @@ public class Client extends ClientWrapper implements Runnable{
 	
 	InetSocketAddress address;
 	SocketChannel channel;
+	
+	ClientReader CR;
 	
 	public Client addMethods(OnlineMethods o) {
 		OM = o;
@@ -33,14 +37,6 @@ public class Client extends ClientWrapper implements Runnable{
 	
 	public Client start(String IP, int PORT) {
 		address = new InetSocketAddress(IP, PORT);
-		t = new Thread(this);
-		t.start();
-		return this;
-	}
-
-	@Override
-	public void run() {
-		
 		try {
 			channel = SocketChannel.open(address);
 			channel.configureBlocking(false);
@@ -50,24 +46,24 @@ public class Client extends ClientWrapper implements Runnable{
 			e1.printStackTrace();
 		}
 		
+		CR = new ClientReader(this).setChannel(channel).start();
+		
+		t = new Thread(this);
+		t.start();
+		return this;
+	}
+
+	@Override
+	public void run() {
+		
 		setConnections(1);
 		if(OM!=null) OM.onConnectionChange(1);
 		while(channel.isConnected()) {
 			if(message != null && !message.equals("0")) {
 				write(channel, message);
 				message = "0";
-				parse(channel, read(channel));
 			}
 			if(OM!=null) OM.ping();
-		}
-		
-		try {
-			channel.close();
-			if(OM!=null) OM.stop();
-			t.join();
-		} catch (IOException | InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		
 	}
@@ -75,7 +71,9 @@ public class Client extends ClientWrapper implements Runnable{
 	public void stop() {
 		try {
 			channel.close();
-		} catch (IOException e) {
+			if(OM!=null) OM.stop();
+			t.join();
+		} catch (IOException | InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

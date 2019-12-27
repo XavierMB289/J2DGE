@@ -1,8 +1,11 @@
-package online;
+package online.client;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+
+import online.CustomParser;
+import online.Logger;
 
 public class ClientWrapper extends Logger{
 	
