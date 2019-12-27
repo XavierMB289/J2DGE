@@ -12,7 +12,7 @@ import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Set;
 
-public class Server extends Wrapper implements Runnable{
+public class Server extends ServerWrapper implements Runnable{
 	
 	private static final long serialVersionUID = -1181155211514559101L;
 	
@@ -95,33 +95,21 @@ public class Server extends Wrapper implements Runnable{
 						
 					}else if(myKey.isReadable()) {
 						SocketChannel client = (SocketChannel) myKey.channel();
-						ByteBuffer buffer = ByteBuffer.allocate(256);
-						client.read(buffer);
-						String result = new String(buffer.array()).trim();
-						
+						String result = read(client);
 						parse(client, result);
-					}
-					if(myKey.isWritable()){
+						client.register(sel, SelectionKey.OP_WRITE);
+						
+					}else if(myKey.isWritable()){
 						if(!message.equals("") && message != null){
 							SocketChannel client = (SocketChannel) myKey.channel();
-							ByteBuffer buffer = ByteBuffer.wrap(message.getBytes());
-							buffer.flip();
-							try {
-								client.write(buffer);
-							} catch (IOException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-							buffer.clear();
+							write(client, message);
+							message = "";
+							client.register(sel, SelectionKey.OP_READ);
 						}
 					}
 					iterator.remove();
 				}
 				if(OM!=null) OM.ping();
-				if(getConnections() != tempNum) {
-					setConnections(tempNum);
-					if(OM!=null) OM.onConnectionChange(tempNum);
-				}
 			}
 			if(OM!=null) OM.stop();
 			socket.close();

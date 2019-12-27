@@ -8,7 +8,7 @@ import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
-public class Client extends Wrapper implements Runnable{
+public class Client extends ClientWrapper implements Runnable{
 	
 	private static final long serialVersionUID = 6799828793921830730L;
 

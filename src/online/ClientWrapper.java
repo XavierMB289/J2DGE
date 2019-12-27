@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
-public class Wrapper extends Logger{
+public class ClientWrapper extends Logger{
 	
 	private static final long serialVersionUID = -7537729586644209586L;
 	
