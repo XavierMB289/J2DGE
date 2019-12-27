@@ -10,7 +10,7 @@ public class Client extends ClientWrapper implements Runnable{
 
 	transient Thread t;
 	
-	public String message = "0";
+	public String message = "";
 
 	OnlineMethods OM;
 	
@@ -55,7 +55,7 @@ public class Client extends ClientWrapper implements Runnable{
 		while(channel.isConnected()) {
 			if(message != null) {
 				write(channel, message);
-				message = "0";
+				message = "";
 			}
 			parse(channel, read(channel));
 			if(OM!=null) OM.ping();

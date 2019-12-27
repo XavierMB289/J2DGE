@@ -25,7 +25,7 @@ public class ClientWrapper extends Logger{
 					e.printStackTrace();
 				}
 				break;
-			case "0":
+			case "":
 				break;
 			default:
 				if(cp != null){
