@@ -61,10 +61,11 @@ public class Client extends Wrapper implements Runnable{
 			if(message != null && !message.equals("")) {
 				writeToChannel(message);
 				message = "";
-				readFromChannel();
+				print(readFromChannel());
 			}
 			if(OM!=null) OM.ping();
 		}
+		
 		try {
 			client.close();
 			if(OM!=null) OM.stop();
