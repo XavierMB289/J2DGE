@@ -60,7 +60,8 @@ public class Client extends Wrapper implements Runnable{
 			if(message != null && !message.equals("")) {
 				writeToChannel(message);
 				message = "";
-				print(readFromChannel());
+				setClient(channel);
+				parse(readFromChannel());
 			}
 			if(OM!=null) OM.ping();
 		}
@@ -81,10 +82,10 @@ public class Client extends Wrapper implements Runnable{
 			try {
 				ByteBuffer buf = ByteBuffer.allocate(256);
 				buf.clear();
-				buf.put(message.getBytes());
+				buf.put(msg.getBytes());
 				buf.flip();
 				while(buf.hasRemaining()){
-					client.write(buf);
+					channel.write(buf);
 				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -96,7 +97,7 @@ public class Client extends Wrapper implements Runnable{
 	private String readFromChannel(){
 		try {
 			ByteBuffer buffer = ByteBuffer.allocate(256);
-			client.read(buffer);
+			channel.read(buffer);
 			String result = new String(buffer.array()).trim();
 			return result;
 		} catch (IOException e) {

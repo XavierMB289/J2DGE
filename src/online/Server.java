@@ -104,13 +104,14 @@ public class Server extends Wrapper implements Runnable{
 					}
 					if(myKey.isWritable()){
 						if(!message.equals("") && message != null){
-							ByteBuffer buf = ByteBuffer.allocate(256);
-							buf.clear();
-							buf.put(message.getBytes());
-							buf.flip();
-							while(buf.hasRemaining()){
-								client.write(buf);
+							ByteBuffer buffer = ByteBuffer.wrap(message.getBytes());
+							try {
+								client.write(buffer);
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
 							}
+							buffer.clear();
 						}
 					}
 					iterator.remove();
