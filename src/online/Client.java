@@ -60,8 +60,8 @@ public class Client extends ClientWrapper implements Runnable{
 			if(message != null && !message.equals("")) {
 				write(channel, message);
 				message = "";
-				parse(channel, read(channel));
 			}
+			parse(channel, read(channel));
 			if(OM!=null) OM.ping();
 		}
 		

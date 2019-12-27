@@ -100,7 +100,7 @@ public class Server extends ServerWrapper implements Runnable{
 						client.register(sel, SelectionKey.OP_WRITE);
 						
 					}else if(myKey.isWritable()){
-						if(!message.equals("") && message != null){
+						if(message != null && !message.equals("")){
 							SocketChannel client = (SocketChannel) myKey.channel();
 							write(client, message);
 							message = "";

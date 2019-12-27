@@ -31,7 +31,6 @@ public class ClientWrapper extends Logger{
 					cp.parse(client, input);
 				}else{
 					print(input);
-					write(client, "ping");
 				}
 				break;
 		}
