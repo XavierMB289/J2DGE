@@ -48,6 +48,7 @@ public class Client extends Wrapper implements Runnable{
 		
 		try {
 			channel = SocketChannel.open(address);
+			channel.configureBlocking(false);
 			if(OM!=null) OM.start();
 			ois = new ObjectInputStream(channel.socket().getInputStream());
 		} catch (IOException e1) {

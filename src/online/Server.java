@@ -27,6 +27,7 @@ public class Server extends Wrapper implements Runnable{
 	public int port;
 	
 	boolean running;
+	
 	private String message;
 	
 	public Server setMethods(OnlineMethods o) {
@@ -100,15 +101,17 @@ public class Server extends Wrapper implements Runnable{
 						
 						setClient(client);
 						parse(result);
-					}else if(myKey.isWritable() && !message.equals("") && message != null){
-						ByteBuffer buffer = ByteBuffer.wrap(message.getBytes());
-						try {
-							client.write(buffer);
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+					}
+					if(myKey.isWritable()){
+						if(!message.equals("") && message != null){
+							ByteBuffer buf = ByteBuffer.allocate(256);
+							buf.clear();
+							buf.put(message.getBytes());
+							buf.flip();
+							while(buf.hasRemaining()){
+								client.write(buf);
+							}
 						}
-						buffer.clear();
 					}
 					iterator.remove();
 				}
@@ -126,10 +129,6 @@ public class Server extends Wrapper implements Runnable{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
-	
-	public void sendMessage(String s){
-		message = s;
 	}
 	
 	public void stop() {
