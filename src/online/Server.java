@@ -25,7 +25,7 @@ public class Server extends ServerWrapper implements Runnable{
 	
 	boolean running;
 	
-	private String message;
+	private String message = "0";
 	
 	public Server setMethods(OnlineMethods o) {
 		OM = o;
@@ -94,10 +94,10 @@ public class Server extends ServerWrapper implements Runnable{
 						client.register(sel, SelectionKey.OP_WRITE);
 						
 					}else if(myKey.isWritable()){
-						if(message != null && !message.equals("")){
+						if(message != null){
 							SocketChannel client = (SocketChannel) myKey.channel();
 							write(client, message);
-							message = "";
+							message = "0";
 							client.register(sel, SelectionKey.OP_READ);
 						}
 					}

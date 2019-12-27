@@ -18,11 +18,12 @@ public class ServerWrapper extends Logger{
 		switch(input) {
 			case "closeConnection":
 				try {
-					write(client, "Connect Soon!");
 					client.close();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
+				break;
+			case "0":
 				break;
 			default:
 				if(cp != null){
