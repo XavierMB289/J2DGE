@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
@@ -13,8 +12,6 @@ import java.util.Iterator;
 import java.util.Set;
 
 public class Server extends ServerWrapper implements Runnable{
-	
-	private static final long serialVersionUID = -1181155211514559101L;
 	
 	transient Thread t = null;
 	Selector sel = null;
@@ -76,11 +73,8 @@ public class Server extends ServerWrapper implements Runnable{
 				Set<SelectionKey> keys = sel.selectedKeys();
 				Iterator<SelectionKey> iterator = keys.iterator();
 				
-				int tempNum = 0;
 				
 				while(iterator.hasNext()) {
-					
-					tempNum++;
 					
 					SelectionKey myKey = iterator.next();
 					

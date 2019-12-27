@@ -1,20 +1,16 @@
 package online;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
 public class Client extends ClientWrapper implements Runnable{
-	
-	private static final long serialVersionUID = 6799828793921830730L;
 
 	transient Thread t;
 	
-	public String message;
+	public String message = "";
 
 	OnlineMethods OM;
 	
@@ -57,7 +53,7 @@ public class Client extends ClientWrapper implements Runnable{
 		setConnections(1);
 		if(OM!=null) OM.onConnectionChange(1);
 		while(channel.isConnected()) {
-			if(message != null && !message.equals("")) {
+			if(message != null) {
 				write(channel, message);
 				message = "";
 			}
