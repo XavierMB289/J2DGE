@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
+import backends.Functions;
 import online.CustomParser;
 import online.Logger;
 
@@ -15,11 +16,23 @@ public class ClientWrapper extends Logger{
 	
 	protected CustomParser cp;
 	
+	protected Functions f;
+	
+	protected int ping;
+	
+	public ClientWrapper(){
+		f = new Functions();
+	}
+	
 	public void setParser(CustomParser c){
 		cp = c;
 	}
 
 	public void parse(SocketChannel client, String input) {
+		if(f.allCharsSame(input)){
+			ping = input.length();
+			return;
+		}
 		switch(input) {
 			case "closeConnection":
 				try {
@@ -27,8 +40,6 @@ public class ClientWrapper extends Logger{
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				break;
-			case "0":
 				break;
 			default:
 				if(cp != null){

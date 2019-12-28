@@ -24,6 +24,15 @@ public class Functions implements Serializable{
 	private GraphicsEnvironment ge;
 	
 	AffineTransform pushpop = null;
+	
+	public boolean allCharsSame(String input){
+		for(int i = 0; i < input.length(); i++){
+			if(input.charAt(i) != input.charAt(0)){
+				return false;
+			}
+		}
+		return true;
+	}
 
 	public String arrayContains(String[] arr, String checking) {
 		if(arr == null || checking == null) {
