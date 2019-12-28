@@ -80,6 +80,10 @@ public class Server extends ServerWrapper implements Runnable{
 					
 					SelectionKey myKey = iterator.next();
 					
+					if(!myKey.isValid()){
+						continue;
+					}
+					
 					if(myKey.isAcceptable()) {
 						SocketChannel client = socket.accept();
 						
@@ -93,11 +97,14 @@ public class Server extends ServerWrapper implements Runnable{
 						SocketChannel client = (SocketChannel) myKey.channel();
 						String result = read(client);
 						parse(client, result);
-						client.register(sel, SelectionKey.OP_WRITE);
+						
+						if(!message.equals("0")){
+							client.register(sel, SelectionKey.OP_WRITE);
+						}
 						
 					}else if(myKey.isWritable()){
 						SocketChannel client = (SocketChannel) myKey.channel();
-						if(message != null && !message.equals("0")){
+						if(message != null){
 							write(client, message);
 							message = "0";
 						}

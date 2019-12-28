@@ -26,7 +26,7 @@ public class ServerWrapper extends Logger{
 					e.printStackTrace();
 				}
 				break;
-			case "":
+			case "0":
 				break;
 			default:
 				if(cp != null){

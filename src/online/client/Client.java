@@ -19,8 +19,6 @@ public class Client extends ClientWrapper implements Runnable{
 	InetSocketAddress address;
 	SocketChannel channel;
 	
-	ClientReader CR;
-	
 	public Client addMethods(OnlineMethods o) {
 		OM = o;
 		return this;
@@ -46,8 +44,6 @@ public class Client extends ClientWrapper implements Runnable{
 			e1.printStackTrace();
 		}
 		
-		CR = new ClientReader(this).setChannel(channel).start();
-		
 		t = new Thread(this);
 		t.start();
 		return this;
@@ -59,10 +55,11 @@ public class Client extends ClientWrapper implements Runnable{
 		setConnections(1);
 		if(OM!=null) OM.onConnectionChange(1);
 		while(channel.isConnected()) {
-			if(message != null && !message.equals("0")) {
-				write(channel, message);
+			write(channel, message);
+			if(!message.equals("0")){
 				message = "0";
 			}
+			parse(channel, read(channel));
 			if(OM!=null) OM.ping();
 		}
 		
