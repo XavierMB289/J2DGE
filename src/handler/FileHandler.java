@@ -20,6 +20,8 @@ import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import javax.swing.JFileChooser;
+
 import engine.Window;
 
 public class FileHandler implements Serializable{
@@ -170,5 +172,14 @@ public class FileHandler implements Serializable{
 			return f.exists();
 		}
 		return false;
+	}
+	
+	public String getDocsLoc() {
+		return new JFileChooser().getFileSystemView().getDefaultDirectory().toString();
+	}
+	
+	public void writeToDocs(String filename, String[] lines) {
+		String filepath = getDocsLoc();
+		writeToFile(filepath+filename, lines);
 	}
 }
