@@ -162,4 +162,13 @@ public class FileHandler implements Serializable{
 		File f = new File(getClass().getClassLoader().getResource(filepath).getFile());
 		return f.length() == 0;
 	}
+	
+	public boolean fileExists(String filepath) {
+		URL u = getClass().getClassLoader().getResource(filepath);
+		if(u != null) {
+			File f = new File(u.getFile());
+			return f.exists();
+		}
+		return false;
+	}
 }
