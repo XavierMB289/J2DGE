@@ -97,15 +97,12 @@ public class Server extends ServerWrapper implements Runnable{
 						SocketChannel client = (SocketChannel) myKey.channel();
 						String result = read(client);
 						parse(client, result);
-						
-						if(!message.equals("0")){
-							client.register(sel, SelectionKey.OP_WRITE);
-						}
+						client.register(sel, SelectionKey.OP_WRITE);
 						
 					}else if(myKey.isWritable()){
 						SocketChannel client = (SocketChannel) myKey.channel();
-						if(message != null){
-							write(client, message);
+						write(client, message);
+						if(!message.equals("0")){
 							message = "0";
 						}
 						client.register(sel, SelectionKey.OP_READ);
