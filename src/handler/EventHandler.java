@@ -5,71 +5,54 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 import backends.AppPage;
+import handler.event.BaseEvent;
 
-public class EventHandler implements Runnable, Serializable{
+public class EventHandler implements Serializable{
 	
 	private static final long serialVersionUID = -2477938767670058066L;
 	
-	private ArrayList<AppPage> events;
-	private ArrayList<AppPage> destroy;
+	private ArrayList<BaseEvent> events;
+	private ArrayList<BaseEvent> destroy;
 	
 	private int eventNum = 0;
-	
-	private Thread tEventThread;
-	private AppPage timedEvent;
-	private int timer;
 	
 	public EventHandler() {
 		events = new ArrayList<>();
 		destroy = new ArrayList<>();
 	}
 	
-	public void addEvent(AppPage e) {
+	public void addEvent(BaseEvent e) {
 		events.add(e);
 	}
 	
-	public void addDestroy(AppPage e) {
+	public void addDestroy(BaseEvent e) {
 		if(events.contains(e)) {
 			destroy.add(e);
 		}
 	}
 	
-	public void addTimedEvent(AppPage e, int millis) {
-		timedEvent = e;
-		timer = millis;
-		tEventThread = new Thread(this);
-		tEventThread.start();
-	}
-	
-	public void nextEvent() {
-		eventNum++;
-	}
-	
 	public void paintCurrentEvent(Graphics2D g) {
 		if(events.size() > eventNum) {
-			events.get(eventNum).paint(g);
+			BaseEvent be = events.get(eventNum);
+			if(!be.FINISHED){
+				events.get(eventNum).paint(g);
+			}
 		}
 	}
 	
 	public void updateCurrentEvent(double delta) {
 		if(events.size() > eventNum) {
-			events.get(eventNum).update(delta);
+			BaseEvent be = events.get(eventNum);
+			if(!be.FINISHED){
+				events.get(eventNum).update();
+			}else{
+				addDestroy(be);
+				eventNum++;
+			}
 		}
 		//Destroying destroyables
-		for(AppPage a : destroy) {
-			events.remove(a);
-		}
-	}
-
-	@Override
-	public void run() {
-		try {
-			Thread.sleep(timer);
-			events.add(0, timedEvent);
-			timedEvent = null;
-			tEventThread.join();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+		for(BaseEvent b : destroy) {
+			events.remove(b);
 		}
 	}
 	
