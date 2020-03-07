@@ -90,7 +90,7 @@ public class FileHandler implements Serializable{
 		
 	}
 	
-	public ArrayList<String> readFromFile(String filepath) {
+	public ArrayList<String> readArrayFromFile(String filepath) {
 		
 		ArrayList<String> ret = new ArrayList<String>();
 		
@@ -107,6 +107,15 @@ public class FileHandler implements Serializable{
 			e.printStackTrace();
 		}
 		
+		return ret;
+	}
+	
+	public String readStringFromFile(String filepath){
+		ArrayList<String> temp = readArrayFromFile(filepath);
+		String ret = "";
+		for(String s : temp){
+			ret += s;
+		}
 		return ret;
 	}
 	
