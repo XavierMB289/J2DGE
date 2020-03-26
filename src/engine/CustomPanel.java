@@ -7,11 +7,15 @@ import java.io.Serializable;
 
 import javax.swing.JPanel;
 
+import coffeeDev.Credit;
+
 public class CustomPanel extends JPanel implements Serializable, Runnable{
 
 	private static final long serialVersionUID = -5758060187282871973L;
 	
 	Window w;
+	
+	private Credit c = null;
 	
 	public int FPS;
 	private int fpsCounter;
@@ -27,7 +31,16 @@ public class CustomPanel extends JPanel implements Serializable, Runnable{
 		this.w = w;
 	}
 	
+	public void init() {
+		this.setBounds(0, 0, w.WIDTH, w.HEIGHT);
+		c = new Credit(w);
+		c.init();
+		w.addPage(c);
+		w.setCurrentPage("credit", true);
+	}
+	
 	@SuppressWarnings("static-access")
+	@Override
 	public void run() {
 		lastLoopTime = System.nanoTime();
 		
@@ -65,7 +78,7 @@ public class CustomPanel extends JPanel implements Serializable, Runnable{
 		
 		update(delta);
 		
-		repaint();
+		this.repaint();
 		
 		try {
 			long temp = ((lastLoopTime-System.nanoTime() + (int)w.OPTIMAL_TIME) / 1000000);
@@ -85,7 +98,7 @@ public class CustomPanel extends JPanel implements Serializable, Runnable{
 		while(delta >= 1) {
 			fpsCounter++;
 			this.repaint();
-			update(1);
+			update(delta);
 			delta--;
 		}
 		FPS = fpsCounter;
@@ -101,6 +114,8 @@ public class CustomPanel extends JPanel implements Serializable, Runnable{
 			w.paint(g2d);
 		}catch(NullPointerException e) {
 			System.err.println("Null Pointer in "+e.getStackTrace()[0]);
+		}catch(Exception e) {
+			System.err.println(e.getStackTrace()[0]);
 		}
 	}
 	

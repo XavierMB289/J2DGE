@@ -10,6 +10,7 @@ import javax.swing.ImageIcon;
 import backends.AppPage;
 import engine.Window;
 
+@Deprecated
 @SuppressWarnings("static-access")
 public class DialogBox extends AppPage{
 	
@@ -136,8 +137,8 @@ public class DialogBox extends AppPage{
 			}
 			if(pageNum*4 > lines.size()) {
 				running = false;
-				w.EventH.addDestroy(this);
-				w.EventH.nextEvent();
+				//w.EventH.addDestroy(this);
+				//w.EventH.nextEvent();
 			}
 		}
 	}

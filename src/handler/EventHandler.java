@@ -4,7 +4,6 @@ import java.awt.Graphics2D;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import backends.AppPage;
 import handler.event.BaseEvent;
 
 public class EventHandler implements Serializable{

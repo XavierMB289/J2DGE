@@ -43,6 +43,7 @@ public class Credit extends AppPage{
 		index = 0;
 		indexMult = 1;
 		timer = 15;
+		w.loadAssets();
 	}
 	
 	@Override

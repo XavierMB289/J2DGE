@@ -4,8 +4,6 @@ import backends.Functions;
 
 public class Logger{
 	
-	private static final long serialVersionUID = 8312500307616997687L;
-	
 	private String[] lastFive;
 	
 	private Functions f;

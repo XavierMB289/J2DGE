@@ -30,7 +30,7 @@ import backends.Clipping;
 import backends.Functions;
 import backends.ImageItem;
 import backends.Overlay;
-import coffeeDev.Credit;
+import debug.Debug;
 import handler.AudioHandler;
 import handler.EntityHandler;
 import handler.EventHandler;
@@ -63,7 +63,6 @@ public class Window implements Config, Serializable {
 
 	// Imports
 	public Debug debug = null;
-	private Credit c = null;
 	public EventHandler EventH = null;
 	public AudioHandler AudioH = null;
 	public ImageHandler ImageH = null;
@@ -75,7 +74,7 @@ public class Window implements Config, Serializable {
 
 	// Page and Overlay Variables
 	private Map<String, AppPage> pages = new HashMap<>();
-	private String currentPage = "credit";
+	private String currentPage = "start";
 	private Map<String, Overlay> overlays = new HashMap<>();
 	private String currentOverlay = "";
 
@@ -95,12 +94,15 @@ public class Window implements Config, Serializable {
 	//ProgressionChecks
 	public ProgressionCheck pageCheck;
 	public ProgressionCheck imageCheck;
+	
+	//Starting Panel
+	StartingPanel sp;
 
 	/**
 	 * @author Xavier Bennett
 	 * @param name This is the name of the created window
 	 */
-	public Window(String name, String[] args) {
+	public Window(String[] args) {
 		
 		customPanel = new CustomPanel(this);
 
@@ -120,7 +122,6 @@ public class Window implements Config, Serializable {
 		FileH = new FileHandler(this);
 		EntityH = new EntityHandler(this);
 		functions = new Functions();
-		c = new Credit(this);
 		
 		//Commands
 		if (args != null && args.length > 0) {
@@ -137,7 +138,8 @@ public class Window implements Config, Serializable {
 		audio = new ArrayList<>();
 		
 		//Setup and create JFrame
-		frame = new JFrame(name);
+		frame = new JFrame(WINDOW_NAME);
+		frame.setLayout(null);
 		frame.add(customPanel);
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		frame.setUndecorated(true);
@@ -172,6 +174,13 @@ public class Window implements Config, Serializable {
 			}
 
 		});
+		
+		sp = new StartingPanel(this);
+		sp.preInit();
+		
+		//Setup Starting Window
+		setWindowSize(200, 200);
+		setVisible();
 
 	}
 	
@@ -202,9 +211,9 @@ public class Window implements Config, Serializable {
 		GraphicsDevice device = env.getScreenDevices()[screenNum];
 		if(device.isFullScreenSupported()) {
 			frame.setLocationRelativeTo(null);
-			frame.setUndecorated(true);
 			frame.setResizable(false);
 			device.setFullScreenWindow(frame);
+			customPanel.requestFocus();
 			windowSetup();
 		}else {
 			setFullscreen();
@@ -236,7 +245,6 @@ public class Window implements Config, Serializable {
 				temp.init();
 			}
 			currentPage = pageId;
-			currentOverlay = pageId;
 		} else {
 			System.err.println("The page "+currentPage+" was not properly loaded in engine.Window");
 			System.exit(-1);
@@ -339,20 +347,17 @@ public class Window implements Config, Serializable {
 		frame.validate();
 		frame.pack();
 		frame.setVisible(true);
-		
+
 		windowSetup();
 		
 	}
 	
 	private void windowSetup() {
-		if (WIDTH == -1) {
-			WIDTH = frame.getWidth();
-			HALF_W = WIDTH / 2;
-		}
-		if (HEIGHT == -1) {
-			HEIGHT = frame.getHeight();
-			HALF_H = HEIGHT / 2;
-		}
+		WIDTH = frame.getWidth();
+		HALF_W = WIDTH / 2;
+			
+		HEIGHT = frame.getHeight();
+		HALF_H = HEIGHT / 2;
 
 		WINDOW_RECT = new Rectangle(WIDTH, HEIGHT);
 		TOP_RECT = new Rectangle(0, 0, WIDTH, (int) HALF_H);
@@ -367,10 +372,28 @@ public class Window implements Config, Serializable {
 		SCREEN_CENTER = new Point(SCREEN_CENTER.x+HALF_W, SCREEN_CENTER.y+HALF_H);
 		
 		debug.setupRect();
-		c.init();
-		pages.put(c.getID(), c);
 		trophy = new Trophy(this);
-
+			
+		if(thread.getState().equals(Thread.State.NEW)) {
+			
+			sp.init();
+			pages.put("start", sp);
+			
+			Clipping[] bgm = AudioH.loadClippings("audio/bgm/");
+			Clipping[] sprite = AudioH.loadClippings("audio/sprite/");
+			
+			for(Clipping clip : bgm) {
+				audio.add(clip);
+			}
+			for(Clipping clip : sprite) {
+				audio.add(clip);
+			}
+		
+			thread.start();
+		}
+	}
+	
+	public void loadAssets() {
 		// Adding Pages
 		String[] pageList = FileH.getFilesFromDir(getClass(), "pages/");
 		String[] overlayList = FileH.getFilesFromDir(getClass(), "overlays/");
@@ -385,8 +408,12 @@ public class Window implements Config, Serializable {
 					Object o = con.newInstance(this);
 					if (o instanceof AppPage) {
 						AppPage ap = (AppPage) o;
+						if(pages.containsKey(ap.getID())) {
+							System.out.println("The AppPage, "+ap.getID()+" has been replaced.");
+						}else {
+							System.out.println("The AppPage, "+ap.getID()+" has been added.");
+						}
 						pages.put(ap.getID(), ap);
-						System.out.println("The AppPage, "+ap.getID()+" has been added.");
 					}
 				}
 				pageCheck.setProgress((int)Math.floor((tempNum / totalFiles) * 100));
@@ -399,8 +426,12 @@ public class Window implements Config, Serializable {
 					Object o = con.newInstance(this);
 					if (o instanceof Overlay) {
 						Overlay ap = (Overlay) o;
+						if(overlays.containsKey(ap.getID())) {
+							System.out.println("The Overlay, "+ap.getID()+" has been replaced.");
+						}else {
+							System.out.println("The Overlay, "+ap.getID()+" has been added.");
+						}
 						overlays.put(ap.getID(), ap);
-						System.out.println("The Overlay, "+ap.getID()+" has been added.");
 					}
 				}
 				pageCheck.setProgress((int)Math.floor((tempNum / totalFiles) * 100));
@@ -411,19 +442,6 @@ public class Window implements Config, Serializable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
-		Clipping[] bgm = AudioH.loadClippings("audio/bgm/");
-		Clipping[] sprite = AudioH.loadClippings("audio/sprite/");
-		
-		for(Clipping clip : bgm) {
-			audio.add(clip);
-		}
-		for(Clipping clip : sprite) {
-			audio.add(clip);
-		}
-
-		thread.start();
 	}
 
 	public synchronized void stop() {
