@@ -17,8 +17,6 @@ public class EntityHandler implements Serializable{
 	private ArrayList<Entity> entity = null;
 	private ArrayList<Entity> removeEnt = null;
 	private ArrayList<Entity> addEnt = null;
-	private int tick = 3;
-	private double deltas = 0;
 
 	public EntityHandler(Window w) {
 		this.w = w;
@@ -36,13 +34,8 @@ public class EntityHandler implements Serializable{
 	}
 	
 	public void update(double delta) {
-		deltas += delta;
-		if(--tick <= 0) {
-			tick = 3;
-			deltas = 0;
-			for(Entity e : entity) {
-				e.onTick(deltas);
-			}
+		for(Entity e : entity) {
+			e.update(delta);
 		}
 		if(removeEnt.size() > 0) {
 			for(Entity e : removeEnt) {
