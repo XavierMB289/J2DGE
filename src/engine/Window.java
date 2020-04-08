@@ -139,12 +139,8 @@ public class Window implements Config, Serializable {
 		
 		//Setup and create JFrame
 		frame = new JFrame(WINDOW_NAME);
-		frame.setLayout(null);
-		frame.add(customPanel);
-		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		frame.setUndecorated(true);
 
-		frame.addKeyListener(new KeyListener() {
+		customPanel.addKeyListener(new KeyListener() {
 
 			@Override
 			public void keyTyped(KeyEvent e) {
@@ -175,12 +171,22 @@ public class Window implements Config, Serializable {
 
 		});
 		
-		sp = new StartingPanel(this);
-		sp.preInit();
+		frame.setLayout(null);
+		frame.add(customPanel);
+		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		frame.setUndecorated(true);
 		
-		//Setup Starting Window
-		setWindowSize(200, 200);
-		setVisible();
+		if(FORCE_FULLSCREEN) {
+			fullscreenExclusive(0);
+			customPanel.init();
+		}else {
+			sp = new StartingPanel(this);
+			sp.preInit();
+			
+			//Setup Starting Window
+			setWindowSize(200, 200);
+			setVisible();
+		}
 
 	}
 	
@@ -213,11 +219,12 @@ public class Window implements Config, Serializable {
 			frame.setLocationRelativeTo(null);
 			frame.setResizable(false);
 			device.setFullScreenWindow(frame);
+			frame.setFocusable(true);
 			customPanel.requestFocus();
-			windowSetup();
 		}else {
 			setFullscreen();
 		}
+		windowSetup();
 	}
 
 	/**
@@ -239,8 +246,10 @@ public class Window implements Config, Serializable {
 	public void setCurrentPage(String pageId, boolean init) {
 		if(pages.get(pageId) != null) {
 			//Only if there is a new page to go to, make sure to "exit" old page
-			if(init) { 
-				getCurrentAppPage().onChange();
+			if(init) {
+				if(getCurrentAppPage() != null) {
+					getCurrentAppPage().onChange();
+				}
 				AppPage temp = pages.get(pageId);
 				temp.init();
 			}
@@ -298,22 +307,22 @@ public class Window implements Config, Serializable {
 	}
 
 	public void addMouseListen(MouseListener l) {
-		frame.addMouseListener(l);
+		customPanel.addMouseListener(l);
 		frame.validate();
 	}
 
 	public void addMouseMotionListen(MouseMotionListener l) {
-		frame.addMouseMotionListener(l);
+		customPanel.addMouseMotionListener(l);
 		frame.validate();
 	}
 
 	public void addMouseWheelListen(MouseWheelListener l) {
-		frame.addMouseWheelListener(l);
+		customPanel.addMouseWheelListener(l);
 		frame.validate();
 	}
 
 	public void addComp(Component c) {
-		frame.add(c);
+		customPanel.add(c);
 		frame.validate();
 	}
 
@@ -323,22 +332,22 @@ public class Window implements Config, Serializable {
 	}
 	
 	public void removeMouseListen(MouseListener l) {
-		frame.removeMouseListener(l);
+		customPanel.removeMouseListener(l);
 		frame.validate();
 	}
 	
 	public void removeMouseMotionListen(MouseMotionListener l) {
-		frame.removeMouseMotionListener(l);
+		customPanel.removeMouseMotionListener(l);
 		frame.validate();
 	}
 
 	public void removeMouseWheelListen(MouseWheelListener l) {
-		frame.removeMouseWheelListener(l);
+		customPanel.removeMouseWheelListener(l);
 		frame.validate();
 	}
 
 	public void removeComp(Component c) {
-		frame.remove(c);
+		customPanel.remove(c);
 		frame.validate();
 	}
 
@@ -376,8 +385,10 @@ public class Window implements Config, Serializable {
 			
 		if(thread.getState().equals(Thread.State.NEW)) {
 			
-			sp.init();
-			pages.put("start", sp);
+			if(sp != null) {
+				sp.init();
+				pages.put("start", sp);
+			}
 			
 			Clipping[] bgm = AudioH.loadClippings("audio/bgm/");
 			Clipping[] sprite = AudioH.loadClippings("audio/sprite/");
@@ -409,11 +420,11 @@ public class Window implements Config, Serializable {
 					if (o instanceof AppPage) {
 						AppPage ap = (AppPage) o;
 						if(pages.containsKey(ap.getID())) {
-							System.out.println("The AppPage, "+ap.getID()+" has been replaced.");
+							System.out.println("The AppPage, "+ap.getID()+" was already there...");
 						}else {
 							System.out.println("The AppPage, "+ap.getID()+" has been added.");
+							pages.put(ap.getID(), ap);
 						}
-						pages.put(ap.getID(), ap);
 					}
 				}
 				pageCheck.setProgress((int)Math.floor((tempNum / totalFiles) * 100));
@@ -427,11 +438,11 @@ public class Window implements Config, Serializable {
 					if (o instanceof Overlay) {
 						Overlay ap = (Overlay) o;
 						if(overlays.containsKey(ap.getID())) {
-							System.out.println("The Overlay, "+ap.getID()+" has been replaced.");
+							System.out.println("The Overlay, "+ap.getID()+" was already there...");
 						}else {
 							System.out.println("The Overlay, "+ap.getID()+" has been added.");
+							overlays.put(ap.getID(), ap);
 						}
-						overlays.put(ap.getID(), ap);
 					}
 				}
 				pageCheck.setProgress((int)Math.floor((tempNum / totalFiles) * 100));
