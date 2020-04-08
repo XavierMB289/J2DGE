@@ -38,6 +38,10 @@ public class Trophy extends Notify implements Serializable{
 		setIcon(icon);
 	}
 	
+	public void resetImg(ImageIcon i){
+		icon = i;
+	}
+	
 	/**
 	 * @author Xavier Bennett
 	 * @param TITLE Title of achievement.

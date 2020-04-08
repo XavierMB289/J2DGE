@@ -36,4 +36,7 @@ public interface Config {
 	public final double OPTIMAL_TIME = 1000000000 / TARGET_FPS;
 	//Physics Variables
 	public final double GRAVITY = 9.8;
+	
+	//Server Variables
+	public final String SERVER_STOP = "tacoTwuck";
 }
