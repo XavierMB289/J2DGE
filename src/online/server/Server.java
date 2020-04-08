@@ -53,6 +53,7 @@ public class Server extends ServerWrapper implements Runnable{
 		return this;
 	}
 
+	@SuppressWarnings("unused")
 	@Override
 	public void run() {
 		try {

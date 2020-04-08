@@ -11,6 +11,7 @@ public class PhysicsCircle extends PhysicsObj{
 		center = p;
 	}
 
+	@SuppressWarnings("unused")
 	public void collide(PhysicsCircle c) {
 		Vector2D now = center.clone();
 		Vector2D later = Vector2D.add(center, vel);
