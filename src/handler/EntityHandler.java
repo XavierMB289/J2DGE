@@ -85,6 +85,7 @@ public class EntityHandler implements Serializable{
 				return;
 			}
 		}
+		addEntity(e);
 	}
 	
 	public void resetEntities(){
