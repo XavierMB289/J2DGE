@@ -1,19 +1,23 @@
 package online.server;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Set;
 
+import backends.Entity;
 import engine.Window;
+import online.EntityWrapper;
 import online.Logger;
 
-public class Server extends Logger implements Runnable{
+public class EntityServer extends Logger implements Runnable{
 	
 	Window w;
 	
@@ -21,18 +25,20 @@ public class Server extends Logger implements Runnable{
 	
 	private Selector sel;
 	private ServerSocketChannel socket;
-	protected ByteBuffer buffer;
+	
+	ArrayList<EntityWrapper> changes;
 	
 	private boolean running = true;
 	
-	public Server(Window w, String IP, int PORT){
+	public EntityServer(Window w, String IP, int PORT){
 		try {
 			sel = Selector.open();
 			socket = ServerSocketChannel.open();
 			socket.bind(new InetSocketAddress(IP, PORT));
 			socket.configureBlocking(false);
 			socket.register(sel, SelectionKey.OP_ACCEPT);
-			buffer = ByteBuffer.allocate(256);
+			
+			changes = new ArrayList<>();
 			
 			w.SERVER_ENABLED = true;
 		} catch (IOException e) {
@@ -85,41 +91,44 @@ public class Server extends Logger implements Runnable{
 		}
 	}
 	
-	@SuppressWarnings("static-access")
 	private void answer(SelectionKey key){
-		try {
-			SocketChannel client = (SocketChannel) key.channel();
-			client.read(buffer);
-			read(client);
-			if(new String(buffer.array()).trim().equals(w.SERVER_STOP)){
-				client.close();
-				print("Not accepting client messages");
+		SocketChannel client = (SocketChannel) key.channel();
+		read(client);
+		write(client);
+	}
+	
+	public void write(SocketChannel client){
+		if(changes.size() > 0){
+			try {
+				ObjectOutputStream  oos = new ObjectOutputStream(client.socket().getOutputStream());
+				oos.writeObject(changes.get(0));
+				oos.close();
+				changes.remove(0);
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
-			write(client);
-			buffer.flip();
-			client.write(buffer);
-			buffer.clear();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+		}
+	}
+	
+	public void read(SocketChannel client){
+		
+		try {
+			ObjectInputStream ois = new ObjectInputStream(client.socket().getInputStream());
+			
+			EntityWrapper ew = (EntityWrapper)ois.readObject();
+			
+			if(ew.getChange().equals("add")){
+				w.EntityH.addEntity(ew.getEnt());
+			}else if(ew.getChange().equals("remove")){
+				w.EntityH.removeEntity(ew.getEnt());
+			}else if(ew.getChange().equals("change")){
+				w.EntityH.changeEntity(ew.getEnt());
+			}
+			
+		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
 		}
 		
-	}
-	
-	/*
-	 * @author Xavier Bennett
-	 * @desc A "dummy" method. Used more in EntityServer
-	 */
-	public void write(SocketChannel client){
-		return;
-	}
-	
-	/*
-	 * @author Xavier Bennett
-	 * @desc A "dummy" method. Used more in EntityServer
-	 */
-	public void read(SocketChannel client){
-		return;
 	}
 	
 	public void register(){
@@ -129,9 +138,12 @@ public class Server extends Logger implements Runnable{
 			client.configureBlocking(false);
 			client.register(sel, SelectionKey.OP_READ);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public void addChange(Entity e, String str){
+		changes.add(new EntityWrapper(e, str));
 	}
 
 }

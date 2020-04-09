@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 import backends.Entity;
 import engine.Window;
+import online.EntityWrapper;
 
 public class EntityHandler implements Serializable{
 	
@@ -27,9 +28,7 @@ public class EntityHandler implements Serializable{
 	
 	public void paint(Graphics2D g) {
 		for(Entity e : entity) {
-			if(w.getCurrentPage().equals(e.getID())) {
-				e.paint(g);
-			}
+			e.paint(g);
 		}
 	}
 	
@@ -39,13 +38,17 @@ public class EntityHandler implements Serializable{
 		}
 		if(removeEnt.size() > 0) {
 			for(Entity e : removeEnt) {
-				entity.remove(e);
+				if(entity.contains(e)){
+					entity.remove(e);
+				}
 			}
 			removeEnt = new ArrayList<>();
 		}
 		if(addEnt.size() > 0) {
 			for(Entity e : addEnt) {
-				entity.add(e);
+				if(!entity.contains(e)){
+					entity.add(e);
+				}
 			}
 			addEnt = new ArrayList<>();
 		}
@@ -54,13 +57,38 @@ public class EntityHandler implements Serializable{
 	public void removeEntity(Entity e) {
 		if(entity.contains(e)) {
 			removeEnt.add(e);
+			if(w.SERVER_ENABLED){
+				w.eServer.addChange(e, EntityWrapper.REMOVE);
+			}
+			if(w.CLIENT_ENABLED){
+				w.eClient.addChange(e, EntityWrapper.REMOVE);
+			}
 		}
 	}
 	
 	public void addEntity(Entity e) {
 		if(!entity.contains(e)) {
 			addEnt.add(e);
+			if(w.SERVER_ENABLED){
+				w.eServer.addChange(e, EntityWrapper.ADD);
+			}
+			if(w.CLIENT_ENABLED){
+				w.eClient.addChange(e, EntityWrapper.ADD);
+			}
 		}
+	}
+	
+	public void changeEntity(Entity e){
+		for(int i = 0; i < entity.size(); i++){
+			if(entity.get(i).getID().equals(e.getID())){
+				entity.set(i, e);
+				return;
+			}
+		}
+	}
+	
+	public void resetEntities(){
+		entity = new ArrayList<>();
 	}
 	
 	public ArrayList<Entity> getEntities(){

@@ -5,9 +5,7 @@ import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
-import online.Logger;
-
-public class Client extends Logger{
+public class Client{
 
 	private SocketChannel client;
 	private ByteBuffer buffer;
@@ -22,22 +20,36 @@ public class Client extends Logger{
 		}
 	}
 	
-	public String sendMessage(String msg){
+	public void sendMessage(String msg){
 		buffer = ByteBuffer.wrap(msg.getBytes());
-		String ret = "";
 		
 		try {
+			write();
 			client.write(buffer);
 			buffer.clear();
 			client.read(buffer);
-			ret = new String(buffer.array()).trim();
-			print("C: "+ret);
+			read();
 			buffer.clear();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return ret;
+	}
+	
+	/*
+	 * @author Xavier Bennett
+	 * @desc A "dummy" method. Used more in EntityClient
+	 */
+	public void write(){
+		return;
+	}
+	
+	/*
+	 * @author Xavier Bennett
+	 * @desc A "dummy" method. Used more in EntityClient
+	 */
+	public void read(){
+		return;
 	}
 
 }

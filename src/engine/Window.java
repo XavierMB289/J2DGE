@@ -2,6 +2,7 @@ package engine;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.Graphics2D;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -22,6 +23,7 @@ import java.util.Map;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
+import javax.swing.WindowConstants;
 
 import achievement.Trophy;
 import achievement.TrophyCallback;
@@ -38,9 +40,14 @@ import handler.FileHandler;
 import handler.ImageHandler;
 import handler.TransitionHandler;
 import interfaces.Config;
+import interfaces.EngineChanges;
 import objs.progress.ProgressionCheck;
+import online.client.Client;
+import online.client.EntityClient;
+import online.server.EntityServer;
+import online.server.Server;
 
-public class Window implements Config, Serializable {
+public class Window extends EngineChanges implements Config, Serializable {
 
 	private static final long serialVersionUID = 5651871526801520822L;
 	
@@ -97,6 +104,12 @@ public class Window implements Config, Serializable {
 	
 	//Starting Panel
 	StartingPanel sp;
+	
+	//Server and Client starting Variables
+	public Server server;
+	public Client client;
+	public EntityServer eServer;
+	public EntityClient eClient;
 
 	/**
 	 * @author Xavier Bennett
@@ -173,7 +186,7 @@ public class Window implements Config, Serializable {
 		
 		frame.setLayout(null);
 		frame.add(customPanel);
-		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		frame.setUndecorated(true);
 		
 		if(FORCE_FULLSCREEN) {
@@ -203,7 +216,7 @@ public class Window implements Config, Serializable {
 	 * @desc Creates a fullscreen window
 	 */
 	public void setFullscreen() {
-		frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+		frame.setExtendedState(Frame.MAXIMIZED_BOTH);
 		frame.setFocusable(true);
 		customPanel.requestFocus();
 	}
@@ -369,10 +382,10 @@ public class Window implements Config, Serializable {
 		HALF_H = HEIGHT / 2;
 
 		WINDOW_RECT = new Rectangle(WIDTH, HEIGHT);
-		TOP_RECT = new Rectangle(0, 0, WIDTH, (int) HALF_H);
-		BOTTOM_RECT = new Rectangle(0, (int) HALF_H, WIDTH, (int) HALF_H);
-		LEFT_RECT = new Rectangle(0, 0, (int) HALF_W, HEIGHT);
-		RIGHT_RECT = new Rectangle((int) HALF_W, 0, (int) HALF_W, HEIGHT);
+		TOP_RECT = new Rectangle(0, 0, WIDTH, HALF_H);
+		BOTTOM_RECT = new Rectangle(0, HALF_H, WIDTH, HALF_H);
+		LEFT_RECT = new Rectangle(0, 0, HALF_W, HEIGHT);
+		RIGHT_RECT = new Rectangle(HALF_W, 0, HALF_W, HEIGHT);
 		W12 = (int) Math.floor(WIDTH / 12);
 		H12 = (int) Math.floor(HEIGHT / 12);
 		

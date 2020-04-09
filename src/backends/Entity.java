@@ -13,6 +13,10 @@ public abstract class Entity implements Serializable{
 	
 	protected String ID;
 	
+	protected int x, y;
+	
+	protected Vector2D movement;
+	
 	/**
 	 * @author Xavier Bennett
 	 * @param w
@@ -20,7 +24,9 @@ public abstract class Entity implements Serializable{
 	public Entity(Window w) {
 		this.w = w;
 		ID = new Exception().getStackTrace()[2].getClassName().split("\\.")[1];
-		ID = ID.substring(0, 1).toLowerCase() + ID.substring(1);
+		ID = ID.substring(0, 1).toLowerCase() + ID.substring(1) + System.currentTimeMillis();
+		ID = w.functions.md5(ID);
+		ID = ID.length() > 10 ? ID.substring(0, 11) : ID;
 	}
 	
 	public abstract void paint(Graphics2D g);
