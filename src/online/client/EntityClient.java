@@ -28,6 +28,7 @@ public class EntityClient implements Runnable{
 			this.w = w;
 			client = SocketChannel.open(new InetSocketAddress(IP, PORT));
 			changes = new ArrayList<>();
+			w.CLIENT_ENABLED = true;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
