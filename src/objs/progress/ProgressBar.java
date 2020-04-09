@@ -116,7 +116,7 @@ public class ProgressBar extends Entity{
 	}
 
 	@Override
-	public void onTick(double delta) {
+	public void update(double delta) {
 		if(x >= left.x + width) {
 			if(looping) {
 				x = left.x;
