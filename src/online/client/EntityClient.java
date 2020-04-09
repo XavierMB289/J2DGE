@@ -39,6 +39,16 @@ public class EntityClient implements Runnable{
 		t.start();
 	}
 	
+	public void stop(){
+		running = false;
+		try {
+			t.join();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	/*
 	 * @author Xavier Bennett
 	 * @desc A "dummy" method. Used more in EntityClient
