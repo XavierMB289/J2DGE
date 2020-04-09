@@ -11,9 +11,13 @@ import backends.Entity;
 import engine.Window;
 import online.EntityWrapper;
 
-public class EntityClient {
+public class EntityClient implements Runnable{
 	
 	Window w;
+	
+	Thread t;
+	
+	boolean running = true;
 
 	private SocketChannel client;
 	
@@ -30,9 +34,9 @@ public class EntityClient {
 		}
 	}
 	
-	public void sendMessage(String msg){
-		write();
-		read();
+	public void start(){
+		t = new Thread(this);
+		t.start();
 	}
 	
 	/*
@@ -77,6 +81,16 @@ public class EntityClient {
 	
 	public void addChange(Entity e, String str){
 		changes.add(new EntityWrapper(e, str));
+	}
+
+	@Override
+	public void run() {
+		while(running){
+			if(client.isConnected()){
+				write();
+				read();
+			}
+		}
 	}
 
 }

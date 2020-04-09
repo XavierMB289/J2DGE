@@ -48,7 +48,7 @@ public class Credit extends AppPage{
 	
 	@Override
 	public void onChange() {
-		
+		w.EntityH.resetEntities();
 	}
 
 	@Override
