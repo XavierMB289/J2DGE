@@ -2,6 +2,8 @@ package engine;
 
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -16,6 +18,7 @@ public class StartingPanel extends AppPage{
 	private static final long serialVersionUID = 839804302267614473L;
 	
 	JComboBox<String> resolutions;
+	JComboBox<String> screens;
 	String res;
 	JCheckBox fsCheck;
 	JButton play;
@@ -24,7 +27,6 @@ public class StartingPanel extends AppPage{
 		super(win);
 	}
 	
-	@SuppressWarnings("static-access")
 	public void preInit() {
 		resolutions = new JComboBox<String>(w.ALLOWED_RESOLUTIONS);
 		resolutions.setSelectedIndex(0);
@@ -34,6 +36,23 @@ public class StartingPanel extends AppPage{
 			public void actionPerformed(ActionEvent e) {
 				res = (String)((JComboBox<?>)e.getSource()).getSelectedItem();
 				System.out.println("Resolution selected: "+res);
+			}
+			
+		});
+		
+		GraphicsEnvironment g = GraphicsEnvironment.getLocalGraphicsEnvironment();
+		GraphicsDevice[] devices = g.getScreenDevices();
+		String[] screenNum = new String[devices.length];
+		for(int i = 0; i < devices.length; i++){
+			screenNum[i] = "Display "+i;
+		}
+		screens = new JComboBox<String>(screenNum);
+		screens.setSelectedIndex(0);
+		screens.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				w.MAIN_SCREEN = Integer.parseInt(((String)((JComboBox<?>)e.getSource()).getSelectedItem()).split(" ")[1]);
 			}
 			
 		});
@@ -48,7 +67,7 @@ public class StartingPanel extends AppPage{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if(fsCheck.isSelected()) {
-					w.fullscreenExclusive(0);
+					w.fullscreenExclusive(w.MAIN_SCREEN);
 					w.getPanel().init();
 				}else {
 					if(res != null && res.contains("x")) {
@@ -69,6 +88,10 @@ public class StartingPanel extends AppPage{
 		resolutions.setBounds(w.HALF_W-temp.width/2, (int)w.H12*2-temp.height/2, temp.width, temp.height);
 		w.addComp(resolutions);
 		
+		temp = screens.getPreferredSize();
+		screens.setBounds(w.HALF_W-temp.width/2, (int)w.H12-temp.height/2, temp.width, temp.height);
+		w.addComp(screens);
+		
 		temp = fsCheck.getPreferredSize();
 		fsCheck.setBounds(w.HALF_W-temp.width/2, w.HALF_H-temp.height/2, temp.width, temp.height);
 		w.addComp(fsCheck);
@@ -81,6 +104,7 @@ public class StartingPanel extends AppPage{
 	@Override
 	public void onChange() {
 		w.removeComp(resolutions);
+		w.removeComp(screens);
 		w.removeComp(fsCheck);
 		w.removeComp(play);
 	}

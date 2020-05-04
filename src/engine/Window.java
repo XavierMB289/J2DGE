@@ -39,7 +39,6 @@ import handler.EventHandler;
 import handler.FileHandler;
 import handler.ImageHandler;
 import handler.TransitionHandler;
-import interfaces.Config;
 import interfaces.EngineChanges;
 import objs.progress.ProgressionCheck;
 import online.client.Client;
@@ -47,7 +46,7 @@ import online.client.EntityClient;
 import online.server.EntityServer;
 import online.server.Server;
 
-public class Window extends EngineChanges implements Config, Serializable {
+public class Window extends EngineChanges implements Serializable {
 
 	private static final long serialVersionUID = 5651871526801520822L;
 	
@@ -190,7 +189,7 @@ public class Window extends EngineChanges implements Config, Serializable {
 		frame.setUndecorated(true);
 		
 		if(FORCE_FULLSCREEN) {
-			fullscreenExclusive(0);
+			fullscreenExclusive(MAIN_SCREEN);
 			customPanel.init();
 		}else {
 			sp = new StartingPanel(this);

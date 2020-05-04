@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -120,6 +122,13 @@ public class ImageHandler implements Serializable{
 		g.drawImage(image.getImage(), 0, 0, null);
 		g.dispose();
 		return toImage(temp);
+	}
+	
+	public BufferedImage flip(BufferedImage img){
+		AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
+		tx.translate(-img.getWidth(), 0);
+		AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+		return op.filter(img, null);	
 	}
 	
 }
