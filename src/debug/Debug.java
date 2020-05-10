@@ -6,11 +6,11 @@ import java.awt.Rectangle;
 import java.util.HashMap;
 import java.util.Map;
 
-import engine.Window;
+import engine.GameWindow;
 
 public class Debug {
 
-	Window w;
+	GameWindow w;
 	private String[] args;
 	private Rectangle DEBUG_RECT;
 	
@@ -18,7 +18,7 @@ public class Debug {
 	
 	boolean enabled = false;
 	
-	public Debug(Window w) {
+	public Debug(GameWindow w) {
 		this.w = w;
 	}
 	
@@ -29,7 +29,7 @@ public class Debug {
 		events.put("-fps", new DebugEvent(w) {
 
 			@Override
-			public void event(Window w, Graphics2D g, Rectangle rect) {
+			public void event(Graphics2D g, Rectangle rect) {
 				debugText(g, Integer.toString(w.getPanel().FPS), rect);
 			}
 			
@@ -39,12 +39,12 @@ public class Debug {
 	}
 	
 	public String getCommands(String splitter) {
-		String temp = w.functions.arrayContains(args, splitter);
+		String temp = w.getFunctions().arrayContains(args, splitter);
 		return temp == null ? "" : temp.split("=")[1];
 	}
 	
 	public void setupRect() {
-		DEBUG_RECT = new Rectangle(0, 0, (int) w.W12, (int) w.H12 * 2);
+		DEBUG_RECT = new Rectangle(0, 0, (int) w.getW12(), (int) w.getH12() * 2);
 	}
 	
 	public void paint(Graphics2D g) {
@@ -52,7 +52,7 @@ public class Debug {
 			g.setFont(new Font("Arial", Font.PLAIN, 24));
 			for(Map.Entry<String, DebugEvent> entry : events.entrySet()) {
 				if(getCommands(entry.getKey()) != null) {
-					entry.getValue().event(w, g, DEBUG_RECT);
+					entry.getValue().event(g, DEBUG_RECT);
 				}
 			}
 		}

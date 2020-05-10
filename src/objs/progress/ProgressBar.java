@@ -9,10 +9,10 @@ import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
 
-import backends.Entity;
-import engine.Window;
+import backends.objs.EntityBase;
+import engine.GameWindow;
 
-public class ProgressBar extends Entity{
+public class ProgressBar extends EntityBase{
 
 	private static final long serialVersionUID = -7884396062702622182L;
 	
@@ -35,7 +35,7 @@ public class ProgressBar extends Entity{
 	int progressAdding = 0;
 	int spacing = 0;
 
-	public ProgressBar(Window win, ImageIcon i, Point l, int w, int h) {
+	public ProgressBar(GameWindow win, ImageIcon i, Point l, int w, int h) {
 		super(win);
 		image = i;
 		left = l;

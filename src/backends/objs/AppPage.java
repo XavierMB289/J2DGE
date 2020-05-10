@@ -1,15 +1,15 @@
-package backends;
+package backends.objs;
 
 import java.awt.Graphics2D;
 import java.io.Serializable;
 
-import engine.Window;
+import engine.GameWindow;
 
 public abstract class AppPage implements Serializable{
 	
 	private static final long serialVersionUID = 5638768653315988428L;
 	
-	protected transient Window w;
+	protected GameWindow w;
 	
 	protected String ID = getClass().getSimpleName();
 	
@@ -18,7 +18,7 @@ public abstract class AppPage implements Serializable{
 	 * @param win engine.Window
 	 * Setup for ID so that it can be properly displayed by engine.Window
 	 */
-	public AppPage(Window win) {
+	public AppPage(GameWindow win) {
 		w = win;
 		ID = ID.substring(0, 1).toLowerCase() + ID.substring(1);
 	}

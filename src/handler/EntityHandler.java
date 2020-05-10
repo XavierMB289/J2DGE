@@ -4,22 +4,22 @@ import java.awt.Graphics2D;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import backends.Entity;
-import engine.Window;
+import backends.objs.EntityBase;
+import engine.GameWindow;
 import online.EntityWrapper;
 
 public class EntityHandler implements Serializable{
 	
 	private static final long serialVersionUID = -6427291011070466960L;
 
-	Window w;
+	GameWindow w;
 	
 	// Entity Variables
-	private ArrayList<Entity> entity = null;
-	private ArrayList<Entity> removeEnt = null;
-	private ArrayList<Entity> addEnt = null;
+	private ArrayList<EntityBase> entity = null;
+	private ArrayList<EntityBase> removeEnt = null;
+	private ArrayList<EntityBase> addEnt = null;
 
-	public EntityHandler(Window w) {
+	public EntityHandler(GameWindow w) {
 		this.w = w;
 		entity = new ArrayList<>();
 		removeEnt = new ArrayList<>();
@@ -27,17 +27,17 @@ public class EntityHandler implements Serializable{
 	}
 	
 	public void paint(Graphics2D g) {
-		for(Entity e : entity) {
+		for(EntityBase e : entity) {
 			e.paint(g);
 		}
 	}
 	
 	public void update(double delta) {
-		for(Entity e : entity) {
+		for(EntityBase e : entity) {
 			e.update(delta);
 		}
 		if(removeEnt.size() > 0) {
-			for(Entity e : removeEnt) {
+			for(EntityBase e : removeEnt) {
 				if(entity.contains(e)){
 					entity.remove(e);
 				}
@@ -45,7 +45,7 @@ public class EntityHandler implements Serializable{
 			removeEnt = new ArrayList<>();
 		}
 		if(addEnt.size() > 0) {
-			for(Entity e : addEnt) {
+			for(EntityBase e : addEnt) {
 				if(!entity.contains(e)){
 					entity.add(e);
 				}
@@ -54,7 +54,7 @@ public class EntityHandler implements Serializable{
 		}
 	}
 	
-	public void removeEntity(Entity e) {
+	public void removeEntity(EntityBase e) {
 		if(entity.contains(e)) {
 			removeEnt.add(e);
 			if(w.SERVER_ENABLED){
@@ -66,7 +66,7 @@ public class EntityHandler implements Serializable{
 		}
 	}
 	
-	public void addEntity(Entity e) {
+	public void addEntity(EntityBase e) {
 		if(!entity.contains(e)) {
 			addEnt.add(e);
 			if(w.SERVER_ENABLED){
@@ -78,7 +78,7 @@ public class EntityHandler implements Serializable{
 		}
 	}
 	
-	public void changeEntity(Entity e){
+	public void changeEntity(EntityBase e){
 		for(int i = 0; i < entity.size(); i++){
 			if(entity.get(i).getID().equals(e.getID())){
 				entity.set(i, e);
@@ -92,7 +92,7 @@ public class EntityHandler implements Serializable{
 		entity = new ArrayList<>();
 	}
 	
-	public ArrayList<Entity> getEntities(){
+	public ArrayList<EntityBase> getEntities(){
 		return entity;
 	}
 

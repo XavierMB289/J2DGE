@@ -12,16 +12,16 @@ import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
 
-import backends.ImageItem;
-import engine.Window;
+import backends.objs.ImageItem;
+import engine.GameWindow;
 
 public class ImageHandler implements Serializable{
 	
 	private static final long serialVersionUID = -317953162923412609L;
 	
-	Window w;
+	GameWindow w;
 	
-	public ImageHandler(Window w) {
+	public ImageHandler(GameWindow w) {
 		this.w = w;
 	}
 
@@ -61,7 +61,7 @@ public class ImageHandler implements Serializable{
 	 */
 	public ArrayList<ImageItem> getAllImages(String filename) {
 		ArrayList<ImageItem> ret = new ArrayList<>();
-		String[] temp = w.FileH.getFilesFromDir(getClass(), filename);
+		String[] temp = w.getHandlers().getFileHandler().getFilesFromDir(getClass(), filename);
 		int totalFiles = temp.length;
 		int num = 0;
 		
@@ -75,11 +75,11 @@ public class ImageHandler implements Serializable{
 		return ret;
 	}
 	
-	public ImageIcon resizeImage(Window w, ImageIcon img, double scale) {
+	public ImageIcon resizeImage(ImageIcon img, double scale) {
 		return new ImageIcon(img.getImage().getScaledInstance((int)(img.getIconWidth()*scale), (int)(img.getIconHeight()*scale), Image.SCALE_SMOOTH));
 	}
 	
-	public ImageIcon getSprite(Window w, Image img, int x, int y, int size) {
+	public ImageIcon getSprite(Image img, int x, int y, int size) {
 		BufferedImage i = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
 		Graphics g = i.getGraphics();
 		g.drawImage(img, -x, -y, null);
@@ -87,12 +87,12 @@ public class ImageHandler implements Serializable{
 		return new ImageIcon(i);
 	}
 	
-	public ImageIcon[] getSprites(Window w, ImageIcon img, int size) {
+	public ImageIcon[] getSprites(ImageIcon img, int size) {
 		int sheetW = img.getIconWidth()/size, sheetH = img.getIconHeight()/size;
 		ImageIcon[] ret = new ImageIcon[sheetW*sheetH];
 		for(int y = 0; y < sheetH; y++) {
 			for(int x = 0; x < sheetW; x++) {
-				ret[(y*sheetW)+x] = getSprite(w, img.getImage(), x*size, y*size, size);
+				ret[(y*sheetW)+x] = getSprite(img.getImage(), x*size, y*size, size);
 			}
 		}
 		return ret;
@@ -104,7 +104,7 @@ public class ImageHandler implements Serializable{
 			for (int x = 0; x < image.getWidth(); x++) {
 				int rgb = image.getRGB(x, y);
 				if( (rgb>>24) != 0x00 ) {
-					Color blended = w.functions.blend(new Color(image.getRGB(x, y), true), base);
+					Color blended = w.getFunctions().blend(new Color(image.getRGB(x, y), true), base);
 					image.setRGB(x, y, blended.getRGB());
 				}
 			}

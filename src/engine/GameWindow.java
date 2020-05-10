@@ -6,7 +6,6 @@ import java.awt.Frame;
 import java.awt.Graphics2D;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -25,71 +24,35 @@ import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.WindowConstants;
 
-import achievement.Trophy;
-import achievement.TrophyCallback;
-import backends.AppPage;
-import backends.Clipping;
-import backends.Functions;
-import backends.ImageItem;
-import backends.Overlay;
-import debug.Debug;
-import handler.AudioHandler;
-import handler.EntityHandler;
-import handler.EventHandler;
-import handler.FileHandler;
-import handler.ImageHandler;
-import handler.TransitionHandler;
-import interfaces.EngineChanges;
+import backends.objs.AppPage;
+import backends.objs.Clipping;
+import backends.objs.ImageItem;
+import backends.objs.Overlay;
+import backends.objs.Vector2D;
 import objs.progress.ProgressionCheck;
 import online.client.Client;
 import online.client.EntityClient;
 import online.server.EntityServer;
 import online.server.Server;
 
-public class Window extends EngineChanges implements Serializable {
+public class GameWindow extends Collector implements Serializable {
 
 	private static final long serialVersionUID = 5651871526801520822L;
 	
-	//Private JPanel
+	//Immediate Frame Variables
 	private CustomPanel customPanel;
-
-	// Frame Variables
 	private JFrame frame = null;
-
 	private transient Thread thread = null;
-
-	public int WIDTH = -1, HEIGHT = -1, HALF_W = -1, HALF_H = -1;
-	public double H12, W12;
-
-	//Window Graphics Variables
-	public Rectangle WINDOW_RECT, TOP_RECT, BOTTOM_RECT, LEFT_RECT, RIGHT_RECT;
 	
-	//Window Location Variables
-	public Point SCREEN_CENTER;
-
-	// Imports
-	public Debug debug = null;
-	public EventHandler EventH = null;
-	public AudioHandler AudioH = null;
-	public ImageHandler ImageH = null;
-	public TransitionHandler TransH = null;
-	public FileHandler FileH = null;
-	public EntityHandler EntityH = null;
-	public Functions functions = null;
-	public Trophy trophy = null;
-
-	// Page and Overlay Variables
-	private Map<String, AppPage> pages = new HashMap<>();
-	private String currentPage = "start";
-	private Map<String, Overlay> overlays = new HashMap<>();
-	private String currentOverlay = "";
+	//"Programming" Variables
+	private int WIDTH = -1, HEIGHT = -1, HALF_W = -1, HALF_H = -1;
+	private double H12, W12;
+	private Rectangle WINDOW_RECT, TOP_RECT, BOTTOM_RECT, LEFT_RECT, RIGHT_RECT;
+	private Vector2D SCREEN_CENTER;
 
 	// Key Variables
 	private Map<Integer, Boolean> keys = new HashMap<>();
 	private Map<Integer, Boolean> keyUp = new HashMap<>();
-	
-	//Global Variables
-	Map<String, Object> globals;
 
 	// Images
 	private ArrayList<ImageItem> images = null;
@@ -98,7 +61,6 @@ public class Window extends EngineChanges implements Serializable {
 	private ArrayList<Clipping> audio = null;
 	
 	//ProgressionChecks
-	public ProgressionCheck pageCheck;
 	public ProgressionCheck imageCheck;
 	
 	//Starting Panel
@@ -114,37 +76,18 @@ public class Window extends EngineChanges implements Serializable {
 	 * @author Xavier Bennett
 	 * @param name This is the name of the created window
 	 */
-	public Window(String[] args) {
+	public GameWindow(String[] args) {
+		start(this, args);
 		
 		customPanel = new CustomPanel(this);
 
 		thread = new Thread(customPanel);
 		
-		globals = new HashMap<>();
 		
-		pageCheck = new ProgressionCheck();
 		imageCheck = new ProgressionCheck();
 
-		// Imports
-		debug = new Debug(this);
-		EventH = new EventHandler();
-		AudioH = new AudioHandler();
-		ImageH = new ImageHandler(this);
-		TransH = new TransitionHandler(this);
-		FileH = new FileHandler(this);
-		EntityH = new EntityHandler(this);
-		functions = new Functions();
-		
-		//Commands
-		if (args != null && args.length > 0) {
-			debug.init(args);
-		}
-
-		pages = new HashMap<>();
-		overlays = new HashMap<>();
-
 		// Setting Up Images
-		images = ImageH.getAllImages("img/");
+		images = getHandlers().getImageHandler().getAllImages("img/");
 		
 		//Audio Init
 		audio = new ArrayList<>();
@@ -166,17 +109,17 @@ public class Window extends EngineChanges implements Serializable {
 			@Override
 			public void keyReleased(KeyEvent e) {
 				keys.put(e.getKeyCode(), false);
-				if(!TransH.transitioning) {
+				if(!getHandlers().getTransHandler().transitioning) {
 					keyUp.put(e.getKeyCode(), true);
 				}
 
 				if (e.getKeyCode() == EXIT) {
-					if (currentPage.equals("credit") || currentPage.equals("mainMenu")) {
+					if (getHandlers().getPageHandler().compareAppPage("credit") || getHandlers().getPageHandler().compareAppPage("mainMenu")) {
 						stop();
 					}
 				} else if (e.getKeyCode() == ENTER || e.getKeyCode() == ENTER_ALT) {
-					if (currentPage.equals("credit")) {
-						setCurrentPage("mainMenu", true);
+					if (getHandlers().getPageHandler().compareAppPage("credit")) {
+						getHandlers().getPageHandler().setCurrentPage("mainMenu", true);
 					}
 				}
 			}
@@ -253,56 +196,6 @@ public class Window extends EngineChanges implements Serializable {
 
 	public void setWindowSize(int x, int y) {
 		setWindowSize(new Dimension(x, y));
-	}
-
-	public void setCurrentPage(String pageId, boolean init) {
-		if(pages.get(pageId) != null) {
-			//Only if there is a new page to go to, make sure to "exit" old page
-			if(init) {
-				if(getCurrentAppPage() != null) {
-					getCurrentAppPage().onChange();
-				}
-				AppPage temp = pages.get(pageId);
-				temp.init();
-			}
-			currentPage = pageId;
-		} else {
-			System.err.println("The page "+currentPage+" was not properly loaded in engine.Window");
-			System.exit(-1);
-		}
-	}
-	
-	public void addPage(AppPage p) {
-		if(!pages.containsValue(p)) {
-			pages.put(p.getID(), p);
-		}
-	}
-	
-	public String getCurrentPage() {
-		return currentPage;
-	}
-	
-	public AppPage getCurrentAppPage() {
-		return pages.get(currentPage);
-	}
-	
-	public AppPage getLoadedPage(String page) {
-		return pages.containsKey(page) ? pages.get(page) : null;
-	}
-	
-	public Overlay getLoadedOverlay(String over) {
-		return pages.containsKey(over) ? overlays.get(over) : null;
-	}
-	
-	public void setCurrentOverlay(String id) {
-		currentOverlay = id;
-		if(overlays.get(currentOverlay) != null) {
-			overlays.get(currentOverlay).init();
-		}
-	}
-	
-	public String getCurrentOverlay() {
-		return currentOverlay;
 	}
 	
 	/**
@@ -389,21 +282,19 @@ public class Window extends EngineChanges implements Serializable {
 		H12 = (int) Math.floor(HEIGHT / 12);
 		
 		//Setting middle of screen
-		SCREEN_CENTER = frame.getLocationOnScreen();
-		SCREEN_CENTER = new Point(SCREEN_CENTER.x+HALF_W, SCREEN_CENTER.y+HALF_H);
+		SCREEN_CENTER = new Vector2D(frame.getLocationOnScreen().x+HALF_W, frame.getLocationOnScreen().y+HALF_H);
 		
-		debug.setupRect();
-		trophy = new Trophy(this);
+		postInit(this);
 			
 		if(thread.getState().equals(Thread.State.NEW)) {
 			
 			if(sp != null) {
 				sp.init();
-				pages.put("start", sp);
+				getHandlers().getPageHandler().addPage(sp);
 			}
 			
-			Clipping[] bgm = AudioH.loadClippings("audio/bgm/");
-			Clipping[] sprite = AudioH.loadClippings("audio/sprite/");
+			Clipping[] bgm = getHandlers().getAudioHandler().loadClippings("audio/bgm/");
+			Clipping[] sprite = getHandlers().getAudioHandler().loadClippings("audio/sprite/");
 			
 			for(Clipping clip : bgm) {
 				audio.add(clip);
@@ -418,8 +309,8 @@ public class Window extends EngineChanges implements Serializable {
 	
 	public void loadAssets() {
 		// Adding Pages
-		String[] pageList = FileH.getFilesFromDir(getClass(), "pages/");
-		String[] overlayList = FileH.getFilesFromDir(getClass(), "overlays/");
+		String[] pageList = getHandlers().getFileHandler().getFilesFromDir(getClass(), "pages/");
+		String[] overlayList = getHandlers().getFileHandler().getFilesFromDir(getClass(), "overlays/");
 		int totalFiles = pageList.length + overlayList.length;
 		int tempNum = 0;
 		try {
@@ -427,39 +318,39 @@ public class Window extends EngineChanges implements Serializable {
 				tempNum++;
 				if (!pn.isEmpty() && !pn.matches(".*\\d.*")) {
 					Class<?> c = Class.forName("pages." + pn.split("\\.")[0]);
-					Constructor<?> con = c.getConstructor(new Class[] { Window.class });
+					Constructor<?> con = c.getConstructor(new Class[] { GameWindow.class });
 					Object o = con.newInstance(this);
 					if (o instanceof AppPage) {
 						AppPage ap = (AppPage) o;
-						if(pages.containsKey(ap.getID())) {
+						if(getHandlers().getPageHandler().containsAppPage(ap)) {
 							System.out.println("The AppPage, "+ap.getID()+" was already there...");
 						}else {
 							System.out.println("The AppPage, "+ap.getID()+" has been added.");
-							pages.put(ap.getID(), ap);
+							getHandlers().getPageHandler().addPage(ap);
 						}
 					}
 				}
-				pageCheck.setProgress((int)Math.floor((tempNum / totalFiles) * 100));
+				getHandlers().getPageHandler().pageCheck.setProgress((int)Math.floor((tempNum / totalFiles) * 100));
 			}
 			for (String pn : overlayList) {
 				tempNum++;
 				if (!pn.isEmpty() && !pn.matches(".*\\d.*")) {
 					Class<?> c = Class.forName("overlays." + pn.split("\\.")[0]);
-					Constructor<?> con = c.getConstructor(new Class[] { Window.class });
+					Constructor<?> con = c.getConstructor(new Class[] { GameWindow.class });
 					Object o = con.newInstance(this);
 					if (o instanceof Overlay) {
 						Overlay ap = (Overlay) o;
-						if(overlays.containsKey(ap.getID())) {
+						if(getHandlers().getPageHandler().containsOverlay(ap)) {
 							System.out.println("The Overlay, "+ap.getID()+" was already there...");
 						}else {
 							System.out.println("The Overlay, "+ap.getID()+" has been added.");
-							overlays.put(ap.getID(), ap);
+							getHandlers().getPageHandler().addOverlay(ap);
 						}
 					}
 				}
-				pageCheck.setProgress((int)Math.floor((tempNum / totalFiles) * 100));
+				getHandlers().getPageHandler().pageCheck.setProgress((int)Math.floor((tempNum / totalFiles) * 100));
 			}
-			pageCheck.setProgress(100);
+			getHandlers().getPageHandler().pageCheck.setProgress(100);
 		} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException
 				| IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			// TODO Auto-generated catch block
@@ -468,17 +359,17 @@ public class Window extends EngineChanges implements Serializable {
 	}
 
 	public synchronized void stop() {
-		getCurrentAppPage().onChange();
+		getHandlers().getPageHandler().getCurrentAppPage().onChange();
 		frame.setVisible(false);
 		System.exit(-1);
 	}
 
 	private void paintPage(Graphics2D g2d) {
-		AppPage ap = pages.get(currentPage);
+		AppPage ap = getHandlers().getPageHandler().getCurrentLoadedPage();
 		if(ap != null) {
 			ap.paint(g2d);
-			EntityH.paint(g2d);
-			Overlay o = overlays.get(currentOverlay);
+			getHandlers().getEntityHandler().paint(g2d);
+			Overlay o = getHandlers().getPageHandler().getCurrentOverlay();
 			if(o != null) {
 				o.paint(g2d);
 			}
@@ -487,24 +378,24 @@ public class Window extends EngineChanges implements Serializable {
 	
 	public void paint(Graphics2D g) {
 		g.clearRect(0, 0, WIDTH, HEIGHT);
-		if (!TransH.transitioning) {
+		if (!getHandlers().getTransHandler().transitioning) {
 			paintPage(g);
 		} else {
-			g.drawImage(TransH.getTransition().getImage(), 0, 0, null);
+			g.drawImage(getHandlers().getTransHandler().getTransition().getImage(), 0, 0, null);
 		}
-		if(trophy != null) {
-			trophy.paint(g);
+		if(getTrophy() != null) {
+			getTrophy().paint(g);
 		}
-		debug.paint(g);
+		getDebug().paint(g);
 	}
 
 	private void updatePage(double delta) {
-		AppPage ap = pages.get(currentPage);
+		AppPage ap = getHandlers().getPageHandler().getCurrentAppPage();
 		if(ap != null) {
 			ap.update(delta);
-			EntityH.update(delta);
-			if(!currentOverlay.equals("")) {
-				Overlay o = overlays.get(currentOverlay);
+			getHandlers().getEntityHandler().update(delta);
+			if(getHandlers().getPageHandler().getCurrentLoadedOverlay() != null) {
+				Overlay o = getHandlers().getPageHandler().getCurrentOverlay();
 				if(o != null) {
 					o.update(delta);
 				}
@@ -513,11 +404,11 @@ public class Window extends EngineChanges implements Serializable {
 	}
 	
 	public void update(double delta) {
-		if (!TransH.transitioning) {
+		if (!getHandlers().getTransHandler().transitioning) {
 			updatePage(delta);
 		}
-		if(trophy != null) {
-			trophy.update();
+		if(getTrophy() != null) {
+			getTrophy().update();
 		}
 	}
 
@@ -549,29 +440,57 @@ public class Window extends EngineChanges implements Serializable {
 		return null;
 	}
 	
-	public void addTrophy(String title, String desc) {
-		trophy.addTrophy(title, desc);
-	}
-	
-	public void addTrophy(String title, String desc, TrophyCallback call) {
-		trophy.addTrophy(title, desc, call);
-	}
-	
-	public Object getGlobal(String key) {
-		return globals.containsKey(key) ? globals.get(key) : -1;
-	}
-	
-	public void setGlobal(String key, Object value) {
-		globals.put(key, value);
-	}
-	
-	public Map<String, Object> globalDump(){
-		return globals;
-	}
-	
 	public void resetKeyUp() {
 		for(Map.Entry<Integer, Boolean> entry : keyUp.entrySet()) {
 			keyUp.put(entry.getKey(), false);
 		}
+	}
+	
+	public int getWIDTH() {
+		return WIDTH;
+	}
+
+	public int getHEIGHT() {
+		return HEIGHT;
+	}
+
+	public int getHALF_W() {
+		return HALF_W;
+	}
+
+	public int getHALF_H() {
+		return HALF_H;
+	}
+
+	public double getH12() {
+		return H12;
+	}
+
+	public double getW12() {
+		return W12;
+	}
+
+	public Rectangle getWINDOW_RECT() {
+		return WINDOW_RECT;
+	}
+
+	public Rectangle getTOP_RECT() {
+		return TOP_RECT;
+	}
+
+	public Rectangle getBOTTOM_RECT() {
+		return BOTTOM_RECT;
+	}
+
+	public Rectangle getLEFT_RECT() {
+		return LEFT_RECT;
+	}
+
+	public Rectangle getRIGHT_RECT() {
+		return RIGHT_RECT;
+	}
+
+	public Vector2D getSCREEN_CENTER() {
+		return SCREEN_CENTER;
 	}
 }

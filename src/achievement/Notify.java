@@ -8,7 +8,7 @@ import java.awt.TrayIcon.MessageType;
 
 import javax.swing.ImageIcon;
 
-import engine.Window;
+import engine.GameWindow;
 import handler.ImageHandler;
 
 public class Notify extends ImageHandler{
@@ -17,7 +17,7 @@ public class Notify extends ImageHandler{
 	
 	private ImageIcon icon = null;
 	
-	public Notify(Window w) {
+	public Notify(GameWindow w) {
 		super(w);
 	}
 	

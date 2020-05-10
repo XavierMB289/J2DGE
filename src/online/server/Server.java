@@ -10,12 +10,12 @@ import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Set;
 
-import engine.Window;
+import engine.GameWindow;
 import online.Logger;
 
 public class Server extends Logger implements Runnable{
 	
-	Window w;
+	GameWindow w;
 	
 	private Thread t;
 	
@@ -25,7 +25,7 @@ public class Server extends Logger implements Runnable{
 	
 	private boolean running = true;
 	
-	public Server(Window w, String IP, int PORT){
+	public Server(GameWindow w, String IP, int PORT){
 		try {
 			sel = Selector.open();
 			socket = ServerSocketChannel.open();

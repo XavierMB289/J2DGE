@@ -7,13 +7,13 @@ import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 
-import backends.Entity;
-import engine.Window;
+import backends.objs.EntityBase;
+import engine.GameWindow;
 import online.EntityWrapper;
 
 public class EntityClient implements Runnable{
 	
-	Window w;
+	GameWindow w;
 	
 	Thread t;
 	
@@ -23,7 +23,7 @@ public class EntityClient implements Runnable{
 	
 	ArrayList<EntityWrapper> changes;
 	
-	public EntityClient(Window w, String IP, int PORT){
+	public EntityClient(GameWindow w, String IP, int PORT){
 		try {
 			this.w = w;
 			client = SocketChannel.open(new InetSocketAddress(IP, PORT));
@@ -78,11 +78,11 @@ public class EntityClient implements Runnable{
 			EntityWrapper ew = (EntityWrapper)ois.readObject();
 			
 			if(ew.getChange().equals("add")){
-				w.EntityH.addEntity(ew.getEnt());
+				w.getHandlers().getEntityHandler().addEntity(ew.getEnt());
 			}else if(ew.getChange().equals("remove")){
-				w.EntityH.removeEntity(ew.getEnt());
+				w.getHandlers().getEntityHandler().removeEntity(ew.getEnt());
 			}else if(ew.getChange().equals("change")){
-				w.EntityH.changeEntity(ew.getEnt());
+				w.getHandlers().getEntityHandler().changeEntity(ew.getEnt());
 			}
 			
 		} catch (IOException | ClassNotFoundException e) {
@@ -90,7 +90,7 @@ public class EntityClient implements Runnable{
 		}
 	}
 	
-	public void addChange(Entity e, String str){
+	public void addChange(EntityBase e, String str){
 		changes.add(new EntityWrapper(e, str));
 	}
 

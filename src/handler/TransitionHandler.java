@@ -7,16 +7,16 @@ import java.io.Serializable;
 
 import javax.swing.ImageIcon;
 
-import backends.AppPage;
-import backends.Entity;
-import backends.Overlay;
-import engine.Window;
+import backends.objs.AppPage;
+import backends.objs.EntityBase;
+import backends.objs.Overlay;
+import engine.GameWindow;
 
 public class TransitionHandler implements Serializable{
 	
 	private static final long serialVersionUID = 2303151858356010675L;
 
-	Window w;
+	GameWindow w;
 	
 	//Generic Variables
 	private int x = 0, y = 0;
@@ -32,7 +32,7 @@ public class TransitionHandler implements Serializable{
 	private int appTrans = -1;
 	private String audioFile = "";
 	
-	public TransitionHandler(Window w) {
+	public TransitionHandler(GameWindow w) {
 		this.w = w;
 	}
 	
@@ -51,14 +51,14 @@ public class TransitionHandler implements Serializable{
 			transitioning = true;
 			this.oldPage = oldPage;
 			oldPage.onChange();
-			oldOverlay = w.getLoadedOverlay(oldPage.getID());
+			oldOverlay = w.getHandlers().getPageHandler().getLoadedOverlay(oldPage.getID());
 			this.newPage = newPage;
 			newPage.init();
-			newOverlay = w.getLoadedOverlay(newPage.getID());
+			newOverlay = w.getHandlers().getPageHandler().getLoadedOverlay(newPage.getID());
 			if(!audioFile.equals("")) {
-				w.AudioH.playSound(audioFile);
+				w.getHandlers().getAudioHandler().playSound(audioFile);
 			}
-			w.addPage(newPage);
+			w.getHandlers().getPageHandler().addPage(newPage);
 		}
 	}
 	
@@ -67,13 +67,13 @@ public class TransitionHandler implements Serializable{
 			transitioning = true;
 			this.oldPage = oldPage;
 			oldPage.onChange();
-			oldOverlay = w.getLoadedOverlay(oldPage.getID());
+			oldOverlay = w.getHandlers().getPageHandler().getLoadedOverlay(oldPage.getID());
 			this.newPage = newPage;
-			newOverlay = w.getLoadedOverlay(newPage.getID());
+			newOverlay = w.getHandlers().getPageHandler().getLoadedOverlay(newPage.getID());
 			if(!audioFile.equals("")) {
-				w.AudioH.playSound(audioFile);
+				w.getHandlers().getAudioHandler().playSound(audioFile);
 			}
-			w.addPage(newPage);
+			w.getHandlers().getPageHandler().addPage(newPage);
 		}
 	}
 	
@@ -107,12 +107,12 @@ public class TransitionHandler implements Serializable{
 	}
 	
 	public ImageIcon topDown() {
-		BufferedImage temp = new BufferedImage(w.WIDTH, w.HEIGHT, BufferedImage.TYPE_INT_ARGB);
+		BufferedImage temp = new BufferedImage(w.getWIDTH(), w.getHEIGHT(), BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = temp.createGraphics();
 		
-		g.translate(0, -w.HEIGHT+y);
+		g.translate(0, -w.getHEIGHT()+y);
 		newPage.paint(g);
-		for(Entity e : w.EntityH.getEntities()) {
+		for(EntityBase e : w.getHandlers().getEntityHandler().getEntities()) {
 			if(e.getID().equals(newPage.getID())) {
 				e.paint(g);
 			}
@@ -120,9 +120,9 @@ public class TransitionHandler implements Serializable{
 		if(newOverlay != null) {
 			newOverlay.paint(g);
 		}
-		g.translate(0, w.HEIGHT);
+		g.translate(0, w.getHEIGHT());
 		oldPage.paint(g);
-		for(Entity e : w.EntityH.getEntities()) {
+		for(EntityBase e : w.getHandlers().getEntityHandler().getEntities()) {
 			if(e.getID().equals(oldPage.getID())) {
 				e.paint(g);
 			}
@@ -132,24 +132,24 @@ public class TransitionHandler implements Serializable{
 		}
 		g.dispose();
 		
-		if(y >= w.HEIGHT) {
-			w.setCurrentPage(newPage.getID(), false);
+		if(y >= w.getHEIGHT()) {
+			w.getHandlers().getPageHandler().setCurrentPage(newPage.getID(), false);
 			y = 0;
 			transitioning = false;
 			transition = -1;
 		}else{
 			y+=speed;
 		}
-		return w.ImageH.toImage(temp);
+		return w.getHandlers().getImageHandler().toImage(temp);
 	}
 	
 	public ImageIcon leftRight() {
-		BufferedImage temp = new BufferedImage(w.WIDTH, w.HEIGHT, BufferedImage.TYPE_INT_ARGB);
+		BufferedImage temp = new BufferedImage(w.getWIDTH(), w.getHEIGHT(), BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = temp.createGraphics();
 		
-		g.translate(-w.WIDTH+x, 0);
+		g.translate(-w.getWIDTH()+x, 0);
 		newPage.paint(g);
-		for(Entity e : w.EntityH.getEntities()) {
+		for(EntityBase e : w.getHandlers().getEntityHandler().getEntities()) {
 			if(e.getID().equals(newPage.getID())) {
 				e.paint(g);
 			}
@@ -157,9 +157,9 @@ public class TransitionHandler implements Serializable{
 		if(newOverlay != null) {
 			newOverlay.paint(g);
 		}
-		g.translate(w.WIDTH, 0);
+		g.translate(w.getWIDTH(), 0);
 		oldPage.paint(g);
-		for(Entity e : w.EntityH.getEntities()) {
+		for(EntityBase e : w.getHandlers().getEntityHandler().getEntities()) {
 			if(e.getID().equals(oldPage.getID())) {
 				e.paint(g);
 			}
@@ -169,24 +169,24 @@ public class TransitionHandler implements Serializable{
 		}
 		g.dispose();
 		
-		if(x >= w.WIDTH) {
-			w.setCurrentPage(newPage.getID(), false);
+		if(x >= w.getWIDTH()) {
+			w.getHandlers().getPageHandler().setCurrentPage(newPage.getID(), false);
 			x = 0;
 			transitioning = false;
 			transition = -1;
 		}else{
 			x+=speed;
 		}
-		return w.ImageH.toImage(temp);
+		return w.getHandlers().getImageHandler().toImage(temp);
 	}
 	
 	public ImageIcon fadeInOut() {
-		BufferedImage temp = new BufferedImage(w.WIDTH, w.HEIGHT, BufferedImage.TYPE_INT_ARGB);
+		BufferedImage temp = new BufferedImage(w.getWIDTH(), w.getHEIGHT(), BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = temp.createGraphics();
 		
 		if(!flipped) {
 			oldPage.paint(g);
-			for(Entity e : w.EntityH.getEntities()) {
+			for(EntityBase e : w.getHandlers().getEntityHandler().getEntities()) {
 				if(e.getID().equals(oldPage.getID())) {
 					e.paint(g);
 				}
@@ -196,7 +196,7 @@ public class TransitionHandler implements Serializable{
 			}
 		}else {
 			newPage.paint(g);
-			for(Entity e : w.EntityH.getEntities()) {
+			for(EntityBase e : w.getHandlers().getEntityHandler().getEntities()) {
 				if(e.getID().equals(newPage.getID())) {
 					e.paint(g);
 				}
@@ -207,7 +207,7 @@ public class TransitionHandler implements Serializable{
 		}
 		
 		g.setColor(new Color(0f, 0f, 0f, transparency));
-		g.fillRect(0, 0, w.WIDTH, w.HEIGHT);
+		g.fillRect(0, 0, w.getWIDTH(), w.getHEIGHT());
 		
 		g.dispose();
 		
@@ -216,13 +216,13 @@ public class TransitionHandler implements Serializable{
 			flipped = true;
 			transparency = 1f;
 		}else if(flipped == true && transparency <= 0f) {
-			w.setCurrentPage(newPage.getID(), false);
+			w.getHandlers().getPageHandler().setCurrentPage(newPage.getID(), false);
 			transparency = 0f;
 			flipped = false;
 			transitioning = false;
 			transition = -1;
 		}
 		
-		return w.ImageH.toImage(temp);
+		return w.getHandlers().getImageHandler().toImage(temp);
 	}
 }

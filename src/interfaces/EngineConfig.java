@@ -2,7 +2,7 @@ package interfaces;
 
 import java.awt.event.KeyEvent;
 
-public class Config {
+public abstract class EngineConfig {
 	
 	//Window Name
 	public final String WINDOW_NAME = "Example Name";
@@ -40,4 +40,6 @@ public class Config {
 	
 	//Server Variables
 	public final String SERVER_STOP = "tacoTwuck";
+	public boolean SERVER_ENABLED = false;
+	public boolean CLIENT_ENABLED = false;
 }

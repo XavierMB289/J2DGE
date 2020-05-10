@@ -22,15 +22,15 @@ import java.util.jar.JarFile;
 
 import javax.swing.JFileChooser;
 
-import engine.Window;
+import engine.GameWindow;
 
 public class FileHandler implements Serializable{
 	
 	private static final long serialVersionUID = -5163715433825135015L;
 	
-	Window w;
+	GameWindow w;
 	
-	public FileHandler(Window w) {
+	public FileHandler(GameWindow w) {
 		this.w = w;
 	}
 	

@@ -7,8 +7,8 @@ import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
 
-import backends.AppPage;
-import engine.Window;
+import backends.objs.AppPage;
+import engine.GameWindow;
 
 @Deprecated
 @SuppressWarnings("static-access")
@@ -33,14 +33,14 @@ public class DialogBox extends AppPage{
 	int lineMaxLength = 25;
 	int charMaxTimer = 8;
 	
-	public DialogBox(Window w, String str, Color[] colors) {
+	public DialogBox(GameWindow w, String str, Color[] colors) {
 		super(w);
 		//variable setup
 		arrow = w.getImage("dialogArrow");
 		words = str.split(" ");
-		middle = new Point(w.WIDTH/2, (int)w.H12 * 8);
-		height = w.H12*4;
-		width = w.W12*8;
+		middle = new Point(w.getWIDTH()/2, (int)w.getH12() * 8);
+		height = w.getH12()*4;
+		width = w.getW12()*8;
 		back = colors[0];
 		front = colors[1];
 		//setup lines

@@ -1,15 +1,15 @@
-package backends;
+package backends.objs;
 
 import java.awt.Graphics2D;
 import java.io.Serializable;
 
-import engine.Window;
+import engine.GameWindow;
 
-public abstract class Entity implements Serializable{
+public abstract class EntityBase implements Serializable{
 	
 	private static final long serialVersionUID = -3124026621796435033L;
 	
-	protected Window w;
+	protected GameWindow w;
 	
 	protected String ID;
 	
@@ -21,11 +21,11 @@ public abstract class Entity implements Serializable{
 	 * @author Xavier Bennett
 	 * @param w
 	 */
-	public Entity(Window w) {
+	public EntityBase(GameWindow w) {
 		this.w = w;
 		ID = new Exception().getStackTrace()[2].getClassName().split("\\.")[1];
 		ID = ID.substring(0, 1).toLowerCase() + ID.substring(1) + System.currentTimeMillis();
-		ID = w.functions.md5(ID);
+		ID = w.getFunctions().md5(ID);
 		ID = ID.length() > 10 ? ID.substring(0, 11) : ID;
 	}
 	
@@ -37,8 +37,8 @@ public abstract class Entity implements Serializable{
 		return ID;
 	}
 	
-	public void removeMe(Entity e) {
-		w.EntityH.removeEntity(this);
+	public void removeMe(EntityBase e) {
+		w.getHandlers().getEntityHandler().removeEntity(this);
 	}
 	
 }

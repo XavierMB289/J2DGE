@@ -9,20 +9,20 @@ import java.awt.Rectangle;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
 
-import engine.Window;
+import engine.GameWindow;
 
 public abstract class DebugEvent {
 	
-	Window w;
+	GameWindow w;
 	
-	public DebugEvent(Window w) {
+	public DebugEvent(GameWindow w) {
 		this.w = w;
 	}
 
-	public abstract void event(Window w, Graphics2D g, Rectangle rect);
+	public abstract void event(Graphics2D g, Rectangle rect);
 	
 	public void debugText(Graphics2D g, String text, Rectangle rect) {
-		w.functions.push(g);
+		w.getFunctions().push(g);
 		Font font = g.getFont();
 		
 	    FontMetrics metrics = g.getFontMetrics(font);
@@ -37,7 +37,7 @@ public abstract class DebugEvent {
 		g.translate(x, y);
 		g.setColor(Color.black);
 		g.draw(gv.getOutline());
-		w.functions.pop(g);
+		w.getFunctions().pop(g);
 		g.setColor(Color.white);
 		g.drawString(text, x, y);
 	}

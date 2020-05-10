@@ -2,13 +2,13 @@ package online;
 
 import java.io.Serializable;
 
-import backends.Entity;
+import backends.objs.EntityBase;
 
 public class EntityWrapper implements Serializable{
 	
 	private static final long serialVersionUID = -6774441827094028752L;
 
-	private Entity e;
+	private EntityBase e;
 	
 	private String change;
 	
@@ -16,7 +16,7 @@ public class EntityWrapper implements Serializable{
 	public static final String REMOVE = "remove";
 	public static final String CHANGE = "change";
 	
-	public EntityWrapper(Entity e, String change){
+	public EntityWrapper(EntityBase e, String change){
 		this.e = e;
 		this.change = change;
 	}
@@ -25,7 +25,7 @@ public class EntityWrapper implements Serializable{
 		return change;
 	}
 	
-	public Entity getEnt(){
+	public EntityBase getEnt(){
 		return e;
 	}
 	

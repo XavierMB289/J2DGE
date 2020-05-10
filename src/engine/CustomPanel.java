@@ -13,7 +13,7 @@ public class CustomPanel extends JPanel implements Serializable, Runnable{
 
 	private static final long serialVersionUID = -5758060187282871973L;
 	
-	Window w;
+	GameWindow w;
 	
 	private Credit c = null;
 	
@@ -27,16 +27,16 @@ public class CustomPanel extends JPanel implements Serializable, Runnable{
 	//Original Loop Variables
 	private double delta;
 
-	public CustomPanel(Window w) {
+	public CustomPanel(GameWindow w) {
 		this.w = w;
 	}
 	
 	public void init() {
-		this.setBounds(0, 0, w.WIDTH, w.HEIGHT);
+		this.setBounds(0, 0, w.getWIDTH(), w.getHEIGHT());
 		c = new Credit(w);
 		c.init();
-		w.addPage(c);
-		w.setCurrentPage("credit", true);
+		w.getHandlers().getPageHandler().addPage(c);
+		w.getHandlers().getPageHandler().setAllToCurrent("credit", true);
 	}
 	
 	@SuppressWarnings("static-access")

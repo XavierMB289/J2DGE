@@ -1,22 +1,22 @@
-package backends;
+package backends.objs;
 
 import java.awt.AlphaComposite;
 import java.awt.Graphics2D;
 import java.io.Serializable;
 
-import engine.Window;
+import engine.GameWindow;
 
 public abstract class Overlay implements Serializable{
 	
 	private static final long serialVersionUID = 5638768653315988428L;
 	
-	protected Window w;
+	protected GameWindow w;
 	
 	protected String ID = getClass().getSimpleName();
 	
 	protected float alpha = 0.5f;
 	
-	public Overlay(Window w) {
+	public Overlay(GameWindow w) {
 		this.w = w;
 		ID = ID.substring(0, 1).toLowerCase() + ID.substring(1);
 	}

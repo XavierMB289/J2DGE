@@ -10,13 +10,13 @@ import java.util.Map;
 
 import javax.swing.ImageIcon;
 
-import engine.Window;
+import engine.GameWindow;
 
 public class Trophy extends Notify implements Serializable{
 	
 	private static final long serialVersionUID = 6902391967908717996L;
 
-	Window w;
+	GameWindow w;
 	
 	Rectangle rect;
 	ImageIcon icon;
@@ -29,11 +29,11 @@ public class Trophy extends Notify implements Serializable{
 	Map<String, String> added;
 	String recent = "";
 	
-	public Trophy(Window w) {
+	public Trophy(GameWindow w) {
 		super(w);
 		this.w = w;
-		icon = w.ImageH.resizeImage(w, w.ImageH.getImage("achievement/trophy.png"), 2);
-		rect = new Rectangle(10, 10, (int)(w.W12*3), (int)w.H12);
+		icon = w.getHandlers().getImageHandler().resizeImage(w.getHandlers().getImageHandler().getImage("achievement/trophy.png"), 2);
+		rect = new Rectangle(10, 10, (int)(w.getW12()*3), (int)w.getH12());
 		added = new HashMap<String, String>();
 		setIcon(icon);
 	}
@@ -79,7 +79,7 @@ public class Trophy extends Notify implements Serializable{
 			bg.fillRect(0, 0, buff.getWidth(), buff.getHeight());
 			bg.drawImage(icon.getImage(), 10, 0, null);
 			bg.setColor(Color.white);
-			w.functions.drawCenteredString(bg, recent+": "+added.get(recent), tempRect, 0, 0);
+			w.getFunctions().drawCenteredString(bg, recent+": "+added.get(recent), tempRect, 0, 0);
 			
 			bg.dispose();
 			g.drawImage(buff, rect.x, rect.y, null);

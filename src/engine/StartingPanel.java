@@ -11,7 +11,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 
-import backends.AppPage;
+import backends.objs.AppPage;
 
 public class StartingPanel extends AppPage{
 
@@ -23,7 +23,7 @@ public class StartingPanel extends AppPage{
 	JCheckBox fsCheck;
 	JButton play;
 
-	public StartingPanel(Window win) {
+	public StartingPanel(GameWindow win) {
 		super(win);
 	}
 	
@@ -85,19 +85,19 @@ public class StartingPanel extends AppPage{
 	public void init() {
 		
 		Dimension temp = resolutions.getPreferredSize();
-		resolutions.setBounds(w.HALF_W-temp.width/2, (int)w.H12*2-temp.height/2, temp.width, temp.height);
+		resolutions.setBounds(w.getHALF_W()-temp.width/2, (int)w.getH12()*2-temp.height/2, temp.width, temp.height);
 		w.addComp(resolutions);
 		
 		temp = screens.getPreferredSize();
-		screens.setBounds(w.HALF_W-temp.width/2, (int)w.H12-temp.height/2, temp.width, temp.height);
+		screens.setBounds(w.getHALF_W()-temp.width/2, (int)w.getH12()-temp.height/2, temp.width, temp.height);
 		w.addComp(screens);
 		
 		temp = fsCheck.getPreferredSize();
-		fsCheck.setBounds(w.HALF_W-temp.width/2, w.HALF_H-temp.height/2, temp.width, temp.height);
+		fsCheck.setBounds(w.getHALF_W()-temp.width/2, w.getHALF_H()-temp.height/2, temp.width, temp.height);
 		w.addComp(fsCheck);
 		
 		temp = fsCheck.getPreferredSize();
-		play.setBounds(w.HALF_W-temp.width/2, (int)w.H12*10-temp.height/2, temp.width, temp.height);
+		play.setBounds(w.getHALF_W()-temp.width/2, (int)w.getH12()*10-temp.height/2, temp.width, temp.height);
 		w.addComp(play);
 	}
 

@@ -1,6 +1,6 @@
 package physics;
 
-import backends.Vector2D;
+import backends.objs.Vector2D;
 
 public class PhysicsCircle extends PhysicsObj{
 

@@ -5,7 +5,7 @@ import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
 
-import backends.Clipping;
+import backends.objs.Clipping;
 
 public class AudioHandler implements Serializable{
 	
