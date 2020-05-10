@@ -29,7 +29,6 @@ import backends.objs.Clipping;
 import backends.objs.ImageItem;
 import backends.objs.Overlay;
 import backends.objs.Vector2D;
-import objs.progress.ProgressionCheck;
 import online.client.Client;
 import online.client.EntityClient;
 import online.server.EntityServer;
@@ -60,9 +59,6 @@ public class GameWindow extends Collector implements Serializable {
 	//Audio
 	private ArrayList<Clipping> audio = null;
 	
-	//ProgressionChecks
-	public ProgressionCheck imageCheck;
-	
 	//Starting Panel
 	StartingPanel sp;
 	
@@ -82,9 +78,6 @@ public class GameWindow extends Collector implements Serializable {
 		customPanel = new CustomPanel(this);
 
 		thread = new Thread(customPanel);
-		
-		
-		imageCheck = new ProgressionCheck();
 
 		// Setting Up Images
 		images = getHandlers().getImageHandler().getAllImages("img/");
@@ -311,11 +304,8 @@ public class GameWindow extends Collector implements Serializable {
 		// Adding Pages
 		String[] pageList = getHandlers().getFileHandler().getFilesFromDir(getClass(), "pages/");
 		String[] overlayList = getHandlers().getFileHandler().getFilesFromDir(getClass(), "overlays/");
-		int totalFiles = pageList.length + overlayList.length;
-		int tempNum = 0;
 		try {
 			for (String pn : pageList) {
-				tempNum++;
 				if (!pn.isEmpty() && !pn.matches(".*\\d.*")) {
 					Class<?> c = Class.forName("pages." + pn.split("\\.")[0]);
 					Constructor<?> con = c.getConstructor(new Class[] { GameWindow.class });
@@ -330,10 +320,8 @@ public class GameWindow extends Collector implements Serializable {
 						}
 					}
 				}
-				getHandlers().getPageHandler().pageCheck.setProgress((int)Math.floor((tempNum / totalFiles) * 100));
 			}
 			for (String pn : overlayList) {
-				tempNum++;
 				if (!pn.isEmpty() && !pn.matches(".*\\d.*")) {
 					Class<?> c = Class.forName("overlays." + pn.split("\\.")[0]);
 					Constructor<?> con = c.getConstructor(new Class[] { GameWindow.class });
@@ -348,9 +336,7 @@ public class GameWindow extends Collector implements Serializable {
 						}
 					}
 				}
-				getHandlers().getPageHandler().pageCheck.setProgress((int)Math.floor((tempNum / totalFiles) * 100));
 			}
-			getHandlers().getPageHandler().pageCheck.setProgress(100);
 		} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException
 				| IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			// TODO Auto-generated catch block

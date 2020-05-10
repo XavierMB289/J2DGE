@@ -5,7 +5,6 @@ import java.util.Map;
 
 import backends.objs.AppPage;
 import backends.objs.Overlay;
-import objs.progress.ProgressionCheck;
 
 public class PageHandler {
 	
@@ -13,11 +12,8 @@ public class PageHandler {
 	private String currentPage = "start";
 	private Map<String, Overlay> overlays = new HashMap<>();
 	private String currentOverlay = "";
-	
-	public ProgressionCheck pageCheck;
 
 	public PageHandler() {
-		pageCheck = new ProgressionCheck();
 		
 		pages = new HashMap<>();
 		overlays = new HashMap<>();

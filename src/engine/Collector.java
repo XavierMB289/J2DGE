@@ -3,9 +3,9 @@ package engine;
 import achievement.Trophy;
 import backends.Functions;
 import backends.GlobalVars;
+import configs.EngineConfig;
 import debug.Debug;
 import handler.HandlerCollection;
-import interfaces.EngineConfig;
 
 public class Collector extends EngineConfig{
 	
