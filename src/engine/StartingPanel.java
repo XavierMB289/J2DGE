@@ -68,12 +68,13 @@ public class StartingPanel extends AppPage{
 			public void actionPerformed(ActionEvent e) {
 				if(fsCheck.isSelected()) {
 					w.fullscreenExclusive(w.MAIN_SCREEN);
-					w.getPanel().init();
+					w.getLoop().init();
 				}else {
 					if(res != null && res.contains("x")) {
 						String[] temp = res.split("x");
 						w.setWindowSize(Integer.parseInt(temp[0]), Integer.parseInt(temp[1]));
-						w.getPanel().init();
+						w.setVisible();
+						w.getLoop().init();
 					}
 				}
 			}
@@ -85,32 +86,31 @@ public class StartingPanel extends AppPage{
 	public void init() {
 		
 		Dimension temp = resolutions.getPreferredSize();
-		resolutions.setBounds(w.getHALF_W()-temp.width/2, (int)w.getH12()*2-temp.height/2, temp.width, temp.height);
+		resolutions.setBounds(w.getFrame().getHALF_W()-temp.width/2, (int)w.getFrame().getH12()*2-temp.height/2, temp.width, temp.height);
 		w.addComp(resolutions);
 		
 		temp = screens.getPreferredSize();
-		screens.setBounds(w.getHALF_W()-temp.width/2, (int)w.getH12()-temp.height/2, temp.width, temp.height);
+		screens.setBounds(w.getFrame().getHALF_W()-temp.width/2, (int)w.getFrame().getH12()*4-temp.height/2, temp.width, temp.height);
 		w.addComp(screens);
 		
 		temp = fsCheck.getPreferredSize();
-		fsCheck.setBounds(w.getHALF_W()-temp.width/2, w.getHALF_H()-temp.height/2, temp.width, temp.height);
+		fsCheck.setBounds(w.getFrame().getHALF_W()-temp.width/2, w.getFrame().getHALF_H()-temp.height/2, temp.width, temp.height);
 		w.addComp(fsCheck);
 		
-		temp = fsCheck.getPreferredSize();
-		play.setBounds(w.getHALF_W()-temp.width/2, (int)w.getH12()*10-temp.height/2, temp.width, temp.height);
+		temp = play.getPreferredSize();
+		play.setBounds(w.getFrame().getHALF_W()-temp.width/2, (int)w.getFrame().getH12()*10-temp.height/2, temp.width, temp.height);
 		w.addComp(play);
 	}
 
 	@Override
 	public void onChange() {
-		w.removeComp(resolutions);
-		w.removeComp(screens);
-		w.removeComp(fsCheck);
-		w.removeComp(play);
+		w.removeAll();
 	}
 
 	@Override
-	public void paint(Graphics2D g) {  }
+	public void paint(Graphics2D g) {
+		
+	}
 
 	@Override
 	public void update(double delta) {  }

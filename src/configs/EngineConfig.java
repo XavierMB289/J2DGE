@@ -8,10 +8,11 @@ public abstract class EngineConfig {
 	public final String WINDOW_NAME = "Example Name";
 	//Window Variables
 	public final boolean FULLSCREEN_ALLOWED = true;
-	public final boolean FORCE_FULLSCREEN = true;
+	public final boolean FORCE_FULLSCREEN = false;
 	public final String[] ALLOWED_RESOLUTIONS = new String[] {
 		"1920x1080",
-		"1366x768"
+		"1366x768",
+		"400x400"
 	};
 	public int MAIN_SCREEN = 0;
 	

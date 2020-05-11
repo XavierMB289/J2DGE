@@ -1,15 +1,10 @@
 package engine;
 
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.io.Serializable;
-
-import javax.swing.JPanel;
 
 import coffeeDev.Credit;
 
-public class CustomPanel extends JPanel implements Serializable, Runnable{
+public class GameLoop implements Serializable, Runnable{
 
 	private static final long serialVersionUID = -5758060187282871973L;
 	
@@ -27,12 +22,11 @@ public class CustomPanel extends JPanel implements Serializable, Runnable{
 	//Original Loop Variables
 	private double delta;
 
-	public CustomPanel(GameWindow w) {
+	public GameLoop(GameWindow w) {
 		this.w = w;
 	}
 	
 	public void init() {
-		this.setBounds(0, 0, w.getWIDTH(), w.getHEIGHT());
 		c = new Credit(w);
 		c.init();
 		w.getHandlers().getPageHandler().addPage(c);
@@ -76,9 +70,9 @@ public class CustomPanel extends JPanel implements Serializable, Runnable{
 			fpsCounter = 0;
 		}
 		
-		update(delta);
+		w.update(delta);
 		
-		this.repaint();
+		w.getFrame().repaint();
 		
 		try {
 			long temp = ((lastLoopTime-System.nanoTime() + (int)w.OPTIMAL_TIME) / 1000000);
@@ -97,30 +91,12 @@ public class CustomPanel extends JPanel implements Serializable, Runnable{
 		lastLoopTime = now;
 		while(delta >= 1) {
 			fpsCounter++;
-			this.repaint();
-			update(delta);
+			w.getFrame().repaint();
+			w.update(delta);
 			delta--;
 		}
 		FPS = fpsCounter;
 		fpsCounter = 0;
-	}
-	
-	@Override
-	public void paint(Graphics g) {
-		Graphics2D g2d = (Graphics2D) g;
-		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-		try {
-			w.paint(g2d);
-		}catch(NullPointerException e) {
-			System.err.println("Null Pointer in "+e.getStackTrace()[0]);
-		}catch(Exception e) {
-			System.err.println(e.getStackTrace()[0]);
-		}
-	}
-	
-	public void update(double delta) {
-		w.update(delta);
 	}
 
 }

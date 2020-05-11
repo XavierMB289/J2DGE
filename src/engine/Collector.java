@@ -20,6 +20,7 @@ public class Collector extends EngineConfig{
 		globals = new GlobalVars();
 		debug = new Debug(w);
 		functions = new Functions();
+		handlers = new HandlerCollection(w);
 		
 		//if Commands then init
 		if (args != null && args.length > 0) {

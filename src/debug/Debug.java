@@ -30,7 +30,7 @@ public class Debug {
 
 			@Override
 			public void event(Graphics2D g, Rectangle rect) {
-				debugText(g, Integer.toString(w.getPanel().FPS), rect);
+				debugText(g, Integer.toString(w.getLoop().FPS), rect);
 			}
 			
 		});
@@ -44,7 +44,7 @@ public class Debug {
 	}
 	
 	public void setupRect() {
-		DEBUG_RECT = new Rectangle(0, 0, (int) w.getW12(), (int) w.getH12() * 2);
+		DEBUG_RECT = new Rectangle(0, 0, (int) w.getFrame().getW12(), (int) w.getFrame().getH12() * 2);
 	}
 	
 	public void paint(Graphics2D g) {

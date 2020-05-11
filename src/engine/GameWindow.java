@@ -3,10 +3,11 @@ package engine;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Frame;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
-import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
@@ -20,7 +21,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.ImageIcon;
-import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.WindowConstants;
 
@@ -28,7 +28,6 @@ import backends.objs.AppPage;
 import backends.objs.Clipping;
 import backends.objs.ImageItem;
 import backends.objs.Overlay;
-import backends.objs.Vector2D;
 import online.client.Client;
 import online.client.EntityClient;
 import online.server.EntityServer;
@@ -39,15 +38,9 @@ public class GameWindow extends Collector implements Serializable {
 	private static final long serialVersionUID = 5651871526801520822L;
 	
 	//Immediate Frame Variables
-	private CustomPanel customPanel;
-	private JFrame frame = null;
+	private GameLoop gameLoop;
+	private GameFrame frame = null;
 	private transient Thread thread = null;
-	
-	//"Programming" Variables
-	private int WIDTH = -1, HEIGHT = -1, HALF_W = -1, HALF_H = -1;
-	private double H12, W12;
-	private Rectangle WINDOW_RECT, TOP_RECT, BOTTOM_RECT, LEFT_RECT, RIGHT_RECT;
-	private Vector2D SCREEN_CENTER;
 
 	// Key Variables
 	private Map<Integer, Boolean> keys = new HashMap<>();
@@ -75,9 +68,9 @@ public class GameWindow extends Collector implements Serializable {
 	public GameWindow(String[] args) {
 		start(this, args);
 		
-		customPanel = new CustomPanel(this);
+		gameLoop = new GameLoop(this);
 
-		thread = new Thread(customPanel);
+		thread = new Thread(gameLoop);
 
 		// Setting Up Images
 		images = getHandlers().getImageHandler().getAllImages("img/");
@@ -86,9 +79,10 @@ public class GameWindow extends Collector implements Serializable {
 		audio = new ArrayList<>();
 		
 		//Setup and create JFrame
-		frame = new JFrame(WINDOW_NAME);
+		frame = new GameFrame(this);
+		frame.setTitle(WINDOW_NAME);
 
-		customPanel.addKeyListener(new KeyListener() {
+		frame.addKeyListener(new KeyListener() {
 
 			@Override
 			public void keyTyped(KeyEvent e) {
@@ -120,13 +114,12 @@ public class GameWindow extends Collector implements Serializable {
 		});
 		
 		frame.setLayout(null);
-		frame.add(customPanel);
 		frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		frame.setUndecorated(true);
 		
 		if(FORCE_FULLSCREEN) {
 			fullscreenExclusive(MAIN_SCREEN);
-			customPanel.init();
+			gameLoop.init();
 		}else {
 			sp = new StartingPanel(this);
 			sp.preInit();
@@ -138,12 +131,12 @@ public class GameWindow extends Collector implements Serializable {
 
 	}
 	
-	public JFrame getFrame() {
+	public GameFrame getFrame() {
 		return frame;
 	}
 	
-	public CustomPanel getPanel() {
-		return customPanel;
+	public GameLoop getLoop() {
+		return gameLoop;
 	}
 
 	/**
@@ -153,7 +146,7 @@ public class GameWindow extends Collector implements Serializable {
 	public void setFullscreen() {
 		frame.setExtendedState(Frame.MAXIMIZED_BOTH);
 		frame.setFocusable(true);
-		customPanel.requestFocus();
+		frame.requestFocus();
 	}
 	
 	/**
@@ -168,7 +161,7 @@ public class GameWindow extends Collector implements Serializable {
 			frame.setResizable(false);
 			device.setFullScreenWindow(frame);
 			frame.setFocusable(true);
-			customPanel.requestFocus();
+			frame.requestFocus();
 		}else {
 			setFullscreen();
 		}
@@ -184,7 +177,7 @@ public class GameWindow extends Collector implements Serializable {
 		frame.setMinimumSize(minimumSize);
 		frame.setLocationRelativeTo(null);
 		frame.setFocusable(true);
-		customPanel.requestFocus();
+		frame.requestFocus();
 	}
 
 	public void setWindowSize(int x, int y) {
@@ -205,22 +198,22 @@ public class GameWindow extends Collector implements Serializable {
 	}
 
 	public void addMouseListen(MouseListener l) {
-		customPanel.addMouseListener(l);
+		frame.addMouseListener(l);
 		frame.validate();
 	}
 
 	public void addMouseMotionListen(MouseMotionListener l) {
-		customPanel.addMouseMotionListener(l);
+		frame.addMouseMotionListener(l);
 		frame.validate();
 	}
 
 	public void addMouseWheelListen(MouseWheelListener l) {
-		customPanel.addMouseWheelListener(l);
+		frame.addMouseWheelListener(l);
 		frame.validate();
 	}
 
 	public void addComp(Component c) {
-		customPanel.add(c);
+		frame.add(c);
 		frame.validate();
 	}
 
@@ -230,28 +223,34 @@ public class GameWindow extends Collector implements Serializable {
 	}
 	
 	public void removeMouseListen(MouseListener l) {
-		customPanel.removeMouseListener(l);
+		frame.removeMouseListener(l);
 		frame.validate();
 	}
 	
 	public void removeMouseMotionListen(MouseMotionListener l) {
-		customPanel.removeMouseMotionListener(l);
+		frame.removeMouseMotionListener(l);
 		frame.validate();
 	}
 
 	public void removeMouseWheelListen(MouseWheelListener l) {
-		customPanel.removeMouseWheelListener(l);
+		frame.removeMouseWheelListener(l);
 		frame.validate();
 	}
 
 	public void removeComp(Component c) {
-		customPanel.remove(c);
+		frame.remove(c);
 		frame.validate();
+	}
+	
+	public void removeAll() {
+		frame.removeAll();
+		frame.revalidate();
 	}
 
 	public void setVisible() {
-
-		frame.validate();
+		
+		frame.setVisible(false);
+		frame.revalidate();
 		frame.pack();
 		frame.setVisible(true);
 
@@ -260,22 +259,8 @@ public class GameWindow extends Collector implements Serializable {
 	}
 	
 	private void windowSetup() {
-		WIDTH = frame.getWidth();
-		HALF_W = WIDTH / 2;
-			
-		HEIGHT = frame.getHeight();
-		HALF_H = HEIGHT / 2;
-
-		WINDOW_RECT = new Rectangle(WIDTH, HEIGHT);
-		TOP_RECT = new Rectangle(0, 0, WIDTH, HALF_H);
-		BOTTOM_RECT = new Rectangle(0, HALF_H, WIDTH, HALF_H);
-		LEFT_RECT = new Rectangle(0, 0, HALF_W, HEIGHT);
-		RIGHT_RECT = new Rectangle(HALF_W, 0, HALF_W, HEIGHT);
-		W12 = (int) Math.floor(WIDTH / 12);
-		H12 = (int) Math.floor(HEIGHT / 12);
 		
-		//Setting middle of screen
-		SCREEN_CENTER = new Vector2D(frame.getLocationOnScreen().x+HALF_W, frame.getLocationOnScreen().y+HALF_H);
+		frame.init();
 		
 		postInit(this);
 			
@@ -283,7 +268,8 @@ public class GameWindow extends Collector implements Serializable {
 			
 			if(sp != null) {
 				sp.init();
-				getHandlers().getPageHandler().addPage(sp);
+				//getHandlers().getPageHandler().addPage(sp);
+				frame.revalidate();
 			}
 			
 			Clipping[] bgm = getHandlers().getAudioHandler().loadClippings("audio/bgm/");
@@ -362,17 +348,31 @@ public class GameWindow extends Collector implements Serializable {
 		}
 	}
 	
-	public void paint(Graphics2D g) {
-		g.clearRect(0, 0, WIDTH, HEIGHT);
-		if (!getHandlers().getTransHandler().transitioning) {
-			paintPage(g);
-		} else {
-			g.drawImage(getHandlers().getTransHandler().getTransition().getImage(), 0, 0, null);
+	
+	public void paint(Graphics gr) {
+		try {
+			Graphics2D g = (Graphics2D) gr;
+			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+			if(getHandlers().getPageHandler().compareAppPage("start") != true) {
+				g.clearRect(0, 0, frame.getWIDTH(), frame.getHEIGHT());
+				if (!getHandlers().getTransHandler().transitioning) {
+					paintPage(g);
+				} else {
+					g.drawImage(getHandlers().getTransHandler().getTransition().getImage(), 0, 0, null);
+				}
+				if(getTrophy() != null) {
+					getTrophy().paint(g);
+				}
+				getDebug().paint(g);
+			}else {
+				
+			}
+		}catch(NullPointerException e) {
+			System.err.println("Null Pointer in "+e.getStackTrace()[0]);
+		}catch(Exception e) {
+			System.err.println(e.getStackTrace()[0]);
 		}
-		if(getTrophy() != null) {
-			getTrophy().paint(g);
-		}
-		getDebug().paint(g);
 	}
 
 	private void updatePage(double delta) {
@@ -432,51 +432,4 @@ public class GameWindow extends Collector implements Serializable {
 		}
 	}
 	
-	public int getWIDTH() {
-		return WIDTH;
-	}
-
-	public int getHEIGHT() {
-		return HEIGHT;
-	}
-
-	public int getHALF_W() {
-		return HALF_W;
-	}
-
-	public int getHALF_H() {
-		return HALF_H;
-	}
-
-	public double getH12() {
-		return H12;
-	}
-
-	public double getW12() {
-		return W12;
-	}
-
-	public Rectangle getWINDOW_RECT() {
-		return WINDOW_RECT;
-	}
-
-	public Rectangle getTOP_RECT() {
-		return TOP_RECT;
-	}
-
-	public Rectangle getBOTTOM_RECT() {
-		return BOTTOM_RECT;
-	}
-
-	public Rectangle getLEFT_RECT() {
-		return LEFT_RECT;
-	}
-
-	public Rectangle getRIGHT_RECT() {
-		return RIGHT_RECT;
-	}
-
-	public Vector2D getSCREEN_CENTER() {
-		return SCREEN_CENTER;
-	}
 }

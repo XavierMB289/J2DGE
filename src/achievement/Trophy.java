@@ -33,7 +33,7 @@ public class Trophy extends Notify implements Serializable{
 		super(w);
 		this.w = w;
 		icon = w.getHandlers().getImageHandler().resizeImage(w.getHandlers().getImageHandler().getImage("achievement/trophy.png"), 2);
-		rect = new Rectangle(10, 10, (int)(w.getW12()*3), (int)w.getH12());
+		rect = new Rectangle(10, 10, (int)(w.getFrame().getW12()*3), (int)w.getFrame().getH12());
 		added = new HashMap<String, String>();
 		setIcon(icon);
 	}

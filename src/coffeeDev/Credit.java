@@ -34,9 +34,9 @@ public class Credit extends AppPage{
 	@Override
 	public void paint(Graphics2D g) {
 		g.setColor(Color.black);
-		g.fillRect(0, 0, w.getWIDTH(), w.getHEIGHT());
+		g.fillRect(0, 0, w.getFrame().getWIDTH(), w.getFrame().getHEIGHT());
 		w.getFunctions().push(g);
-		g.translate(w.getHALF_W(), w.getHALF_H());
+		g.translate(w.getFrame().getHALF_W(), w.getFrame().getHALF_H());
 		g.rotate(Math.toRadians(rotate));
 		g.drawImage(icon.getImage(), 0, 0, null);
 		w.getFunctions().pop(g);
