@@ -13,7 +13,7 @@ public class GameFrame extends JFrame{
 	
 	GameWindow w;
 
-	private int WIDTH = -1, HEIGHT = -1, HALF_W = -1, HALF_H = -1;
+	private int HALF_W = -1, HALF_H = -1;
 	private double H12, W12;
 	private Rectangle WINDOW_RECT, TOP_RECT, BOTTOM_RECT, LEFT_RECT, RIGHT_RECT;
 	private Vector2D SCREEN_CENTER;
@@ -23,19 +23,16 @@ public class GameFrame extends JFrame{
 	}
 	
 	public void init() {
-		WIDTH = getWidth();
-		HALF_W = WIDTH / 2;
-			
-		HEIGHT = getHeight();
-		HALF_H = HEIGHT / 2;
+		HALF_W = getWidth() / 2;
+		HALF_H = getHeight() / 2;
 
-		WINDOW_RECT = new Rectangle(WIDTH, HEIGHT);
-		TOP_RECT = new Rectangle(0, 0, WIDTH, HALF_H);
-		BOTTOM_RECT = new Rectangle(0, HALF_H, WIDTH, HALF_H);
-		LEFT_RECT = new Rectangle(0, 0, HALF_W, HEIGHT);
-		RIGHT_RECT = new Rectangle(HALF_W, 0, HALF_W, HEIGHT);
-		W12 = (int) Math.floor(WIDTH / 12);
-		H12 = (int) Math.floor(HEIGHT / 12);
+		WINDOW_RECT = new Rectangle(getWidth(), getHeight());
+		TOP_RECT = new Rectangle(0, 0, getWidth(), HALF_H);
+		BOTTOM_RECT = new Rectangle(0, HALF_H, getWidth(), HALF_H);
+		LEFT_RECT = new Rectangle(0, 0, HALF_W, getHeight());
+		RIGHT_RECT = new Rectangle(HALF_W, 0, HALF_W, getHeight());
+		W12 = (int) Math.floor(getWidth() / 12);
+		H12 = (int) Math.floor(getHeight() / 12);
 		
 		//Setting middle of screen
 		SCREEN_CENTER = new Vector2D(getLocationOnScreen().x+HALF_W, getLocationOnScreen().y+HALF_H);
@@ -44,14 +41,6 @@ public class GameFrame extends JFrame{
 	@Override
 	public void paint(Graphics g) {
 		w.paint(g);
-	}
-	
-	public int getWIDTH() {
-		return WIDTH;
-	}
-
-	public int getHEIGHT() {
-		return HEIGHT;
 	}
 
 	public int getHALF_W() {

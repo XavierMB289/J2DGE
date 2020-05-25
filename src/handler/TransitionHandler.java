@@ -107,10 +107,10 @@ public class TransitionHandler implements Serializable{
 	}
 	
 	public ImageIcon topDown() {
-		BufferedImage temp = new BufferedImage(w.getFrame().getWIDTH(), w.getFrame().getHEIGHT(), BufferedImage.TYPE_INT_ARGB);
+		BufferedImage temp = new BufferedImage(w.getFrame().getWidth(), w.getFrame().getHeight(), BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = temp.createGraphics();
 		
-		g.translate(0, -w.getFrame().getHEIGHT()+y);
+		g.translate(0, -w.getFrame().getHeight()+y);
 		newPage.paint(g);
 		for(EntityBase e : w.getHandlers().getEntityHandler().getEntities()) {
 			if(e.getID().equals(newPage.getID())) {
@@ -120,7 +120,7 @@ public class TransitionHandler implements Serializable{
 		if(newOverlay != null) {
 			newOverlay.paint(g);
 		}
-		g.translate(0, w.getFrame().getHEIGHT());
+		g.translate(0, w.getFrame().getHeight());
 		oldPage.paint(g);
 		for(EntityBase e : w.getHandlers().getEntityHandler().getEntities()) {
 			if(e.getID().equals(oldPage.getID())) {
@@ -132,7 +132,7 @@ public class TransitionHandler implements Serializable{
 		}
 		g.dispose();
 		
-		if(y >= w.getFrame().getHEIGHT()) {
+		if(y >= w.getFrame().getHeight()) {
 			w.getHandlers().getPageHandler().setCurrentPage(newPage.getID(), false);
 			y = 0;
 			transitioning = false;
@@ -144,10 +144,10 @@ public class TransitionHandler implements Serializable{
 	}
 	
 	public ImageIcon leftRight() {
-		BufferedImage temp = new BufferedImage(w.getFrame().getWIDTH(), w.getFrame().getHEIGHT(), BufferedImage.TYPE_INT_ARGB);
+		BufferedImage temp = new BufferedImage(w.getFrame().getWidth(), w.getFrame().getWidth(), BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = temp.createGraphics();
 		
-		g.translate(-w.getFrame().getWIDTH()+x, 0);
+		g.translate(-w.getFrame().getWidth()+x, 0);
 		newPage.paint(g);
 		for(EntityBase e : w.getHandlers().getEntityHandler().getEntities()) {
 			if(e.getID().equals(newPage.getID())) {
@@ -157,7 +157,7 @@ public class TransitionHandler implements Serializable{
 		if(newOverlay != null) {
 			newOverlay.paint(g);
 		}
-		g.translate(w.getFrame().getWIDTH(), 0);
+		g.translate(w.getFrame().getWidth(), 0);
 		oldPage.paint(g);
 		for(EntityBase e : w.getHandlers().getEntityHandler().getEntities()) {
 			if(e.getID().equals(oldPage.getID())) {
@@ -169,7 +169,7 @@ public class TransitionHandler implements Serializable{
 		}
 		g.dispose();
 		
-		if(x >= w.getFrame().getWIDTH()) {
+		if(x >= w.getFrame().getWidth()) {
 			w.getHandlers().getPageHandler().setCurrentPage(newPage.getID(), false);
 			x = 0;
 			transitioning = false;
@@ -181,7 +181,7 @@ public class TransitionHandler implements Serializable{
 	}
 	
 	public ImageIcon fadeInOut() {
-		BufferedImage temp = new BufferedImage(w.getFrame().getWIDTH(), w.getFrame().getHEIGHT(), BufferedImage.TYPE_INT_ARGB);
+		BufferedImage temp = new BufferedImage(w.getFrame().getWidth(), w.getFrame().getHeight(), BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = temp.createGraphics();
 		
 		if(!flipped) {
@@ -207,7 +207,7 @@ public class TransitionHandler implements Serializable{
 		}
 		
 		g.setColor(new Color(0f, 0f, 0f, transparency));
-		g.fillRect(0, 0, w.getFrame().getWIDTH(), w.getFrame().getHEIGHT());
+		g.fillRect(0, 0, w.getFrame().getWidth(), w.getFrame().getHeight());
 		
 		g.dispose();
 		

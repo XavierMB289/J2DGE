@@ -6,6 +6,7 @@ import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -27,9 +28,10 @@ public class StartingPanel extends AppPage{
 		super(win);
 	}
 	
-	public void preInit() {
+	public void init() {
 		resolutions = new JComboBox<String>(w.ALLOWED_RESOLUTIONS);
 		resolutions.setSelectedIndex(0);
+		res = resolutions.getItemAt(0);
 		resolutions.addActionListener(new ActionListener() {
 
 			@Override
@@ -39,6 +41,7 @@ public class StartingPanel extends AppPage{
 			}
 			
 		});
+		resolutions.validate();
 		
 		GraphicsEnvironment g = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		GraphicsDevice[] devices = g.getScreenDevices();
@@ -56,55 +59,75 @@ public class StartingPanel extends AppPage{
 			}
 			
 		});
+		screens.validate();
 		
 		fsCheck = new JCheckBox("Fullscreen?");
 		fsCheck.setToolTipText("Overrides the resolution...");
 		fsCheck.setMnemonic('F');
+		if(w.FORCE_FULLSCREEN){
+			fsCheck.setSelected(true);
+			fsCheck.setEnabled(false);
+		}
+		fsCheck.validate();
 		
 		play = new JButton("PLAY");
 		play.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				
+				w.windowSetup();
+				
 				if(fsCheck.isSelected()) {
 					w.fullscreenExclusive(w.MAIN_SCREEN);
+					w.setVisible();
+					if(w.paintImg == null){
+						w.paintImg = new BufferedImage(w.getFrame().getWidth(), w.getFrame().getHeight(), BufferedImage.TYPE_INT_ARGB);
+					}
 					w.getLoop().init();
 				}else {
 					if(res != null && res.contains("x")) {
 						String[] temp = res.split("x");
 						w.setWindowSize(Integer.parseInt(temp[0]), Integer.parseInt(temp[1]));
 						w.setVisible();
+						if(w.paintImg == null){
+							w.paintImg = new BufferedImage(w.getFrame().getWidth(), w.getFrame().getHeight(), BufferedImage.TYPE_INT_ARGB);
+						}
 						w.getLoop().init();
 					}
 				}
 			}
 			
 		});
-	}
-
-	@Override
-	public void init() {
+		play.validate();
+		
+		int halfW = w.getFrame().getWidth()/2;
+		int halfH = w.getFrame().getHeight()/2;
+		int h12 = w.getFrame().getHeight()/12;
 		
 		Dimension temp = resolutions.getPreferredSize();
-		resolutions.setBounds(w.getFrame().getHALF_W()-temp.width/2, (int)w.getFrame().getH12()*2-temp.height/2, temp.width, temp.height);
+		resolutions.setBounds(halfW-temp.width/2, (int)h12*2-temp.height/2, temp.width, temp.height);
 		w.addComp(resolutions);
 		
 		temp = screens.getPreferredSize();
-		screens.setBounds(w.getFrame().getHALF_W()-temp.width/2, (int)w.getFrame().getH12()*4-temp.height/2, temp.width, temp.height);
+		screens.setBounds(halfW-temp.width/2, (int)h12*4-temp.height/2, temp.width, temp.height);
 		w.addComp(screens);
 		
 		temp = fsCheck.getPreferredSize();
-		fsCheck.setBounds(w.getFrame().getHALF_W()-temp.width/2, w.getFrame().getHALF_H()-temp.height/2, temp.width, temp.height);
+		fsCheck.setBounds(halfW-temp.width/2, halfH-temp.height/2, temp.width, temp.height);
 		w.addComp(fsCheck);
 		
 		temp = play.getPreferredSize();
-		play.setBounds(w.getFrame().getHALF_W()-temp.width/2, (int)w.getFrame().getH12()*10-temp.height/2, temp.width, temp.height);
+		play.setBounds(halfW-temp.width/2, (int)h12*10-temp.height/2, temp.width, temp.height);
 		w.addComp(play);
 	}
 
 	@Override
 	public void onChange() {
-		w.removeAll();
+		w.removeComp(resolutions);
+		w.removeComp(screens);
+		w.removeComp(fsCheck);
+		w.removeComp(play);
 	}
 
 	@Override

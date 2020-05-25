@@ -13,6 +13,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelListener;
+import java.awt.image.BufferedImage;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -41,6 +42,7 @@ public class GameWindow extends Collector implements Serializable {
 	private GameLoop gameLoop;
 	private GameFrame frame = null;
 	private transient Thread thread = null;
+	public transient BufferedImage paintImg = null;
 
 	// Key Variables
 	private Map<Integer, Boolean> keys = new HashMap<>();
@@ -66,17 +68,9 @@ public class GameWindow extends Collector implements Serializable {
 	 * @param name This is the name of the created window
 	 */
 	public GameWindow(String[] args) {
+		
 		start(this, args);
-		
-		gameLoop = new GameLoop(this);
-
-		thread = new Thread(gameLoop);
-
-		// Setting Up Images
-		images = getHandlers().getImageHandler().getAllImages("img/");
-		
-		//Audio Init
-		audio = new ArrayList<>();
+		preInitPages();
 		
 		//Setup and create JFrame
 		frame = new GameFrame(this);
@@ -117,17 +111,14 @@ public class GameWindow extends Collector implements Serializable {
 		frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		frame.setUndecorated(true);
 		
-		if(FORCE_FULLSCREEN) {
-			fullscreenExclusive(MAIN_SCREEN);
-			gameLoop.init();
-		}else {
-			sp = new StartingPanel(this);
-			sp.preInit();
+		setWindowSize(200, 200);
 			
-			//Setup Starting Window
-			setWindowSize(200, 200);
-			setVisible();
-		}
+		sp = new StartingPanel(this);
+		sp.init();
+		getHandlers().getPageHandler().addPage(sp);
+			
+		//Setup Starting Window
+		setVisible();
 
 	}
 	
@@ -165,7 +156,6 @@ public class GameWindow extends Collector implements Serializable {
 		}else {
 			setFullscreen();
 		}
-		windowSetup();
 	}
 
 	/**
@@ -199,91 +189,83 @@ public class GameWindow extends Collector implements Serializable {
 
 	public void addMouseListen(MouseListener l) {
 		frame.addMouseListener(l);
-		frame.validate();
 	}
 
 	public void addMouseMotionListen(MouseMotionListener l) {
 		frame.addMouseMotionListener(l);
-		frame.validate();
 	}
 
 	public void addMouseWheelListen(MouseWheelListener l) {
 		frame.addMouseWheelListener(l);
-		frame.validate();
 	}
 
 	public void addComp(Component c) {
 		frame.add(c);
-		frame.validate();
 	}
 
 	public void setMenuBar(JMenuBar j) {
 		frame.setJMenuBar(j);
-		frame.validate();
 	}
 	
 	public void removeMouseListen(MouseListener l) {
 		frame.removeMouseListener(l);
-		frame.validate();
 	}
 	
 	public void removeMouseMotionListen(MouseMotionListener l) {
 		frame.removeMouseMotionListener(l);
-		frame.validate();
 	}
 
 	public void removeMouseWheelListen(MouseWheelListener l) {
 		frame.removeMouseWheelListener(l);
-		frame.validate();
 	}
 
 	public void removeComp(Component c) {
 		frame.remove(c);
-		frame.validate();
 	}
 	
 	public void removeAll() {
 		frame.removeAll();
-		frame.revalidate();
 	}
 
 	public void setVisible() {
 		
 		frame.setVisible(false);
-		frame.revalidate();
+		frame.validate();
 		frame.pack();
 		frame.setVisible(true);
-
-		windowSetup();
-		
-	}
-	
-	private void windowSetup() {
 		
 		frame.init();
 		
+	}
+	
+	void windowSetup() {
+		
+		getHandlers().start(this);
+		
+		gameLoop = new GameLoop(this);
+
+		thread = new Thread(gameLoop);
+
+		// Setting Up Images
+		images = getHandlers().getImageHandler().getAllImages("img/");
+		
+		//Audio Init
+		audio = new ArrayList<>();
+		
 		postInit(this);
 			
-		if(thread.getState().equals(Thread.State.NEW)) {
+		Clipping[] bgm = getHandlers().getAudioHandler().loadClippings("audio/bgm/");
+		Clipping[] sprite = getHandlers().getAudioHandler().loadClippings("audio/sprite/");
 			
-			if(sp != null) {
-				sp.init();
-				//getHandlers().getPageHandler().addPage(sp);
-				frame.revalidate();
-			}
-			
-			Clipping[] bgm = getHandlers().getAudioHandler().loadClippings("audio/bgm/");
-			Clipping[] sprite = getHandlers().getAudioHandler().loadClippings("audio/sprite/");
-			
-			for(Clipping clip : bgm) {
-				audio.add(clip);
-			}
-			for(Clipping clip : sprite) {
-				audio.add(clip);
-			}
-		
-			thread.start();
+		for(Clipping clip : bgm) {
+			audio.add(clip);
 		}
+		for(Clipping clip : sprite) {
+			audio.add(clip);
+		}
+		
+		thread.start();
+		
 	}
 	
 	public void loadAssets() {
@@ -331,12 +313,20 @@ public class GameWindow extends Collector implements Serializable {
 	}
 
 	public synchronized void stop() {
-		getHandlers().getPageHandler().getCurrentAppPage().onChange();
-		frame.setVisible(false);
+		try {
+			getHandlers().getPageHandler().getCurrentAppPage().onChange();
+			getLoop().RUNNING = false;
+			frame.setVisible(false);
+			thread.join();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		System.exit(-1);
 	}
 
 	private void paintPage(Graphics2D g2d) {
+		
 		AppPage ap = getHandlers().getPageHandler().getCurrentLoadedPage();
 		if(ap != null) {
 			ap.paint(g2d);
@@ -351,22 +341,25 @@ public class GameWindow extends Collector implements Serializable {
 	
 	public void paint(Graphics gr) {
 		try {
-			Graphics2D g = (Graphics2D) gr;
-			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-			if(getHandlers().getPageHandler().compareAppPage("start") != true) {
-				g.clearRect(0, 0, frame.getWIDTH(), frame.getHEIGHT());
-				if (!getHandlers().getTransHandler().transitioning) {
-					paintPage(g);
-				} else {
-					g.drawImage(getHandlers().getTransHandler().getTransition().getImage(), 0, 0, null);
+			if(paintImg != null){
+				Graphics2D g = (Graphics2D) paintImg.createGraphics();
+				g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+				g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+				if(getHandlers().getPageHandler().compareAppPage("start") != true) {
+					g.clearRect(0, 0, frame.getWidth(), frame.getHeight());
+					if (!getHandlers().getTransHandler().transitioning) {
+						paintPage(g);
+					} else {
+						g.drawImage(getHandlers().getTransHandler().getTransition().getImage(), 0, 0, null);
+					}
+					if(getTrophy() != null) {
+						getTrophy().paint(g);
+					}
+					getDebug().paint(g);
 				}
-				if(getTrophy() != null) {
-					getTrophy().paint(g);
-				}
-				getDebug().paint(g);
-			}else {
+				g.dispose();
 				
+				gr.drawImage(paintImg, 0, 0, null);
 			}
 		}catch(NullPointerException e) {
 			System.err.println("Null Pointer in "+e.getStackTrace()[0]);

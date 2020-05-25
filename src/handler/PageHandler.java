@@ -9,7 +9,7 @@ import backends.objs.Overlay;
 public class PageHandler {
 	
 	private Map<String, AppPage> pages = new HashMap<>();
-	private String currentPage = "start";
+	private String currentPage = "startingPanel";
 	private Map<String, Overlay> overlays = new HashMap<>();
 	private String currentOverlay = "";
 

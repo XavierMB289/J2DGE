@@ -14,6 +14,7 @@ public class GameLoop implements Serializable, Runnable{
 	
 	public int FPS;
 	private int fpsCounter;
+	public boolean RUNNING = true;
 	
 	//Variable Timestep Variables
 	private long lastLoopTime;
@@ -33,7 +34,6 @@ public class GameLoop implements Serializable, Runnable{
 		w.getHandlers().getPageHandler().setAllToCurrent("credit", true);
 	}
 	
-	@SuppressWarnings("static-access")
 	@Override
 	public void run() {
 		lastLoopTime = System.nanoTime();
@@ -42,7 +42,7 @@ public class GameLoop implements Serializable, Runnable{
 			delta = 0;
 		}
 		
-		while (w.getFrame().isVisible()) {
+		while (RUNNING) {
 			if(w.LOOP_TYPE == 0) {
 				variableTimestep();
 			}else if(w.LOOP_TYPE == 1) {
@@ -54,7 +54,6 @@ public class GameLoop implements Serializable, Runnable{
 		}
 	}
 	
-	@SuppressWarnings("static-access")
 	private void variableTimestep() {
 		long now = System.nanoTime();
 		long updateLen = now - lastLoopTime;
@@ -84,7 +83,6 @@ public class GameLoop implements Serializable, Runnable{
 		}
 	}
 	
-	@SuppressWarnings("static-access")
 	private void originalLoop() {
 		long now = System.nanoTime();
 		delta = delta + ((now - lastLoopTime) / w.OPTIMAL_TIME);

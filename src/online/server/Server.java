@@ -85,7 +85,6 @@ public class Server extends Logger implements Runnable{
 		}
 	}
 	
-	@SuppressWarnings("static-access")
 	private void answer(SelectionKey key){
 		try {
 			SocketChannel client = (SocketChannel) key.channel();

@@ -16,11 +16,15 @@ public class Collector extends EngineConfig{
 	
 	private GlobalVars globals = null;
 	
+	void preInitPages(){
+		handlers.preInitPages();
+	}
+	
 	public void start(GameWindow w, String[] args) {
 		globals = new GlobalVars();
 		debug = new Debug(w);
 		functions = new Functions();
-		handlers = new HandlerCollection(w);
+		handlers = new HandlerCollection();
 		
 		//if Commands then init
 		if (args != null && args.length > 0) {

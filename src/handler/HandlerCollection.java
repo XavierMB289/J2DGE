@@ -13,14 +13,17 @@ public class HandlerCollection {
 	private EntityHandler EntityH = null;
 	private PageHandler PageH = null;
 	
-	public HandlerCollection(GameWindow w) {
+	public void preInitPages(){
+		PageH = new PageHandler();
+	}
+	
+	public void start(GameWindow w){
 		EventH = new EventHandler();
 		AudioH = new AudioHandler();
 		ImageH = new ImageHandler(w);
 		TransH = new TransitionHandler(w);
 		FileH = new FileHandler(w);
 		EntityH = new EntityHandler(w);
-		PageH = new PageHandler();
 	}
 	
 	public EventHandler getEventHandler() {
