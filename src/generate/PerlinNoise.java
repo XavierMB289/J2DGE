@@ -1,13 +1,10 @@
 package generate;
 
 /**
- * 
- * @author Xavier Bennett
- * 
- * @desc Shamelessly stolen from the P5.js library. All credit goes to them for making it, and me for transcribing it!
+ * Generates Perlin Noise on a coordinate basis (Transcribed by Xavier)
+ * @author P5.js
  *
  */
-
 public class PerlinNoise {
 	
 	int PERLIN_YWRAPB = 4;
@@ -21,8 +18,8 @@ public class PerlinNoise {
 	
 	double[] perlin = null;
 	
-	private double scaled_cosine(double i) {
-		return 0.5 * (1.0 - Math.cos(i * Math.PI));
+	private double scaledCosine(double d) {
+		return 0.5 * (1.0 - Math.cos(d * Math.PI));
 	}
 	
 	public double noise(int x, int y) {
@@ -39,23 +36,23 @@ public class PerlinNoise {
 			y = -y;
 		}
 		int xi = (int)Math.floor(x),
-				yi = (int)Math.floor(y),
-				zi = (int)Math.floor(0);
+			yi = (int)Math.floor(y),
+			zi = (int)Math.floor(0);
 		double xf = x - xi;
 		double yf = y - yi;
 		double zf = 0 - zi;
 		double rxf, ryf;
 		
 		double r = 0;
-		double ampl = 0.5;
+		double amp1 = 0.5;
 		
 		double n1, n2, n3;
 		
 		for(int o = 0; o < perlin_octaves; o++) {
 			int of = xi + (yi << PERLIN_YWRAPB) + (zi << PERLIN_ZWRAPB);
 			
-			rxf = scaled_cosine(xf);
-			ryf = scaled_cosine(yf);
+			rxf = scaledCosine(xf);
+			ryf = scaledCosine(yf);
 			
 			n1 = perlin[of & PERLIN_SIZE];
 			n1 += rxf * (perlin[(of + 1) & PERLIN_SIZE] - n1);
@@ -70,10 +67,10 @@ public class PerlinNoise {
 			n3 += rxf * (perlin[(of + PERLIN_YWRAP + 1) & PERLIN_SIZE] - n3);
 			n2 += ryf * (n3 - n2);
 			
-			n1 += scaled_cosine(zf) * (n2 - n1);
+			n1 += scaledCosine(zf) * (n2 - n1);
 			
-			r += n1 * ampl;
-			ampl *= perlin_amp_falloff;
+			r += n1 * amp1;
+			amp1 *= perlin_amp_falloff;
 			xi <<= 1;
 			xf *= 2;
 			yi <<= 1;
@@ -114,10 +111,10 @@ public class PerlinNoise {
 			perlin[i] = lcg.rand();
 		}
 	}
-
+	
 }
 
-class LCG{
+class LCG {
 	long m = 4294967296L;
 	long a = 1664525;
 	long c = 1013904223;
@@ -126,10 +123,6 @@ class LCG{
 	
 	public void setSeed(double val) {
 		z = (int)(Double.isNaN(val) ? Math.random() * m : val) >> 0;
-	}
-	
-	public double getSeed() {
-		return seed;
 	}
 	
 	public double rand() {
