@@ -37,20 +37,24 @@ public class ScreenHandler {
 	}
 	
 	public void setScreens(GameEngine ge, Class<?> clazz, String filename) {
-		currentScreen = sg.getGameScreen(ge, clazz, filename);
+		currentScreen = sg.getGameScreen(ge, clazz, filename, "screens/");
 		nextScreen = currentScreen;
 	}
 	
 	public void setOverlay(GameEngine ge, Class<?> clazz, String filename) {
-		overlay = sg.getGameScreen(ge, clazz, filename);
+		overlay = sg.getGameScreen(ge, clazz, filename, "overlays/");
 	}
 	
 	public void changeScreen(GameEngine ge, Class<?> clazz, String filename) {
-		nextScreen = sg.getGameScreen(ge, clazz, filename); //TODO: screen transitions
+		nextScreen = sg.getGameScreen(ge, clazz, filename, "screens/"); //TODO: screen transitions
 	}
 	
 	public GameScreen getScreen() {
 		return currentScreen;
+	}
+	
+	public GameScreen getOverlay() {
+		return overlay;
 	}
 	
 }
@@ -63,8 +67,8 @@ class ScreenGetter{
 		prior = p;
 	}
 	
-	private String getSingleScreen(Class<?> clazz, String filename) {
-		URL url = clazz.getClassLoader().getResource(prior+"pages/");
+	private String getSingleScreen(Class<?> clazz, String filename, String basicPath) {
+		URL url = clazz.getClassLoader().getResource(prior+basicPath);
 		if(url != null && url.getProtocol().equals("file")) {
 			try {
 				String[] ret = new File(url.toURI()).list();
@@ -93,12 +97,14 @@ class ScreenGetter{
 			Enumeration<JarEntry> entries = jar.entries();
 			while(entries.hasMoreElements()) {
 				String name = entries.nextElement().getName();
-				if(name.startsWith(filename)) {
-					String entry = name.substring(filename.length());
+				if(name.startsWith(basicPath+filename)) {
+					String entry = name.substring(basicPath.length());
+					System.out.println(entry);
 					int checkSubdir = entry.indexOf("/");
 					if(checkSubdir >= 0) {
 						entry = entry.substring(0, checkSubdir);
 					}
+					System.out.println(entry);
 					return entry;
 				}
 			}
@@ -110,11 +116,11 @@ class ScreenGetter{
 		return prior.equals("") ? "" : prior.replace("/", ".");
 	}
 	
-	public GameScreen getGameScreen(GameEngine en, Class<?> clazz, String filename) {
-		String pn = getSingleScreen(clazz, filename);
+	public GameScreen getGameScreen(GameEngine en, Class<?> clazz, String filename, String basicPath) {
+		String pn = getSingleScreen(clazz, filename, basicPath);
 		try {
 			if(!pn.isEmpty() && !pn.matches(".*\\d.*")) {
-				Class<?> c = Class.forName(changePrior()+"pages."+pn.split("\\.")[0]);
+				Class<?> c = Class.forName(changePrior()+(basicPath.toLowerCase().replace("/", "."))+pn.split("\\.")[0]);
 				Constructor<?> con = c.getConstructor(new Class[] { GameEngine.class });
 				Object o = con.newInstance(en);
 				if(o instanceof GameScreen) {

@@ -44,6 +44,7 @@ public class GameEngine implements Runnable{
 	
 	//Key Variables
 	private Map<Integer, Boolean> keyDown;
+	private Map<Integer, Boolean> keyUp;
 	
 	//Config Variable
 	Map<String, Object> config;
@@ -70,6 +71,7 @@ public class GameEngine implements Runnable{
 		delta = 0;
 		
 		keyDown = new HashMap<Integer, Boolean>();
+		keyUp = new HashMap<Integer, Boolean>();
 		
 		config = new HashMap<String, Object>();
 	}
@@ -97,6 +99,7 @@ public class GameEngine implements Runnable{
 			@Override
 			public void keyReleased(KeyEvent e) {
 				keyDown.put(e.getKeyCode(), false);
+				keyUp.put(e.getKeyCode(), true);
 				
 				if(config.containsKey(GameConfigKeys.EXIT_KEY)) {
 					if(e.getKeyCode() == (int)config.get(GameConfigKeys.EXIT_KEY)) {
@@ -113,6 +116,7 @@ public class GameEngine implements Runnable{
 		
 		sh.init();
 		
+		sh.setOverlay(this, getClass(), "MainMenuOverlay");
 		sh.setScreens(this, getClass(), "MainMenu");
 		
 		window.init();
@@ -161,6 +165,7 @@ public class GameEngine implements Runnable{
 			g.setColor(Color.black);
 			sh.getScreen().paint(g);
 			eh.paint(g);
+			sh.getOverlay().paint(g);
 			
 			g.dispose();
 		}
@@ -189,6 +194,10 @@ public class GameEngine implements Runnable{
 		}
 	}
 	
+	/**
+	 * Adds the config to the GameEngine Object
+	 * @param c A Map using {@link GameConfigKeys} as the keys
+	 */
 	public void addConfig(Map<String, Object> c) {
 		config = c;
 		if(config.containsKey(GameConfigKeys.FILEPATH)) {
@@ -196,22 +205,43 @@ public class GameEngine implements Runnable{
 		}
 	}
 	
+	/**
+	 * Sets the window to borderless fullscreen window mode
+	 */
 	public void setFullscreen() {
 		window.setFullscreen();
 	}
 	
+	/**
+	 * @deprecated
+	 * Sets the window in fullscreen exclusive mode
+	 * Currently depreciated due to bug
+	 */
 	public void fullscreenExclusive() {
 		window.fullscreenExclusive();
 	}
 	
+	/**
+	 * Sets the window size of the window
+	 * @param x the width of the window
+	 * @param y the height of the window
+	 */
 	public void setWindowSize(int x, int y) {
 		window.setWindowSize(new Dimension(x, y));
 	}
 	
+	/**
+	 * Moves the window on the screen
+	 * @param addX amount to add to the x position
+	 * @param addY amount to add to the y position
+	 */
 	public void changeLocation(int addX, int addY) {
 		window.changeLocation(addX, addY);
 	}
 	
+	/**
+	 * STOPS ALL PROCESSES AND CLOSES THE APP
+	 */
 	public synchronized void stop() {
 		try {
 			running = false;
@@ -224,32 +254,81 @@ public class GameEngine implements Runnable{
 		System.exit(-1);
 	}
 	
+	/**
+	 * Gets the FPS for Debugging purposes
+	 * @return int FPS
+	 */
 	public int getFPS() {
 		return FPS;
 	}
 	
+	/**
+	 * Gets the GlobalVars
+	 * Needed for transferring/holding variables between screens
+	 * @return {@link GlobalVars}
+	 */
 	public GlobalVars getGlobalVars() {
 		return gv;
 	}
 	
+	/**
+	 * Gets the GameWindow
+	 * Holds the GamePanel in which holds variables for SIZING
+	 * @return {@link GameWindow}
+	 */
 	public GameWindow getWindow() {
 		return window;
 	}
 	
+	/**
+	 * Gets the EntityHandler
+	 * Needed for Handling Entities on screen via z-Indexing
+	 * @return {@link EntityHandler}
+	 */
 	public EntityHandler getEntityHandler() {
 		return eh;
 	}
 	
+	/**
+	 * Gets the GameFileHandler
+	 * Needed for savefile manipulation and file getting
+	 * @return {@link GameFileHandler}
+	 */
 	public GameFileHandler getFileHandler() {
 		return fh;
 	}
 	
+	/**
+	 * Gets the ScreenHandler Object
+	 * Needed to change which screen you're looking at
+	 * @return {@link ScreenHandler}
+	 */
 	public ScreenHandler getScreenHandler() {
 		return sh;
 	}
 	
+	/**
+	 * Returns the key state if the key is there
+	 * @param key KeyEvent key to check for
+	 * @return if key is pressed...
+	 */
 	public boolean keyIsDown(int key) {
 		return keyDown.containsKey(key) ? keyDown.get(key) : false;
+	}
+	
+	/**
+	 * Returns whether the key is up or not
+	 * If the key is there, sets it to false then returns what was originally there
+	 * @param key KeyEvent key to check for
+	 * @return if key is released...
+	 */
+	public boolean keyIsUp(int key) {
+		if(keyUp.containsKey(key)) {
+			boolean ret = keyUp.get(key);
+			keyUp.put(key, false);
+			return ret;
+		}
+		return false;
 	}
 	
 }

@@ -28,7 +28,7 @@ public abstract class GameEntity {
 	public abstract void update(double delta);
 	
 	public String getID() {
-		return this.getID();
+		return ID;
 	}
 	
 	/**
