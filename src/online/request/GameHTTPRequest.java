@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.Scanner;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -36,6 +37,23 @@ public class GameHTTPRequest {
 				}
 				return response.toString();
 			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public static String GetData(String website) {
+		try {
+			URL url = new URL(website);
+			Scanner scan = new Scanner(url.openStream());
+			StringBuffer buff = new StringBuffer();
+			while(scan.hasNextLine()) {
+				buff.append(scan.nextLine().trim());
+			}
+			scan.close();
+			return buff.toString();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

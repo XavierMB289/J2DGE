@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JFrame;
@@ -77,6 +78,7 @@ public class GameWindow{
 		frame.add(panel);
 		frame.pack();
 		frame.setVisible(true);
+		frame.requestFocus();
 		
 		frame.init();
 	}
@@ -115,7 +117,7 @@ class ImagePanel extends JPanel {
 	@Override
 	public void paint(Graphics g) {
 		super.paint(g);
-		g.drawImage(paintImg, 0, 0, getWidth(), getHeight(), null);
+		g.drawImage(paintImg.getScaledInstance(getWidth(), getHeight(), Image.SCALE_FAST), 0, 0, null);
 	}
 	
 }

@@ -27,7 +27,7 @@ public abstract class GameScreen {
 	 * Calls this function from the shown screen ONLY
 	 * Must be Overridden to do anything
 	 */
-	public void onEngineStop() {}
+	public abstract void onEngineStop();
 	
 	public String getID() {
 		return ID;

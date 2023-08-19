@@ -51,6 +51,7 @@ public class GameEngine implements Runnable{
 	
 	//Paint Variables
 	BufferedImage paintImg;
+	Color bgColor;
 	
 	/*
 	 * Client Side variables init
@@ -74,6 +75,8 @@ public class GameEngine implements Runnable{
 		keyUp = new HashMap<Integer, Boolean>();
 		
 		config = new HashMap<String, Object>();
+		
+		bgColor = Color.white;
 	}
 	
 	/*
@@ -160,7 +163,7 @@ public class GameEngine implements Runnable{
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 			
-			g.setColor(Color.white);
+			g.setColor(bgColor);
 			g.fillRect(0, 0, paintImg.getWidth(), paintImg.getHeight());
 			g.setColor(Color.black);
 			sh.getScreen().paint(g);
@@ -172,6 +175,7 @@ public class GameEngine implements Runnable{
 		
 		sh.getScreen().update(delta);
 		eh.update(delta);
+		sh.getOverlay().update(delta);
 		window.paint(paintImg);
 	}
 	
@@ -203,6 +207,14 @@ public class GameEngine implements Runnable{
 		if(config.containsKey(GameConfigKeys.FILEPATH)) {
 			getScreenHandler().setFilepath((String)config.get(GameConfigKeys.FILEPATH));
 		}
+	}
+	
+	/**
+	 * Sets the background color of the app/game
+	 * @param c Color to set the bgColor to
+	 */
+	public void setBGColor(Color c) {
+		bgColor = c;
 	}
 	
 	/**

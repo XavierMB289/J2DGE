@@ -73,7 +73,7 @@ class ScreenGetter{
 			try {
 				String[] ret = new File(url.toURI()).list();
 				for(String r : ret) {
-					if(r.contains(filename)) {
+					if(r.contains(filename) && !r.contains("$")) {
 						return r;
 					}
 				}
@@ -99,12 +99,10 @@ class ScreenGetter{
 				String name = entries.nextElement().getName();
 				if(name.startsWith(basicPath+filename)) {
 					String entry = name.substring(basicPath.length());
-					System.out.println(entry);
 					int checkSubdir = entry.indexOf("/");
 					if(checkSubdir >= 0) {
 						entry = entry.substring(0, checkSubdir);
 					}
-					System.out.println(entry);
 					return entry;
 				}
 			}

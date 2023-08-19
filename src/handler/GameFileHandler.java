@@ -12,17 +12,31 @@ import javax.imageio.ImageIO;
 public class GameFileHandler {
 	
 	public BufferedImage loadImage(String filename) {
-		try {
-			return ImageIO.read(loadFile(filename));
-		} catch (IOException e) {
-			System.err.println("Couldn't find resource in "+filename+" in GameFileHandler.loadImage");
-			return null;
+		if(filename.charAt(1) == ':') { //if filename is absolute path
+			try {
+				return ImageIO.read(new File(filename));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		File loaded = loadFile(filename);
+		if(loaded.exists()) {
+			try {
+				return ImageIO.read(loaded);
+			} catch (IOException e) {
+				System.err.println("Couldn't find resource in "+filename+" in GameFileHandler.loadImage");
+				return loadImage(new File(this.getClass().getResource("../img/missingNo.png").getFile()).getAbsolutePath());
+			}
+		}else {
+			System.err.println("File does not exist: "+filename);
+			return loadImage(new File(this.getClass().getResource("../img/missingNo.png").getFile()).getAbsolutePath());
 		}
 	}
 	
 	public File loadFile(String filename) {
 		try {
-			return new File(getClass().getResource(filename.substring(0, 1).equals("/") ? filename : "/"+filename).toURI());
+			return new File(getClass().getResource(filename).toURI());
 		} catch (URISyntaxException e) {
 			System.err.println("Couldn't find resource in "+filename+" in GameFileHandler.loadFile");
 			return null;

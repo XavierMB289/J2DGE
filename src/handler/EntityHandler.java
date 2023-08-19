@@ -125,6 +125,15 @@ public class EntityHandler {
 	}
 	
 	/**
+	 * DELETES ALL ENTITIES
+	 */
+	public void deleteAll() {
+		for(GameEntity ge : ents) {
+			ge.delete();
+		}
+	}
+	
+	/**
 	 * Returns the total number of entities
 	 * @return the size of the entity list
 	 */
