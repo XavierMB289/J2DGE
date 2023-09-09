@@ -4,18 +4,16 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.swing.WindowConstants;
-
 import handler.EntityHandler;
 import handler.GameFileHandler;
 import handler.ScreenHandler;
-import window.GameWindow;
+import window.AppWindow;
 
 public class GameEngine implements Runnable{
 	
@@ -32,7 +30,7 @@ public class GameEngine implements Runnable{
 	EntityHandler eh = null;
 	
 	//Window
-	GameWindow window = null;
+	AppWindow appWindow = null;
 	
 	//Loop Variables
 	private boolean running;
@@ -42,10 +40,6 @@ public class GameEngine implements Runnable{
 	private long lastLoopTime;
 	private Thread thread;
 	
-	//Key Variables
-	private Map<Integer, Boolean> keyDown;
-	private Map<Integer, Boolean> keyUp;
-	
 	//Config Variable
 	Map<String, Object> config;
 	
@@ -54,8 +48,7 @@ public class GameEngine implements Runnable{
 	Color bgColor;
 	
 	/*
-	 * Client Side variables init
-	 * client side module init
+	 * PreInitializes all the methods and variables used
 	 */
 	public void preInit() {
 		gv = new GlobalVars();
@@ -65,14 +58,11 @@ public class GameEngine implements Runnable{
 		eh = new EntityHandler();
 		eh.preInit();
 		
-		window = new GameWindow();
-		window.preInit();
+		appWindow = new AppWindow();
+		appWindow.preInit();
 		
 		running = true;
 		delta = 0;
-		
-		keyDown = new HashMap<Integer, Boolean>();
-		keyUp = new HashMap<Integer, Boolean>();
 		
 		config = new HashMap<String, Object>();
 		
@@ -80,60 +70,31 @@ public class GameEngine implements Runnable{
 	}
 	
 	/*
-	 * Search for and init pages
-	 * setup Frame Variables
+	 * Initializes Methods and searches for the first Screen/Overlay (MainMenu)
+	 * Recommended Adding the Listeners before calling this.
 	 */
 	public void init() {
 		
 		if(config.containsKey(GameConfigKeys.TITLE)) {
-			window.getFrame().setTitle((String)config.get(GameConfigKeys.TITLE));
+			appWindow.setTitle((String)config.get(GameConfigKeys.TITLE));
 		}
 		
-		window.getFrame().addKeyListener(new KeyListener() {
-
-			@Override
-			public void keyTyped(KeyEvent e) {  }
-
-			@Override
-			public void keyPressed(KeyEvent e) {
-				keyDown.put(e.getKeyCode(), true);
-			}
-
-			@Override
-			public void keyReleased(KeyEvent e) {
-				keyDown.put(e.getKeyCode(), false);
-				keyUp.put(e.getKeyCode(), true);
-				
-				if(config.containsKey(GameConfigKeys.EXIT_KEY)) {
-					if(e.getKeyCode() == (int)config.get(GameConfigKeys.EXIT_KEY)) {
-						stop();
-					}
-				}
-			}
-			
-		});
-		
-		window.getFrame().setLayout(null);
-		window.getFrame().setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-		window.getFrame().setUndecorated(true);
+		appWindow.init();
 		
 		sh.init();
 		
 		sh.setOverlay(this, getClass(), "MainMenuOverlay");
 		sh.setScreens(this, getClass(), "MainMenu");
 		
-		window.init();
-		
 	}
 	
 	/*
-	 * Server Module Setup
-	 * close up loose ends
+	 * Closes up ALL Init procedures
 	 */
 	public void postInit() {
 		thread = new Thread(this);
 		
-		window.finalize();
+		appWindow.postInit();
 		
 		int w = MAX_WIDTH, h = MAX_HEIGHT;
 		if(config.containsKey(GameConfigKeys.WIDTH)) {
@@ -143,12 +104,6 @@ public class GameEngine implements Runnable{
 		if(config.containsKey(GameConfigKeys.HEIGHT)) {
 			h = (int)config.get(GameConfigKeys.HEIGHT);
 			h = h < MAX_HEIGHT ? h : MAX_HEIGHT;
-		}
-		if(w > window.getFrame().getWidth()) {
-			w = window.getFrame().getWidth();
-		}
-		if(h > window.getFrame().getHeight()) {
-			h = window.getFrame().getHeight();
 		}
 		System.out.println(w+" "+h);
 		paintImg = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
@@ -176,7 +131,7 @@ public class GameEngine implements Runnable{
 		sh.getScreen().update(delta);
 		eh.update(delta);
 		sh.getOverlay().update(delta);
-		window.paint(paintImg);
+		appWindow.paint(paintImg);
 	}
 	
 	@Override
@@ -204,8 +159,8 @@ public class GameEngine implements Runnable{
 	 */
 	public void addConfig(Map<String, Object> c) {
 		config = c;
-		if(config.containsKey(GameConfigKeys.FILEPATH)) {
-			getScreenHandler().setFilepath((String)config.get(GameConfigKeys.FILEPATH));
+		if(config.containsKey(GameConfigKeys.SCREEN_FILEPATH)) {
+			getScreenHandler().setFilepath((String)config.get(GameConfigKeys.SCREEN_FILEPATH));
 		}
 	}
 	
@@ -218,19 +173,33 @@ public class GameEngine implements Runnable{
 	}
 	
 	/**
-	 * Sets the window to borderless fullscreen window mode
+	 * Adds a MouseListener to the JFrame
+	 * @param l Custom MouseListener
 	 */
-	public void setFullscreen() {
-		window.setFullscreen();
+	public void addMouseListener(MouseListener l) {
+		appWindow.addMouseListener(l);
 	}
 	
 	/**
-	 * @deprecated
+	 * Adds a KeyListener to the Jframe
+	 * @param l Custom KeyListener
+	 */
+	public void addKeyListener(KeyListener l) {
+		appWindow.addKeyListener(l);
+	}
+	
+	/**
+	 * Sets the window to borderless fullscreen window mode
+	 */
+	public void setFullscreen() {
+		appWindow.setFullscreen();
+	}
+	
+	/**
 	 * Sets the window in fullscreen exclusive mode
-	 * Currently depreciated due to bug
 	 */
 	public void fullscreenExclusive() {
-		window.fullscreenExclusive();
+		appWindow.setFullscreenExclusive();
 	}
 	
 	/**
@@ -239,7 +208,7 @@ public class GameEngine implements Runnable{
 	 * @param y the height of the window
 	 */
 	public void setWindowSize(int x, int y) {
-		window.setWindowSize(new Dimension(x, y));
+		appWindow.setWindowSize(new Dimension(x, y));
 	}
 	
 	/**
@@ -248,21 +217,16 @@ public class GameEngine implements Runnable{
 	 * @param addY amount to add to the y position
 	 */
 	public void changeLocation(int addX, int addY) {
-		window.changeLocation(addX, addY);
+		appWindow.changeLocation(addX, addY);
 	}
 	
 	/**
 	 * STOPS ALL PROCESSES AND CLOSES THE APP
 	 */
 	public synchronized void stop() {
-		try {
-			running = false;
-			getScreenHandler().getScreen().onEngineStop();
-			window.stop();
-			thread.join();
-		}catch(InterruptedException e) {
-			System.err.println("Couldn't properly join the thread in GameEngine.stop");
-		}
+		running = false;
+		getScreenHandler().getScreen().onEngineStop();
+		appWindow.stop();
 		System.exit(-1);
 	}
 	
@@ -281,15 +245,6 @@ public class GameEngine implements Runnable{
 	 */
 	public GlobalVars getGlobalVars() {
 		return gv;
-	}
-	
-	/**
-	 * Gets the GameWindow
-	 * Holds the GamePanel in which holds variables for SIZING
-	 * @return {@link GameWindow}
-	 */
-	public GameWindow getWindow() {
-		return window;
 	}
 	
 	/**
@@ -317,30 +272,6 @@ public class GameEngine implements Runnable{
 	 */
 	public ScreenHandler getScreenHandler() {
 		return sh;
-	}
-	
-	/**
-	 * Returns the key state if the key is there
-	 * @param key KeyEvent key to check for
-	 * @return if key is pressed...
-	 */
-	public boolean keyIsDown(int key) {
-		return keyDown.containsKey(key) ? keyDown.get(key) : false;
-	}
-	
-	/**
-	 * Returns whether the key is up or not
-	 * If the key is there, sets it to false then returns what was originally there
-	 * @param key KeyEvent key to check for
-	 * @return if key is released...
-	 */
-	public boolean keyIsUp(int key) {
-		if(keyUp.containsKey(key)) {
-			boolean ret = keyUp.get(key);
-			keyUp.put(key, false);
-			return ret;
-		}
-		return false;
 	}
 	
 }

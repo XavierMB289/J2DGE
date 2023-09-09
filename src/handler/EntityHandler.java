@@ -101,6 +101,10 @@ public class EntityHandler {
 		return ret;
 	}
 	
+	public GameEntity[] getAllEntities() {
+		return ents.toArray(new GameEntity[ents.size()]);
+	}
+	
 	/**
 	 * Changes the index of an object to a different index
 	 * @param current the index of the object to change

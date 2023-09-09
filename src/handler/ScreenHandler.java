@@ -86,7 +86,7 @@ class ScreenGetter{
 			String temp = clazz.getName().replace(".", "/")+".class";
 			url = clazz.getClassLoader().getResource(temp);
 		}
-		if(url.getProtocol().equals("jar")) {
+		if(url.getProtocol().equals("jar")) { //TODO: FIX THIS!!!
 			String jarPath = url.getPath().substring(5, url.getPath().indexOf("!"));
 			JarFile jar = null;
 			try {
@@ -97,7 +97,7 @@ class ScreenGetter{
 			Enumeration<JarEntry> entries = jar.entries();
 			while(entries.hasMoreElements()) {
 				String name = entries.nextElement().getName();
-				if(name.startsWith(basicPath+filename)) {
+				if(name.startsWith(basicPath+filename) && !name.contains("$")) {
 					String entry = name.substring(basicPath.length());
 					int checkSubdir = entry.indexOf("/");
 					if(checkSubdir >= 0) {

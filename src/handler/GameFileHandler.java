@@ -1,6 +1,6 @@
 package handler;
 
-import java.awt.image.BufferedImage;
+import java.awt.Image;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -11,17 +11,17 @@ import javax.imageio.ImageIO;
 
 public class GameFileHandler {
 	
-	public BufferedImage loadImage(String filename) {
+	public Image loadImage(String filename) {
 		if(filename.charAt(1) == ':') { //if filename is absolute path
 			try {
-				return ImageIO.read(new File(filename));
+				return ImageIO.read(getClass().getResource(filename));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 		
 		File loaded = loadFile(filename);
-		if(loaded.exists()) {
+		if(loaded != null && loaded.exists()) {
 			try {
 				return ImageIO.read(loaded);
 			} catch (IOException e) {
