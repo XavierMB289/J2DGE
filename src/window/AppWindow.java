@@ -1,5 +1,6 @@
 package window;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GraphicsDevice;
@@ -7,6 +8,7 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JFrame;
@@ -41,15 +43,16 @@ public class AppWindow {
 	
 	/**
 	 * Runs during the GameEngine.postInit()
+	 * @param w Width of the JPanel
+	 * @param h Height of the JPanel
 	 * DO NOT MANUALLY CALL
 	 */
-	public void postInit() {
-		frame.setVisible(false);
+	public void postInit(int w, int h) {
+		panel = new ImagePanel();
+		frame.setContentPane(panel);
 		frame.validate();
 		frame.pack();
 		frame.setVisible(true);
-		panel = new ImagePanel();
-		frame.getContentPane().add(panel);
 	}
 	
 	/**
@@ -71,13 +74,12 @@ public class AppWindow {
 	 */
 	public void paint(BufferedImage img) {
 		panel.setImg(img);
-		//panel.repaint();
+		panel.repaint();
 	}
 	
 	/**
 	 * Sets the title of the window
 	 * @param title String representing the Title wanted
-	 * DO NOT MANUALLY CALL
 	 */
 	public void setTitle(String title) {
 		frame.setTitle(title);
@@ -149,8 +151,45 @@ public class AppWindow {
 		frame.addMouseListener(listener);
 	}
 	
+	/**
+	 * Adds a MouseMotionListener to the JFrame
+	 * @param listener Custom MouseMotionListener
+	 */
+	public void addMouseMotionListener(MouseMotionListener listener) {
+		frame.addMouseMotionListener(listener);
+	}
+	
+	/**
+	 * WARNING: Use at own risk.
+	 * @param comp Component to add to JFrame
+	 */
+	public void addGeneric(Component comp) {
+		frame.add(comp);
+	}
+	
+	/**
+	 * Gets the Resolution of the Screen/JFrame
+	 * @return Integer of the Resolution Width
+	 */
+	public int getResWidth() {
+		return frame.getWidth();
+	}
+	
+	/**
+	 * Gets the Resolution of the Screen/JFrame
+	 * @return Integer of the Resolution Height
+	 */
+	public int getResHeight() {
+		return frame.getHeight();
+	}
+	
 }
 
+/**
+ * This is how the image is painted on the screen.
+ * @author silve
+ * DO NOT USE!
+ */
 class ImagePanel extends JPanel {
 	
 	private static final long serialVersionUID = 1664315044350953717L;
@@ -164,7 +203,9 @@ class ImagePanel extends JPanel {
 	@Override
 	public void paint(Graphics g) {
 		super.paint(g);
-		g.drawImage(paintImg.getScaledInstance(getWidth(), getHeight(), Image.SCALE_FAST), 0, 0, null);
+		if(paintImg != null) {
+			g.drawImage(paintImg.getScaledInstance(getWidth(), getHeight(), Image.SCALE_FAST), 0, 0, null);
+		}
 	}
 	
 }

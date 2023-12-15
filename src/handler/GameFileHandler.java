@@ -3,8 +3,9 @@ package handler;
 import java.awt.Image;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.Scanner;
 
 import javax.imageio.ImageIO;
@@ -35,31 +36,52 @@ public class GameFileHandler {
 	}
 	
 	public File loadFile(String filename) {
-		try {
-			return new File(getClass().getResource(filename).toURI());
-		} catch (URISyntaxException e) {
-			System.err.println("Couldn't find resource in "+filename+" in GameFileHandler.loadFile");
-			return null;
-		}
+		return new File(filename);
 	}
 	
 	public String readFile(String filename) {
+		String[] lines = readFileLines(filename);
 		String ret = "";
-		
-		File f = loadFile(filename);
-		Scanner r = null;
-		try {
-			r = new Scanner(f);
-		} catch (FileNotFoundException e) {
-			System.err.println("Couldn't read resource in "+filename+" in GameFileHandler.readFile");
-			return "";
+		for(String line : lines) {
+			ret = ret + line;
 		}
-		while(r.hasNextLine()) {
-			ret = ret + r.nextLine();
-		}
-		r.close();
-		
 		return ret;
+	}
+	
+	public String[] readFileLines(String filename) {
+		String[] ret = new String[0];
+		
+		File file = loadFile(filename);
+		try {
+			Scanner scan = new Scanner(file);
+			while(scan.hasNextLine()) {
+				ret = Arrays.copyOf(ret, ret.length+1);
+				ret[ret.length-1] = scan.nextLine();
+			}
+			scan.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return ret;
+	}
+	
+	public void writeFile(String filename, String[] lines) {
+		try {
+			FileWriter writer = new FileWriter(filename);
+			for(String line : lines) {
+				if(line != lines[lines.length-1]) {
+					writer.write(line+System.lineSeparator());
+				}else {
+					writer.write(line);
+				}
+			}
+			writer.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 	
 }

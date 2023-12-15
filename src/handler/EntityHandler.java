@@ -9,11 +9,9 @@ import backend.obj.GameEntity;
 public class EntityHandler {
 	
 	ArrayList<GameEntity> ents;
-	ArrayList<GameEntity> remove;
 	
 	public void preInit() {
 		ents = new ArrayList<GameEntity>();
-		remove = new ArrayList<GameEntity>();
 	}
 	
 	public void paint(Graphics2D g) {
@@ -23,14 +21,17 @@ public class EntityHandler {
 	}
 	
 	public void update(double delta) {
-		for(int i = 0; i < ents.size(); i++) {
-			ents.get(i).update(delta);
-			if (ents.get(i).isDeleted()) remove.add(ents.get(i));
+		int index = 0;
+		//Changed to a while loop for easier deletion
+		while(index < ents.size()) {
+			GameEntity ent = ents.get(index);
+			ent.update(delta);
+			
+			if(ents.get(index).isDeleted()) {
+				ents.remove(index);
+			}
+			index+=1;
 		}
-		for(GameEntity e : remove) {
-			ents.remove(e);
-		}
-		remove = new ArrayList<>();
 	}
 	
 	/**
